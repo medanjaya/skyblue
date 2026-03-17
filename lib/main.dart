@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
-
-import 'package:skyblue/menu.dart';
+import 'package:skyblue/screens/splash_screen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const SkyblueApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class SkyblueApp extends StatelessWidget {
+  const SkyblueApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'UD Skyblue 1.0 (uks)',
       debugShowCheckedModeBanner: false,
-
+      title: 'Skyblue Inventory',
       theme: ThemeData(
-        useMaterial3: false,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 135, 206, 235),
-        ),
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-
-      home: const Menu(),
+      home: const SplashScreen(),
     );
   }
 }
