@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyblue/screens/stok_screen.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -75,15 +76,12 @@ class _DashboardState extends State<Dashboard> {
                   child: Container(
                     margin: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF90CAF9), // Warna biru muda
+                      color: Colors.white, // Ganti jadi putih agar konten stok terlihat jelas
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Center(
-                      child: Text(
-                        "Halaman $selectedMenu",
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    child: selectedMenu == "MASTER - Stok" 
+                        ? const StokScreen() // Panggil widget StokScreen jika menu dipilih
+                        : Center(child: Text("Halaman $selectedMenu")),
                   ),
                 ),
               ],
