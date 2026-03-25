@@ -21,3 +21,7 @@ flutter:
   assets:
     - assets/
   uses-material-design: true
+
+  assets:
+    - assets/images/background_store.jpg
+    - assets/images/logo_sk.png
