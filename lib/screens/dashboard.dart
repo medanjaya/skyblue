@@ -1,38 +1,65 @@
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  bool isExpanded = true; // Status sidebar buka/tutup
+  String selectedMenu = 'Dashboard'; // Menu yang aktif
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          // Sidebar
-          NavigationRail(
-            backgroundColor: Colors.grey[200],
-            selectedIndex: 0,
-            onDestinationSelected: (int index) {},
-            labelType: NavigationRailLabelType.none,
-            leading: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Icon(Icons.menu),
+          // ================= SIDEBAR =================
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: isExpanded ? 250 : 70, // Lebar berubah sesuai status
+            color: Colors.grey[300],
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                // Tombol Hamburger untuk Toggle
+                Align(
+                  alignment: isExpanded ? Alignment.centerLeft : Alignment.center,
+                  child: IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      setState(() {
+                        isExpanded = !isExpanded;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Daftar Menu
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildMenuItem(Icons.home_outlined, "DASHBOARD"),
+                      _buildExpansionMenu(Icons.menu_book_outlined, "MASTER", ["Stok", "Vendor", "User"]),
+                      _buildExpansionMenu(Icons.shopping_cart_outlined, "TRANSAKSI", ["Penjualan", "Pembelian"]),
+                      _buildExpansionMenu(Icons.description_outlined, "LAPORAN", ["Penjualan", "Pembelian", "Stock"]),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            destinations: const [
-              NavigationRailDestination(icon: Icon(Icons.home_filled), label: Text('Home')),
-              NavigationRailDestination(icon: Icon(Icons.laptop_mac), label: Text('Device')),
-              NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Shop')),
-              NavigationRailDestination(icon: Icon(Icons.description_outlined), label: Text('Report')),
-            ],
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // Main Content
+
+          // ================= MAIN CONTENT =================
           Expanded(
             child: Column(
               children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
+                // Header / Top Bar
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: const [
@@ -42,22 +69,20 @@ class Dashboard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Card Tabel
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
+                
+                // Area Konten Utama (Biru seperti di gambar)
+                Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFF90CAF9), // Warna biru muda
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        Text("DEVICE", style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text("Type", style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text("LAST SIGNED IN", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                    child: Center(
+                      child: Text(
+                        "Halaman $selectedMenu",
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),
@@ -66,6 +91,43 @@ class Dashboard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // Widget untuk menu biasa (tanpa dropdown)
+  Widget _buildMenuItem(IconData icon, String title) {
+    bool isSelected = selectedMenu == title;
+    return ListTile(
+      leading: Icon(icon, color: Colors.black),
+      title: isExpanded ? Text(title, style: const TextStyle(fontWeight: FontWeight.bold)) : null,
+      onTap: () => setState(() => selectedMenu = title),
+      tileColor: isSelected ? Colors.grey[400] : null,
+    );
+  }
+
+  // Widget untuk menu dengan Dropdown (ExpansionTile)
+  Widget _buildExpansionMenu(IconData icon, String title, List<String> subItems) {
+    if (!isExpanded) {
+      // Jika sidebar mengecil, hanya tampilkan Icon saja
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: IconButton(
+          icon: Icon(icon),
+          onPressed: () => setState(() => isExpanded = true),
+        ),
+      );
+    }
+
+    return ExpansionTile(
+      leading: Icon(icon, color: Colors.black),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      children: subItems.map((subTitle) {
+        return ListTile(
+          contentPadding: const EdgeInsets.only(left: 50),
+          title: Text(subTitle),
+          onTap: () => setState(() => selectedMenu = "$title - $subTitle"),
+        );
+      }).toList(),
     );
   }
 }
