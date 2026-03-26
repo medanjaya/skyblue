@@ -43,10 +43,10 @@ class _DashboardState extends State<Dashboard> {
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildMenuItem(Icons.home_outlined, "DASHBOARD"),
-                      _buildExpansionMenu(Icons.menu_book_outlined, "MASTER", ["Stok", "Vendor", "User"]),
-                      _buildExpansionMenu(Icons.shopping_cart_outlined, "TRANSAKSI", ["Penjualan", "Pembelian"]),
-                      _buildExpansionMenu(Icons.description_outlined, "LAPORAN", ["Penjualan", "Pembelian", "Stock"]),
+                      _buildMenuItem(Icons.home_outlined, 'DASHBOARD'),
+                      _buildExpansionMenu(Icons.menu_book_outlined, 'MASTER', ['Stok', 'Vendor', 'User']),
+                      _buildExpansionMenu(Icons.shopping_cart_outlined, 'TRANSAKSI', ['Penjualan', 'Pembelian']),
+                      _buildExpansionMenu(Icons.description_outlined, 'LAPORAN', ['Penjualan', 'Pembelian', 'Stock']),
                     ],
                   ),
                 ),
@@ -61,12 +61,12 @@ class _DashboardState extends State<Dashboard> {
                 // Header / Top Bar
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
+                    children: [
                       Icon(Icons.dark_mode_outlined),
                       SizedBox(width: 10),
-                      Text("Administrator", style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Administrator', style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -79,9 +79,9 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.white, // Ganti jadi putih agar konten stok terlihat jelas
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: selectedMenu == "MASTER - Stok" 
+                    child: selectedMenu == 'MASTER - Stok' 
                         ? const StokScreen() // Panggil widget StokScreen jika menu dipilih
-                        : Center(child: Text("Halaman $selectedMenu")),
+                        : Center(child: Text('Halaman $selectedMenu')),
                   ),
                 ),
               ],
@@ -94,7 +94,7 @@ class _DashboardState extends State<Dashboard> {
 
   // Widget untuk menu biasa (tanpa dropdown)
   Widget _buildMenuItem(IconData icon, String title) {
-    bool isSelected = selectedMenu == title;
+    var isSelected = selectedMenu == title;
     return ListTile(
       leading: Icon(icon, color: Colors.black),
       title: isExpanded ? Text(title, style: const TextStyle(fontWeight: FontWeight.bold)) : null,
@@ -123,7 +123,7 @@ class _DashboardState extends State<Dashboard> {
         return ListTile(
           contentPadding: const EdgeInsets.only(left: 50),
           title: Text(subTitle),
-          onTap: () => setState(() => selectedMenu = "$title - $subTitle"),
+          onTap: () => setState(() => selectedMenu = '$title - $subTitle'),
         );
       }).toList(),
     );

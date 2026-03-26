@@ -4,3 +4,7 @@ linter:
   rules:
     prefer_const_constructors: true  
     omit_local_variable_types: true
+
+analyzer:
+  errors:
+    use_build_context_synchronously: ignore

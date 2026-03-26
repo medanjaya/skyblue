@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+//telah merge ke login.dart
+
+/* import 'package:flutter/material.dart';
 import 'package:skyblue/screens/dashboard.dart';
 // EDIT DI SINI: Pastikan import package projectmu benar
 
@@ -36,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: const AssetImage('assets/images/background_store.jpg'), // Path gambar background
+            image: const AssetImage('assets/background_store.jpg'), // Path gambar background
             fit: BoxFit.cover, // Gambar memenuhi layar
             // Menambahkan filter gelap agar kotak login lebih terbaca
             colorFilter: ColorFilter.mode(
@@ -68,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // EDIT DI SINI: Logo Kecil di Atas Teks Login
                 // ==========================================
                 Image.asset(
-                  'assets/images/logo_sk.png',
+                  'assets/logo_sk.png',
                   width: 60, // Ukuran kecil
                 ),
                 const SizedBox(height: 10),
@@ -132,4 +134,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
+} */

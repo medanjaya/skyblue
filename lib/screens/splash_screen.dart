@@ -1,4 +1,6 @@
-import 'dart:async';
+//cek FlutterSplashScreen di main.dart, sebaiknya pakai yang itu saja
+
+/* import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:skyblue/screens/login_screen.dart';
 
@@ -61,4 +63,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
+} */

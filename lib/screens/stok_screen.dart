@@ -31,11 +31,11 @@ class _StokScreenState extends State<StokScreen> {
   void _filterData() {
     setState(() {
       _dataTampil = _semuaBarang.where((item) {
-        bool matchNama = filterNama == null || item.nama == filterNama;
-        bool matchTipe = filterTipe == null || item.tipe == filterTipe;
-        bool matchMerek = filterMerek == null || item.merek == filterMerek;
-        bool matchStatus = filterStatus == null || item.status == filterStatus;
-        bool matchKode = filterKode == null || item.kode == filterKode;
+        var matchNama = filterNama == null || item.nama == filterNama;
+        var matchTipe = filterTipe == null || item.tipe == filterTipe;
+        var matchMerek = filterMerek == null || item.merek == filterMerek;
+        var matchStatus = filterStatus == null || item.status == filterStatus;
+        var matchKode = filterKode == null || item.kode == filterKode;
         return matchNama && matchTipe && matchMerek && matchStatus && matchKode;
       }).toList();
     });
@@ -129,14 +129,14 @@ class _StokScreenState extends State<StokScreen> {
   // DIALOG 3: TAMBAH & EDIT (DENGAN NOTIFIKASI SUKSES)
   // ============================================================
   void _showItemDialog({Barang? barang}) {
-    bool isEdit = barang != null;
+    var isEdit = barang != null;
     final nameCtrl = TextEditingController(text: isEdit ? barang.nama : "");
     final tipeCtrl = TextEditingController(text: isEdit ? barang.tipe : "");
     final qtyCtrl = TextEditingController(text: isEdit ? barang.qty.toString() : "");
     final ketCtrl = TextEditingController(text: isEdit ? barang.keterangan : "");
-    String? statusVal = isEdit ? barang.status : null;
-    String? merekVal = isEdit ? barang.merek : null;
-    String? kodeVal = isEdit ? barang.kode : null;
+    var statusVal = isEdit ? barang.status : null;
+    var merekVal = isEdit ? barang.merek : null;
+    var kodeVal = isEdit ? barang.kode : null;
 
     showDialog(
       context: context,
