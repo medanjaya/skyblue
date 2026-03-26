@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skyblue/screens/dashboard.dart';
+import 'package:skyblue/dashboard.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                //TODO cek lagi nanti
+                //TODO cek lagi nanti, mungkin bisa diupdate sama yang png
                 Image.asset(
                   'assets/logo_sk.png',
                   width: 60.0,
