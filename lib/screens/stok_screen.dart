@@ -20,7 +20,13 @@ class _StokScreenState extends State<StokScreen> {
   ];
 
   List<Barang> _dataTampil = [];
-  String? filterNama, filterTipe, filterMerek, filterStatus, filterKode;
+  
+  // Controller untuk Filter
+  final filterNamaCtrl = TextEditingController();
+  final filterTipeCtrl = TextEditingController();
+  final filterMerekCtrl = TextEditingController();
+  final filterStatusCtrl = TextEditingController();
+  final filterKodeCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -31,19 +37,17 @@ class _StokScreenState extends State<StokScreen> {
   void _filterData() {
     setState(() {
       _dataTampil = _semuaBarang.where((item) {
-        var matchNama = filterNama == null || item.nama == filterNama;
-        var matchTipe = filterTipe == null || item.tipe == filterTipe;
-        var matchMerek = filterMerek == null || item.merek == filterMerek;
-        var matchStatus = filterStatus == null || item.status == filterStatus;
-        var matchKode = filterKode == null || item.kode == filterKode;
+        var matchNama = filterNamaCtrl.text.isEmpty || item.nama.toLowerCase().contains(filterNamaCtrl.text.toLowerCase());
+        var matchTipe = filterTipeCtrl.text.isEmpty || item.tipe.toLowerCase().contains(filterTipeCtrl.text.toLowerCase());
+        var matchMerek = filterMerekCtrl.text.isEmpty || item.merek.toLowerCase().contains(filterMerekCtrl.text.toLowerCase());
+        var matchStatus = filterStatusCtrl.text.isEmpty || item.status.toLowerCase().contains(filterStatusCtrl.text.toLowerCase());
+        var matchKode = filterKodeCtrl.text.isEmpty || item.kode.toLowerCase().contains(filterKodeCtrl.text.toLowerCase());
         return matchNama && matchTipe && matchMerek && matchStatus && matchKode;
       }).toList();
     });
   }
 
-  // ============================================================
-  // DIALOG 1: KONFIRMASI HAPUS
-  // ============================================================
+  // DIALOG KONFIRMASI HAPUS
   void _showConfirmDelete(Barang item) {
     showDialog(
       context: context,
@@ -91,9 +95,7 @@ class _StokScreenState extends State<StokScreen> {
     );
   }
 
-  // ============================================================
-  // DIALOG 2: NOTIFIKASI BERHASIL (SUCCESS POP-UP)
-  // ============================================================
+  // NOTIFIKASI BERHASIL
   void _showSuccessPopup(String message, IconData icon) {
     showDialog(
       context: context,
@@ -125,18 +127,16 @@ class _StokScreenState extends State<StokScreen> {
     );
   }
 
-  // ============================================================
-  // DIALOG 3: TAMBAH & EDIT (DENGAN NOTIFIKASI SUKSES)
-  // ============================================================
+  // DIALOG TAMBAH & EDIT (SEMUA INPUT KETIK)
   void _showItemDialog({Barang? barang}) {
     var isEdit = barang != null;
     final nameCtrl = TextEditingController(text: isEdit ? barang.nama : "");
     final tipeCtrl = TextEditingController(text: isEdit ? barang.tipe : "");
     final qtyCtrl = TextEditingController(text: isEdit ? barang.qty.toString() : "");
     final ketCtrl = TextEditingController(text: isEdit ? barang.keterangan : "");
-    var statusVal = isEdit ? barang.status : null;
-    var merekVal = isEdit ? barang.merek : null;
-    var kodeVal = isEdit ? barang.kode : null;
+    final statusCtrl = TextEditingController(text: isEdit ? barang.status : "");
+    final merekCtrl = TextEditingController(text: isEdit ? barang.merek : "");
+    final kodeCtrl = TextEditingController(text: isEdit ? barang.kode : "");
 
     showDialog(
       context: context,
@@ -162,10 +162,10 @@ class _StokScreenState extends State<StokScreen> {
                 children: [
                   _buildDialogInput("NAMA BARANG", nameCtrl, width: 220),
                   _buildDialogInput("TIPE", tipeCtrl, width: 220),
-                  _buildDialogDropdown("STATUS", ["Tersedia", "Habis"], statusVal, (v) => statusVal = v, width: 220),
-                  _buildDialogDropdown("MEREK", ["Skyblue", "Vendor A"], merekVal, (v) => merekVal = v, width: 220),
+                  _buildDialogInput("STATUS", statusCtrl, width: 220),
+                  _buildDialogInput("MEREK", merekCtrl, width: 220),
                   _buildDialogInput("QTY BARANG", qtyCtrl, width: 220, isNumber: true),
-                  _buildDialogDropdown("KODE BARANG", ["SKB-001", "SKB-002", "SKB-003"], kodeVal, (v) => kodeVal = v, width: 220),
+                  _buildDialogInput("KODE BARANG", kodeCtrl, width: 220),
                 ],
               ),
               const SizedBox(height: 30),
@@ -186,15 +186,18 @@ class _StokScreenState extends State<StokScreen> {
                       setState(() {
                         if (isEdit) {
                           barang.nama = nameCtrl.text;
+                          barang.tipe = tipeCtrl.text;
+                          barang.status = statusCtrl.text;
+                          barang.merek = merekCtrl.text;
                           barang.qty = int.tryParse(qtyCtrl.text) ?? 0;
-                          barang.status = statusVal ?? barang.status;
+                          barang.kode = kodeCtrl.text;
+                          barang.keterangan = ketCtrl.text;
                         } else {
-                          _semuaBarang.add(Barang(kodeVal ?? "NEW", nameCtrl.text, merekVal ?? "Skyblue", tipeCtrl.text, statusVal ?? "Tersedia", int.tryParse(qtyCtrl.text) ?? 0, "Pcs"));
+                          _semuaBarang.add(Barang(kodeCtrl.text, nameCtrl.text, merekCtrl.text, tipeCtrl.text, statusCtrl.text, int.tryParse(qtyCtrl.text) ?? 0, "Pcs", keterangan: ketCtrl.text));
                         }
                         _filterData();
                       });
                       Navigator.pop(context);
-                      // TAMPILKAN PESAN SUKSES SESUAI FOTO
                       _showSuccessPopup(isEdit ? "ITEM BERHASIL DIPERBARUI" : "ITEM BERHASIL DITAMBAHKAN", Icons.check);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800], padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
@@ -215,20 +218,11 @@ class _StokScreenState extends State<StokScreen> {
     );
   }
 
-  // Widget pendukung (Input & Dropdown) tetap sama...
   Widget _buildDialogInput(String label, TextEditingController ctrl, {double width = 200, bool isNumber = false}) {
     return SizedBox(width: width, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
       const SizedBox(height: 8),
       TextField(controller: ctrl, keyboardType: isNumber ? TextInputType.number : TextInputType.text, decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.all(12), border: OutlineInputBorder())),
-    ]));
-  }
-
-  Widget _buildDialogDropdown(String label, List<String> items, String? val, Function(String?) onChange, {double width = 200}) {
-    return SizedBox(width: width, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 8),
-      DropdownButtonFormField<String>(value: val, isDense: true, decoration: const InputDecoration(contentPadding: EdgeInsets.all(10), border: OutlineInputBorder()), items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 13)))).toList(), onChanged: onChange),
     ]));
   }
 
@@ -239,7 +233,6 @@ class _StokScreenState extends State<StokScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header (Data Stok & Tambah Stok)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -249,7 +242,7 @@ class _StokScreenState extends State<StokScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Filter Card (Design tetap seperti awal)
+          // Filter Card (Semua TextField)
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(15)),
@@ -257,11 +250,11 @@ class _StokScreenState extends State<StokScreen> {
               const Text("Filter Data", style: TextStyle(fontSize: 12, color: Colors.grey)),
               const SizedBox(height: 15),
               Wrap(spacing: 15, runSpacing: 15, children: [
-                _buildFilterDropdown("NAMA BARANG", ["Kaos Polos Blue", "Hoodie Navy"], (v) => filterNama = v),
-                _buildFilterDropdown("TIPE", ["Atasan", "Jaket"], (v) => filterTipe = v),
-                _buildFilterDropdown("MEREK", ["Skyblue", "Vendor A"], (v) => filterMerek = v),
-                _buildFilterDropdown("STATUS", ["Tersedia", "Habis"], (v) => filterStatus = v),
-                _buildFilterDropdown("KODE BARANG", ["SKB-001", "SKB-002"], (v) => filterKode = v),
+                _buildFilterInput("NAMA BARANG", filterNamaCtrl),
+                _buildFilterInput("TIPE", filterTipeCtrl),
+                _buildFilterInput("MEREK", filterMerekCtrl),
+                _buildFilterInput("STATUS", filterStatusCtrl),
+                _buildFilterInput("KODE BARANG", filterKodeCtrl),
               ]),
               const SizedBox(height: 15),
               Align(alignment: Alignment.bottomRight, child: OutlinedButton(onPressed: _filterData, style: OutlinedButton.styleFrom(backgroundColor: Colors.grey[200]), child: const Text("CARI", style: TextStyle(color: Colors.black)))),
@@ -290,9 +283,7 @@ class _StokScreenState extends State<StokScreen> {
                   return DataRow(cells: [
                     DataCell(Row(
                       children: [
-                        // IKON EDIT (PENA)
                         IconButton(icon: const Icon(Icons.edit_note, color: Colors.blue), onPressed: () => _showItemDialog(barang: item)),
-                        // IKON HAPUS (SESUAI REQUEST)
                         IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _showConfirmDelete(item)),
                       ],
                     )),
@@ -300,7 +291,7 @@ class _StokScreenState extends State<StokScreen> {
                     DataCell(Text(item.nama)),
                     DataCell(Text(item.merek)),
                     DataCell(Text(item.tipe)),
-                    DataCell(Text(item.status, style: TextStyle(color: item.status == "Habis" ? Colors.red : Colors.green))),
+                    DataCell(Text(item.status, style: TextStyle(color: item.status.toLowerCase() == "habis" ? Colors.red : Colors.green))),
                     DataCell(Text(item.qty.toString())),
                     DataCell(Text(item.satuan)),
                   ]);
@@ -313,11 +304,15 @@ class _StokScreenState extends State<StokScreen> {
     );
   }
 
-  Widget _buildFilterDropdown(String label, List<String> items, Function(String?) onChanged) {
+  Widget _buildFilterInput(String label, TextEditingController ctrl) {
     return SizedBox(width: 180, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
       const SizedBox(height: 5),
-      DropdownButtonFormField<String>(isExpanded: true, decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 10), border: OutlineInputBorder()), items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 12)))).toList(), onChanged: onChanged),
+      TextField(
+        controller: ctrl,
+        style: const TextStyle(fontSize: 12),
+        decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12), border: OutlineInputBorder()),
+      ),
     ]));
   }
 }

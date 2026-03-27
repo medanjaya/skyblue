@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:skyblue/screens/stok_screen.dart';
+import 'package:skyblue/screens/vendor_screen.dart';
+import 'package:skyblue/screens/sales_screen.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -9,79 +12,183 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool isExpanded = true; // Status sidebar buka/tutup
-  String selectedMenu = 'Dashboard'; // Menu yang aktif
+  bool isExpand = true;
+  String selectedMenu = 'MASTER - Stok';
 
+  // HELPER: Untuk Menu Biasa
+  Widget buildMenuItem(IconData icon, String title, String key) {
+    var isSelected = selectedMenu == key;
+    return ListTile(
+      onTap: () {
+        setState(
+          () {
+            selectedMenu = key;
+          }
+        );
+      },
+      leading: Icon(
+        icon,
+        color: isSelected ? Colors.blue : Colors.black,
+      ),
+      title: isExpand
+      ? Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? Colors.blue : Colors.black,
+        ),
+      )
+      : null,
+    );
+  }
+
+  // HELPER: Untuk Menu Dropdown (MASTER/TRANSAKSI)
+  Widget buildExpansionMenu({required IconData icon, required String title, required List<Widget> children}) {
+    if (!isExpand) {
+      return IconButton(icon: Icon(icon), onPressed: () => setState(() => isExpand = true));
+    }
+    return ExpansionTile(
+      leading: Icon(icon, color: Colors.black),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      children: children,
+    );
+  }
+
+  // HELPER: Untuk Sub-menu (Stok, Vendor, Penjualan)
+  Widget buildSubMenuItem(String title, String menuKey) {
+    var isSelected = selectedMenu == menuKey;
+    return ListTile(
+      contentPadding: const EdgeInsets.only(left: 50),
+      title: Text(title, style: TextStyle(
+        color: isSelected ? Colors.blue : Colors.black,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      )),
+      onTap: () => setState(() => selectedMenu = menuKey),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          // ================= SIDEBAR =================
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: isExpanded ? 250 : 70, // Lebar berubah sesuai status
+            width: isExpand ? 256.0 : 64.0,
             color: Colors.grey[300],
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
-                // Tombol Hamburger untuk Toggle
-                Align(
-                  alignment: isExpanded ? Alignment.centerLeft : Alignment.center,
-                  child: IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () {
-                      setState(() {
-                        isExpanded = !isExpanded;
-                      });
-                    },
-                  ),
+                const SizedBox(height: 16.0),
+                IconButton(
+                  onPressed: () {
+                    setState(
+                      () {
+                        isExpand = !isExpand;
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.menu),
                 ),
-                const SizedBox(height: 20),
-                
-                // Daftar Menu
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildMenuItem(Icons.home_outlined, 'DASHBOARD'),
-                      _buildExpansionMenu(Icons.menu_book_outlined, 'MASTER', ['Stok', 'Vendor', 'User']),
-                      _buildExpansionMenu(Icons.shopping_cart_outlined, 'TRANSAKSI', ['Penjualan', 'Pembelian']),
-                      _buildExpansionMenu(Icons.description_outlined, 'LAPORAN', ['Penjualan', 'Pembelian', 'Stock']),
+                      buildMenuItem(
+                        Icons.home_outlined,
+                        'DASHBOARD',
+                        'DASHBOARD',
+                      ),
+                      buildExpansionMenu(
+                        icon: Icons.menu_book_outlined,
+                        title: 'MASTER',
+                        children: [
+                          buildSubMenuItem(
+                            'Stok',
+                            'MASTER - Stok',
+                          ),
+                          buildSubMenuItem(
+                            'Vendor',
+                            'MASTER - Vendor',
+                          ),
+                        ],
+                      ),
+                      buildExpansionMenu(
+                        icon: Icons.shopping_cart_outlined,
+                        title: 'TRANSAKSI',
+                        children: [
+                          buildSubMenuItem(
+                            'Penjualan',
+                            'TRANSAKSI - Penjualan',
+                          ),
+                          buildSubMenuItem(
+                            'Pembelian',
+                            'TRANSAKSI - Pembelian',
+                          ),
+                        ],
+                      ),
+                      buildMenuItem(
+                        Icons.description_outlined,
+                        'LAPORAN',
+                        'LAPORAN',
+                      ),
                     ],
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    //TODO
+                  },
+                  icon: const Icon(Icons.exit_to_app),
                 ),
               ],
             ),
           ),
-
-          // ================= MAIN CONTENT =================
           Expanded(
             child: Column(
               children: [
-                // Header / Top Bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 32.0,
+                  ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 16.0,
                     children: [
                       Icon(Icons.dark_mode_outlined),
-                      SizedBox(width: 10),
-                      Text('Administrator', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        'Administrator',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                
-                // Area Konten Utama (Biru seperti di gambar)
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white, // Ganti jadi putih agar konten stok terlihat jelas
-                      borderRadius: BorderRadius.circular(10),
+                    margin: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      bottom: 16.0,
                     ),
-                    child: selectedMenu == 'MASTER - Stok' 
-                        ? const StokScreen() // Panggil widget StokScreen jika menu dipilih
-                        : Center(child: Text('Halaman $selectedMenu')),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: switch (selectedMenu) {
+                      'MASTER - Stok' => const StokScreen(),
+                      'MASTER - Vendor' => const VendorScreen(),
+                      'TRANSAKSI - Penjualan' => const SalesScreen(),
+                      String() => Center(
+                        child: Text(
+                          'Halaman $selectedMenu',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    },
                   ),
                 ),
               ],
@@ -89,43 +196,6 @@ class _DashboardState extends State<Dashboard> {
           ),
         ],
       ),
-    );
-  }
-
-  // Widget untuk menu biasa (tanpa dropdown)
-  Widget _buildMenuItem(IconData icon, String title) {
-    var isSelected = selectedMenu == title;
-    return ListTile(
-      leading: Icon(icon, color: Colors.black),
-      title: isExpanded ? Text(title, style: const TextStyle(fontWeight: FontWeight.bold)) : null,
-      onTap: () => setState(() => selectedMenu = title),
-      tileColor: isSelected ? Colors.grey[400] : null,
-    );
-  }
-
-  // Widget untuk menu dengan Dropdown (ExpansionTile)
-  Widget _buildExpansionMenu(IconData icon, String title, List<String> subItems) {
-    if (!isExpanded) {
-      // Jika sidebar mengecil, hanya tampilkan Icon saja
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: IconButton(
-          icon: Icon(icon),
-          onPressed: () => setState(() => isExpanded = true),
-        ),
-      );
-    }
-
-    return ExpansionTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      children: subItems.map((subTitle) {
-        return ListTile(
-          contentPadding: const EdgeInsets.only(left: 50),
-          title: Text(subTitle),
-          onTap: () => setState(() => selectedMenu = '$title - $subTitle'),
-        );
-      }).toList(),
     );
   }
 }

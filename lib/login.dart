@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:skyblue/dashboard.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,15 +15,8 @@ class _LoginState extends State<Login> {
   final SupabaseClient sb = Supabase.instance.client;
   final TextEditingController user = TextEditingController(), pass = TextEditingController();
 
-  bool able = true;
-
-  @override
-  void initState() {
-    super.initState();
-    user.text = '';
-    pass.text = '';
-  }
-
+  bool isAble = true;
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,11 +93,11 @@ class _LoginState extends State<Login> {
                   width: double.infinity,
                   height: 48.0,
                   child: ElevatedButton(
-                    onPressed: able
+                    onPressed: isAble
                     ? () async {
                         setState(
                           () {
-                            able = false;
+                            isAble = false;
                           }
                         );
                         try {
@@ -141,7 +135,7 @@ class _LoginState extends State<Login> {
                         on AuthApiException catch (e) {
                           setState(
                             () {
-                              able = true;
+                              isAble = true;
                             }
                           );
                           ScaffoldMessenger.of(context)
