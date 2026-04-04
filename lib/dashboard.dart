@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:skyblue/screens/stok_screen.dart';
+import 'package:skyblue/stock.dart';
 import 'package:skyblue/screens/vendor_screen.dart';
 import 'package:skyblue/screens/sales_screen.dart';
 
@@ -12,17 +12,17 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool isExpand = true;
-  String selectedMenu = 'MASTER - Stok';
-
-  // HELPER: Untuk Menu Biasa
-  Widget buildMenuItem(IconData icon, String title, String key) {
-    var isSelected = selectedMenu == key;
+  bool isExpand = false;
+  String current = 'MASTER - Stok';
+  
+  Widget buildMenuItem(String key, IconData icon, String label) {
+    final isSelected = current == key;
+    
     return ListTile(
       onTap: () {
         setState(
           () {
-            selectedMenu = key;
+            current = key;
           }
         );
       },
@@ -30,116 +30,154 @@ class _DashboardState extends State<Dashboard> {
         icon,
         color: isSelected ? Colors.blue : Colors.black,
       ),
-      title: isExpand
-      ? Text(
-        title,
+      title: Text(
+        label,
         style: TextStyle(
           color: isSelected ? Colors.blue : Colors.black,
         ),
-      )
-      : null,
+        softWrap: false,
+      ),
     );
   }
 
-  // HELPER: Untuk Menu Dropdown (MASTER/TRANSAKSI)
-  Widget buildExpansionMenu({required IconData icon, required String title, required List<Widget> children}) {
-    if (!isExpand) {
-      return IconButton(icon: Icon(icon), onPressed: () => setState(() => isExpand = true));
-    }
+  Widget buildExpansionMenu(IconData icon, String label, List<Widget> children) {
     return ExpansionTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      onExpansionChanged: (v) {
+        setState(
+          () {
+            isExpand = true;
+          }
+        );
+      },
+      leading: Icon(
+        icon,
+        color: Colors.black,
+      ),
+      title: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+        softWrap: false,
+      ),
+      showTrailingIcon: false,
       children: children,
     );
   }
 
-  // HELPER: Untuk Sub-menu (Stok, Vendor, Penjualan)
-  Widget buildSubMenuItem(String title, String menuKey) {
-    var isSelected = selectedMenu == menuKey;
+  Widget buildSubMenuItem(String key, String label) {
+    final isSelected = current == key;
+
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 50),
-      title: Text(title, style: TextStyle(
-        color: isSelected ? Colors.blue : Colors.black,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      )),
-      onTap: () => setState(() => selectedMenu = menuKey),
+      onTap: () {
+        setState(
+          () {
+            current = key;
+          }
+        );
+      },
+      contentPadding: const EdgeInsets.only(
+        left: 48.0,
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? Colors.blue : Colors.black,
+        ),
+        softWrap: false,
+      ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: isExpand ? 256.0 : 64.0,
-            color: Colors.grey[300],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16.0),
-                IconButton(
-                  onPressed: () {
-                    setState(
-                      () {
-                        isExpand = !isExpand;
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.menu),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      buildMenuItem(
-                        Icons.home_outlined,
-                        'DASHBOARD',
-                        'DASHBOARD',
-                      ),
-                      buildExpansionMenu(
-                        icon: Icons.menu_book_outlined,
-                        title: 'MASTER',
-                        children: [
-                          buildSubMenuItem(
-                            'Stok',
-                            'MASTER - Stok',
-                          ),
-                          buildSubMenuItem(
-                            'Vendor',
-                            'MASTER - Vendor',
-                          ),
-                        ],
-                      ),
-                      buildExpansionMenu(
-                        icon: Icons.shopping_cart_outlined,
-                        title: 'TRANSAKSI',
-                        children: [
-                          buildSubMenuItem(
-                            'Penjualan',
-                            'TRANSAKSI - Penjualan',
-                          ),
-                          buildSubMenuItem(
-                            'Pembelian',
-                            'TRANSAKSI - Pembelian',
-                          ),
-                        ],
-                      ),
-                      buildMenuItem(
-                        Icons.description_outlined,
-                        'LAPORAN',
-                        'LAPORAN',
-                      ),
-                    ],
+          InkWell(
+            onTap: () {},
+            onHover: (v) {
+              setState(
+                () {
+                  isExpand = !isExpand;
+                }
+              );
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: isExpand ? 256.0 : 56.0,
+              color: Colors.grey[300],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 8.0,
+                    ),
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.menu),
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    //TODO
-                  },
-                  icon: const Icon(Icons.exit_to_app),
-                ),
-              ],
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        buildMenuItem(
+                          'DASHBOARD',
+                          Icons.home_outlined,
+                          'DASHBOARD',
+                        ),
+                        buildExpansionMenu(
+                          Icons.menu_book_outlined,
+                          'MASTER',
+                          [
+                            buildSubMenuItem(
+                              'MASTER - Stok',
+                              'Stok',
+                            ),
+                            buildSubMenuItem(
+                              'MASTER - Vendor',
+                              'Vendor',
+                            ),
+                          ],
+                        ),
+                        buildExpansionMenu(
+                          Icons.shopping_cart_outlined,
+                          'TRANSAKSI',
+                          [
+                            buildSubMenuItem(
+                              'TRANSAKSI - Penjualan',
+                              'Penjualan',
+                            ),
+                            buildSubMenuItem(
+                              'TRANSAKSI - Pembelian',
+                              'Pembelian',
+                            ),
+                          ],
+                        ),
+                        buildMenuItem(
+                          'LAPORAN',
+                          Icons.description_outlined,
+                          'LAPORAN',
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 8.0,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        //TODO
+                      },
+                      icon: const Icon(Icons.exit_to_app),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -176,13 +214,13 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: switch (selectedMenu) {
-                      'MASTER - Stok' => const StokScreen(),
+                    child: switch (current) {
+                      'MASTER - Stok' => const Stock(),
                       'MASTER - Vendor' => const VendorScreen(),
                       'TRANSAKSI - Penjualan' => const SalesScreen(),
                       String() => Center(
                         child: Text(
-                          'Halaman $selectedMenu',
+                          'Halaman $current',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),

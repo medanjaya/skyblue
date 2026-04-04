@@ -155,8 +155,8 @@ class _LoginState extends State<Login> {
                       }
                     : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
                       foregroundColor: Colors.black,
+                      backgroundColor: Colors.grey[300],
                       elevation: 2.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
