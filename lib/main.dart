@@ -1,6 +1,3 @@
-//TODO https://gemini.google.com/share/7e099b69a6ec
-// SPLASH -> LOGIN -> DAHSBOARD
-
 import 'package:flutter/material.dart';
 
 import 'package:skyblue/dashboard.dart';

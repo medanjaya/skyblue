@@ -12,8 +12,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool isExpand = false;
-  String current = 'MASTER - Stok';
+  bool isExpand = true;
+  String current = 'DASHBOARD';
   
   Widget buildMenuItem(String key, IconData icon, String label) {
     final isSelected = current == key;
@@ -41,6 +41,18 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget buildExpansionMenu(IconData icon, String label, List<Widget> children) {
+    if (!isExpand) {
+      return ListTile(
+        leading: Icon(
+          icon,
+          color: Colors.black,
+        ),
+        title: Text(
+          label,
+          softWrap: false,
+        ),
+      );
+    }
     return ExpansionTile(
       onExpansionChanged: (v) {
         setState(
@@ -55,9 +67,6 @@ class _DashboardState extends State<Dashboard> {
       ),
       title: Text(
         label,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
         softWrap: false,
       ),
       showTrailingIcon: false,
@@ -96,87 +105,97 @@ class _DashboardState extends State<Dashboard> {
       body: Row(
         children: [
           InkWell(
-            onTap: () {},
+            /* onTap: () {},
             onHover: (v) {
               setState(
                 () {
-                  isExpand = !isExpand;
-                }
+                  isExpand = v;
+                },
               );
-            },
+            }, */
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               width: isExpand ? 256.0 : 56.0,
               color: Colors.grey[300],
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16.0),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8.0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8.0,
+                      ),
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.menu),
+                      ),
                     ),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.menu),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          buildMenuItem(
+                            'DASHBOARD',
+                            Icons.home_outlined,
+                            'DASHBOARD',
+                          ),
+                          buildExpansionMenu(
+                            Icons.menu_book_outlined,
+                            'MASTER',
+                            [
+                              buildSubMenuItem(
+                                'MASTER - Stok',
+                                'STOK',
+                              ),
+                              buildSubMenuItem(
+                                'MASTER - Vendor',
+                                'VENDOR',
+                              ),
+                            ],
+                          ),
+                          buildExpansionMenu(
+                            Icons.shopping_cart_outlined,
+                            'TRANSAKSI',
+                            [
+                              buildSubMenuItem(
+                                'TRANSAKSI - Penjualan',
+                                'PENJUALAN',
+                              ),
+                              buildSubMenuItem(
+                                'TRANSAKSI - Pembelian',
+                                'PEMBELIAN',
+                              ),
+                            ],
+                          ),
+                          buildMenuItem(
+                            'LAPORAN',
+                            Icons.description_outlined,
+                            'LAPORAN',
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        buildMenuItem(
-                          'DASHBOARD',
-                          Icons.home_outlined,
-                          'DASHBOARD',
-                        ),
-                        buildExpansionMenu(
-                          Icons.menu_book_outlined,
-                          'MASTER',
-                          [
-                            buildSubMenuItem(
-                              'MASTER - Stok',
-                              'Stok',
-                            ),
-                            buildSubMenuItem(
-                              'MASTER - Vendor',
-                              'Vendor',
-                            ),
-                          ],
-                        ),
-                        buildExpansionMenu(
-                          Icons.shopping_cart_outlined,
-                          'TRANSAKSI',
-                          [
-                            buildSubMenuItem(
-                              'TRANSAKSI - Penjualan',
-                              'Penjualan',
-                            ),
-                            buildSubMenuItem(
-                              'TRANSAKSI - Pembelian',
-                              'Pembelian',
-                            ),
-                          ],
-                        ),
-                        buildMenuItem(
-                          'LAPORAN',
-                          Icons.description_outlined,
-                          'LAPORAN',
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 8.0,
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        //TODO
+                    ListTile(
+                      onTap: () {
+                        setState(
+                          () {
+                            //TODO
+                          }
+                        );
                       },
-                      icon: const Icon(Icons.exit_to_app),
+                      leading: const Icon(
+                        Icons.exit_to_app,
+                        color: Colors.black,
+                      ),
+                      title: const Text(
+                        'LOGOUT',
+                        softWrap: false,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
