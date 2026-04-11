@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
-class Barang {
-  String kode, nama, merek, tipe, status, satuan, keterangan;
+class Item {
+  String code, name, brand, type, status, quantity, keterangan;
   int qty;
-  Barang(this.kode, this.nama, this.merek, this.tipe, this.status, this.qty, this.satuan, {this.keterangan = ''});
+  Item(this.code, this.name, this.brand, this.type, this.status, this.qty, this.quantity, {this.keterangan = ''});
 }
 
 class Stock extends StatefulWidget {
@@ -19,14 +19,16 @@ class Stock extends StatefulWidget {
 }
 
 class _StockState extends State<Stock> {
-  final List<Barang> _semuaBarang = [
-    Barang('SKB-001', 'Kaos Polos Blue', 'Skyblue', 'Atasan', 'Tersedia', 100, 'Pcs'),
-    Barang('SKB-002', 'Hoodie Navy', 'Skyblue', 'Jaket', 'Habis', 0, 'Pcs'),
+  final List debugItems = [
+    Item('SKB-001', 'Kaos Polos Blue', 'Skyblue', 'Atasan', 'Tersedia', 100, 'Pcs'),
+    Item('SKB-002', 'Hoodie Navy', 'Skyblue', 'Jaket', 'Habis', 0, 'Pcs'),
   ];
 
-  List<Barang> _dataTampil = [];
+  List displayItems = [];
   
-  // Controller untuk Filter
+  int _rowsPerPage = 10;
+  int current = 1;
+  
   final filterNamaCtrl = TextEditingController();
   final filterTipeCtrl = TextEditingController();
   final filterMerekCtrl = TextEditingController();
@@ -36,24 +38,28 @@ class _StockState extends State<Stock> {
   @override
   void initState() {
     super.initState();
-    _dataTampil = List.from(_semuaBarang);
+    displayItems = List.from(debugItems);
   }
 
   void _filterData() {
-    setState(() {
-      _dataTampil = _semuaBarang.where((item) {
-        var matchNama = filterNamaCtrl.text.isEmpty || item.nama.toLowerCase().contains(filterNamaCtrl.text.toLowerCase());
-        var matchTipe = filterTipeCtrl.text.isEmpty || item.tipe.toLowerCase().contains(filterTipeCtrl.text.toLowerCase());
-        var matchMerek = filterMerekCtrl.text.isEmpty || item.merek.toLowerCase().contains(filterMerekCtrl.text.toLowerCase());
-        var matchStatus = filterStatusCtrl.text.isEmpty || item.status.toLowerCase().contains(filterStatusCtrl.text.toLowerCase());
-        var matchKode = filterKodeCtrl.text.isEmpty || item.kode.toLowerCase().contains(filterKodeCtrl.text.toLowerCase());
-        return matchNama && matchTipe && matchMerek && matchStatus && matchKode;
-      }).toList();
-    });
+    setState(
+      () {
+        displayItems = debugItems.where(
+          (item) { //FIXME persingkat
+            final matchNama = filterNamaCtrl.text.isEmpty || item.name.toLowerCase().contains(filterNamaCtrl.text.toLowerCase());
+            final matchTipe = filterTipeCtrl.text.isEmpty || item.type.toLowerCase().contains(filterTipeCtrl.text.toLowerCase());
+            final matchMerek = filterMerekCtrl.text.isEmpty || item.brand.toLowerCase().contains(filterMerekCtrl.text.toLowerCase());
+            final matchStatus = filterStatusCtrl.text.isEmpty || item.status.toLowerCase().contains(filterStatusCtrl.text.toLowerCase());
+            final matchKode = filterKodeCtrl.text.isEmpty || item.code.toLowerCase().contains(filterKodeCtrl.text.toLowerCase());
+            return matchNama && matchTipe && matchMerek && matchStatus && matchKode;
+          },
+        ).toList();
+      },
+    );
   }
 
   // DIALOG KONFIRMASI HAPUS
-  void _showConfirmDelete(Barang item) {
+  void _showConfirmDelete(Item item) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -82,7 +88,7 @@ class _StockState extends State<Stock> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        _semuaBarang.remove(item);
+                        debugItems.remove(item);
                         _filterData();
                       });
                       Navigator.pop(context);
@@ -133,15 +139,15 @@ class _StockState extends State<Stock> {
   }
 
   // DIALOG TAMBAH & EDIT (SEMUA INPUT KETIK)
-  void _showItemDialog({Barang? barang}) {
-    var isEdit = barang != null;
-    final nameCtrl = TextEditingController(text: isEdit ? barang.nama : '');
-    final tipeCtrl = TextEditingController(text: isEdit ? barang.tipe : '');
+  void _showItemDialog({Item? barang}) {
+    final isEdit = barang != null;
+    final nameCtrl = TextEditingController(text: isEdit ? barang.name : '');
+    final typeCtrl = TextEditingController(text: isEdit ? barang.type : '');
     final qtyCtrl = TextEditingController(text: isEdit ? barang.qty.toString() : '');
     final ketCtrl = TextEditingController(text: isEdit ? barang.keterangan : '');
     final statusCtrl = TextEditingController(text: isEdit ? barang.status : '');
-    final merekCtrl = TextEditingController(text: isEdit ? barang.merek : '');
-    final kodeCtrl = TextEditingController(text: isEdit ? barang.kode : '');
+    final brandCtrl = TextEditingController(text: isEdit ? barang.brand : '');
+    final codeCtrl = TextEditingController(text: isEdit ? barang.code : '');
 
     showDialog(
       context: context,
@@ -166,11 +172,11 @@ class _StockState extends State<Stock> {
                 spacing: 30, runSpacing: 20,
                 children: [
                   _buildDialogInput('NAMA BARANG', nameCtrl, width: 220),
-                  _buildDialogInput('TIPE', tipeCtrl, width: 220),
+                  _buildDialogInput('TIPE', typeCtrl, width: 220),
                   _buildDialogInput('STATUS', statusCtrl, width: 220),
-                  _buildDialogInput('MEREK', merekCtrl, width: 220),
+                  _buildDialogInput('MEREK', brandCtrl, width: 220),
                   _buildDialogInput('QTY BARANG', qtyCtrl, width: 220, isNumber: true),
-                  _buildDialogInput('KODE BARANG', kodeCtrl, width: 220),
+                  _buildDialogInput('KODE BARANG', codeCtrl, width: 220),
                 ],
               ),
               const SizedBox(height: 30),
@@ -190,15 +196,15 @@ class _StockState extends State<Stock> {
                     onPressed: () {
                       setState(() {
                         if (isEdit) {
-                          barang.nama = nameCtrl.text;
-                          barang.tipe = tipeCtrl.text;
+                          barang.name = nameCtrl.text;
+                          barang.type = typeCtrl.text;
                           barang.status = statusCtrl.text;
-                          barang.merek = merekCtrl.text;
+                          barang.brand = brandCtrl.text;
                           barang.qty = int.tryParse(qtyCtrl.text) ?? 0;
-                          barang.kode = kodeCtrl.text;
+                          barang.code = codeCtrl.text;
                           barang.keterangan = ketCtrl.text;
                         } else {
-                          _semuaBarang.add(Barang(kodeCtrl.text, nameCtrl.text, merekCtrl.text, tipeCtrl.text, statusCtrl.text, int.tryParse(qtyCtrl.text) ?? 0, 'Pcs', keterangan: ketCtrl.text));
+                          debugItems.add(Item(codeCtrl.text, nameCtrl.text, brandCtrl.text, typeCtrl.text, statusCtrl.text, int.tryParse(qtyCtrl.text) ?? 0, 'Pcs', keterangan: ketCtrl.text));
                         }
                         _filterData();
                       });
@@ -245,6 +251,12 @@ class _StockState extends State<Stock> {
 
   @override
   Widget build(BuildContext context) {
+    // Logika Pagination Sederhana
+    final totalData = debugItems.length;
+    final firstIndex = (current - 1) * _rowsPerPage;
+    final lastIndex = (firstIndex + _rowsPerPage > totalData) ? totalData : firstIndex + _rowsPerPage;
+    final pagedData = debugItems.sublist(firstIndex, lastIndex);
+
     print('hasil waktu: ${DateTime.now().millisecondsSinceEpoch}');
     
     //NOTE cara membuat sign HMAC-SHA256 untuk API
@@ -278,6 +290,7 @@ class _StockState extends State<Stock> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        spacing: 20.0,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -304,11 +317,10 @@ class _StockState extends State<Stock> {
                   foregroundColor: Colors.black,
                   backgroundColor: const Color(0xFF90CAF9),
                 ),
-                child: const Text('TAMBAH STOK'),
+                child: const Text('Tambah Stok'),
               ),
             ],
           ),
-          const SizedBox(height: 20.0),
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -355,77 +367,156 @@ class _StockState extends State<Stock> {
               ],
             ),
           ),
-          const SizedBox(height: 20.0),
           Container(
+            padding: const EdgeInsets.all(16.0),
             width: double.infinity,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade400), //FIXME
               borderRadius: BorderRadius.circular(12.0),
             ),
             child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('ACTION')),
-                  DataColumn(label: Text('KODE BARANG')),
-                  DataColumn(label: Text('NAMA BARANG')),
-                  DataColumn(label: Text('MEREK')),
-                  DataColumn(label: Text('TIPE')),
-                  DataColumn(label: Text('STATUS')),
-                  DataColumn(label: Text('QTY')),
-                  DataColumn(label: Text('SATUAN')),
-                ],
-                rows: _dataTampil.map(
-                  (item) {
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () => _showItemDialog(
-                                  barang: item,
-                                ),
-                                icon: const Icon(
-                                  Icons.edit_note,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => _showConfirmDelete(item),
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  color: Colors.red,
-                                ), 
-                              ),
-                            ],
-                          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 16.0,
+                children: [
+                  Row(
+                    spacing: 8.0,
+                    children: [
+                      const Text('Show'),
+                      Container(
+                        height: 32.0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
                         ),
-                        DataCell(Text(item.kode)),
-                        DataCell(Text(item.nama)),
-                        DataCell(Text(item.merek)),
-                        DataCell(Text(item.tipe)),
-                        DataCell(
-                          Text(
-                            item.status,
-                            style: TextStyle(
-                              color: item.status.toLowerCase() == 'habis'
-                              ? Colors.red
-                              : Colors.green,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey, //FIXME
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButton(
+                          onChanged: (v) {
+                            setState(
+                              () {
+                                _rowsPerPage = v!;
+                                current = 1;
+                              },
+                            );
+                          },
+                          value: _rowsPerPage,
+                          underline: const SizedBox(),
+                          items: [10, 25, 50].map(
+                            (e) {
+                              return DropdownMenuItem(
+                                value: e,
+                                child: Text(e.toString()),
+                              );  
+                            },
+                          ).toList(),
+                        ),
+                      ),
+                      const Text('entries'),
+                    ],
+                  ),
+                  DataTable(
+                    columns: [
+                      'ACTION',
+                      'KODE BARANG',
+                      'NAMA BARANG',
+                      'MEREK',
+                      'TIPE',
+                      'STATUS',
+                      'QTY',
+                      'SATUAN',
+                    ].map(
+                      (e) {
+                        return DataColumn(
+                          label: Text(e),
+                        );
+                      }
+                    ).toList(),
+                    rows: pagedData.map(
+                      (e) {
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => _showItemDialog(
+                                      barang: e,
+                                    ),
+                                    icon: const Icon(
+                                      Icons.edit_note,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _showConfirmDelete(e),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red,
+                                    ), 
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
-                        DataCell(Text(item.qty.toString())),
-                        DataCell(Text(item.satuan)),
-                      ],
-                    );
-                  },
-                ).toList(),
+                            DataCell(Text(e.code)),
+                            DataCell(Text(e.name)),
+                            DataCell(Text(e.brand)),
+                            DataCell(Text(e.type)),
+                            DataCell(
+                              Text(
+                                e.status,
+                                style: TextStyle(
+                                  color: e.status.toLowerCase() == 'habis'
+                                  ? Colors.red
+                                  : Colors.green,
+                                ),
+                              ),
+                            ),
+                            DataCell(Text(e.qty.toString())),
+                            DataCell(Text(e.quantity)),
+                          ],
+                        );
+                      },
+                    ).toList(),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Showing ${totalData == 0 ? 0 : firstIndex + 1} to $lastIndex from $totalData entries'),
+                      _buildPaginationButtons(totalData),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPaginationButtons(int total) {
+    final totalPages = (total / _rowsPerPage).ceil();
+    return Row(
+      children: List.generate(totalPages, (i) {
+        final page = i + 1;
+        return InkWell(
+          onTap: () => setState(() => current = page),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(left: 5),
+            decoration: BoxDecoration(
+              color: current == page ? const Color(0xFF90CAF9) : Colors.grey[200],
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(page.toString()),
+          ),
+        );
+      }),
     );
   }
 }

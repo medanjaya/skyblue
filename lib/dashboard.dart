@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:skyblue/login.dart';
 import 'package:skyblue/stock.dart';
-import 'package:skyblue/screens/vendor_screen.dart';
+import 'package:skyblue/screens/vendor.dart';
 import 'package:skyblue/screens/sales_screen.dart';
 
 class Dashboard extends StatefulWidget {
@@ -12,6 +15,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final user = Supabase.instance.client;
+
   bool isExpand = true;
   String current = 'DASHBOARD';
   
@@ -70,6 +75,7 @@ class _DashboardState extends State<Dashboard> {
         softWrap: false,
       ),
       showTrailingIcon: false,
+      textColor: Colors.black,
       children: children,
     );
   }
@@ -105,6 +111,7 @@ class _DashboardState extends State<Dashboard> {
       body: Row(
         children: [
           InkWell(
+            //FIXME '(event is PointerAddedEvent) == (lastEvent is PointerRemovedEvent)': is not true.
             /* onTap: () {},
             onHover: (v) {
               setState(
@@ -142,16 +149,34 @@ class _DashboardState extends State<Dashboard> {
                             'DASHBOARD',
                           ),
                           buildExpansionMenu(
-                            Icons.menu_book_outlined,
+                            Icons.book_outlined,
                             'MASTER',
                             [
                               buildSubMenuItem(
-                                'MASTER - Stok',
-                                'STOK',
+                                'MASTER_ITEM',
+                                'BARANG',
                               ),
                               buildSubMenuItem(
-                                'MASTER - Vendor',
+                                'MASTER_VENDOR',
                                 'VENDOR',
+                              ),
+                              buildSubMenuItem(
+                                'MASTER_USER',
+                                'USER',
+                              ),
+                            ],
+                          ),
+                          buildExpansionMenu(
+                            Icons.inventory_outlined,
+                            'STOK',
+                            [
+                              buildSubMenuItem(
+                                'STOCK_DATA',
+                                'DATA',
+                              ),
+                              buildSubMenuItem(
+                                'STOCK_ADJUST',
+                                'PENYESUAIAN',
                               ),
                             ],
                           ),
@@ -160,17 +185,17 @@ class _DashboardState extends State<Dashboard> {
                             'TRANSAKSI',
                             [
                               buildSubMenuItem(
-                                'TRANSAKSI - Penjualan',
+                                'TRANSACTION_SELL',
                                 'PENJUALAN',
                               ),
                               buildSubMenuItem(
-                                'TRANSAKSI - Pembelian',
+                                'TRANSACTION_BUY',
                                 'PEMBELIAN',
                               ),
                             ],
                           ),
                           buildMenuItem(
-                            'LAPORAN',
+                            'REPORT',
                             Icons.description_outlined,
                             'LAPORAN',
                           ),
@@ -180,8 +205,30 @@ class _DashboardState extends State<Dashboard> {
                     ListTile(
                       onTap: () {
                         setState(
-                          () {
-                            //TODO
+                          () async {
+                            await user.auth.signOut()
+                            .then(
+                              (r) {
+                                ScaffoldMessenger.of(context)
+                                .showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Sampai jumpa lain waktu.'),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                )
+                                .closed
+                                .then(
+                                  (r) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const Login(),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
                           }
                         );
                       },
@@ -234,9 +281,9 @@ class _DashboardState extends State<Dashboard> {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     child: switch (current) {
-                      'MASTER - Stok' => const Stock(),
-                      'MASTER - Vendor' => const VendorScreen(),
-                      'TRANSAKSI - Penjualan' => const SalesScreen(),
+                      'MASTER_VENDOR' => const Vendor(),
+                      'STOCK_DATA' => const Stock(),
+                      'TRANSACTION_SELL' => const SalesScreen(),
                       String() => Center(
                         child: Text(
                           'Halaman $current',

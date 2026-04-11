@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:skyblue/dashboard.dart';
-import 'package:skyblue/login.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
+
+import 'package:skyblue/dashboard.dart';
+import 'package:skyblue/login.dart';
 
 Future<void> main() async {
   await Supabase.initialize(

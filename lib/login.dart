@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:skyblue/dashboard.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:skyblue/dashboard.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -49,9 +49,8 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                //TODO cek lagi nanti, mungkin bisa diupdate sama yang png
                 Image.asset(
-                  'assets/logo_sk.png',
+                  'assets/logo.png',
                   width: 60.0,
                 ),
                 const SizedBox(height: 8.0),
