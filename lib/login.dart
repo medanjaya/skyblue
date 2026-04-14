@@ -12,8 +12,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final SupabaseClient sb = Supabase.instance.client;
-  final TextEditingController user = TextEditingController(), pass = TextEditingController();
+  final TextEditingController
+  user = TextEditingController(),
+  pass = TextEditingController();
 
   bool isAble = true;
   
@@ -100,7 +101,7 @@ class _LoginState extends State<Login> {
                           }
                         );
                         try {
-                          await sb.auth.signInWithPassword(
+                          await Supabase.instance.client.auth.signInWithPassword(
                             email: user.text,
                             password: pass.text,
                           )

@@ -15,9 +15,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  final user = Supabase.instance.client;
-
-  bool isExpand = true;
+  bool isExpand = true; //FIXME kenapa harus true baru tidak eror?
   String current = 'DASHBOARD';
   
   Widget buildMenuItem(String key, IconData icon, String label) {
@@ -38,6 +36,7 @@ class _DashboardState extends State<Dashboard> {
       title: Text(
         label,
         style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected ? Colors.blue : Colors.black,
         ),
         softWrap: false,
@@ -45,37 +44,32 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget buildExpansionMenu(IconData icon, String label, List<Widget> children) {
-    if (!isExpand) {
-      return ListTile(
-        leading: Icon(
-          icon,
-          color: Colors.black,
-        ),
-        title: Text(
-          label,
-          softWrap: false,
-        ),
-      );
-    }
+  Widget buildExpansionMenu(String key, IconData icon, String label, List<Widget> children) {
+    final isSelected = current.startsWith(key);
+    
     return ExpansionTile(
       onExpansionChanged: (v) {
         setState(
           () {
-            isExpand = true;
+            isExpand = v;
+            current = key;
           }
         );
       },
       leading: Icon(
         icon,
-        color: Colors.black,
+        color: isSelected ? Colors.blue : Colors.black,
       ),
       title: Text(
         label,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? Colors.blue : Colors.black,
+        ),
         softWrap: false,
       ),
       showTrailingIcon: false,
-      textColor: Colors.black,
+      shape: const Border(),
       children: children,
     );
   }
@@ -92,12 +86,11 @@ class _DashboardState extends State<Dashboard> {
         );
       },
       contentPadding: const EdgeInsets.only(
-        left: 48.0,
+        left: 60.0,
       ),
       title: Text(
         label,
         style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected ? Colors.blue : Colors.black,
         ),
         softWrap: false,
@@ -112,14 +105,14 @@ class _DashboardState extends State<Dashboard> {
         children: [
           InkWell(
             //FIXME '(event is PointerAddedEvent) == (lastEvent is PointerRemovedEvent)': is not true.
-            /* onTap: () {},
+            onTap: () {},
             onHover: (v) {
               setState(
                 () {
                   isExpand = v;
                 },
               );
-            }, */
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               width: isExpand ? 256.0 : 56.0,
@@ -136,8 +129,14 @@ class _DashboardState extends State<Dashboard> {
                         left: 8.0,
                       ),
                       child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.menu),
+                        onPressed: () {
+                          setState(
+                            () {
+                              isExpand = !isExpand;
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.menu), //FIXME hilangkan splash dan highlight
                       ),
                     ),
                     Expanded(
@@ -149,6 +148,7 @@ class _DashboardState extends State<Dashboard> {
                             'DASHBOARD',
                           ),
                           buildExpansionMenu(
+                            'MASTER',
                             Icons.book_outlined,
                             'MASTER',
                             [
@@ -167,6 +167,7 @@ class _DashboardState extends State<Dashboard> {
                             ],
                           ),
                           buildExpansionMenu(
+                            'STOCK',
                             Icons.inventory_outlined,
                             'STOK',
                             [
@@ -181,6 +182,7 @@ class _DashboardState extends State<Dashboard> {
                             ],
                           ),
                           buildExpansionMenu(
+                            'TRANSACTION',
                             Icons.shopping_cart_outlined,
                             'TRANSAKSI',
                             [
@@ -206,7 +208,7 @@ class _DashboardState extends State<Dashboard> {
                       onTap: () {
                         setState(
                           () async {
-                            await user.auth.signOut()
+                            await Supabase.instance.client.auth.signOut()
                             .then(
                               (r) {
                                 ScaffoldMessenger.of(context)
@@ -233,7 +235,7 @@ class _DashboardState extends State<Dashboard> {
                         );
                       },
                       leading: const Icon(
-                        Icons.exit_to_app,
+                        Icons.logout,
                         color: Colors.black,
                       ),
                       title: const Text(
@@ -280,7 +282,7 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: switch (current) {
+                    child: switch (current) { //TODO tambahkan menu lainnya
                       'MASTER_VENDOR' => const Vendor(),
                       'STOCK_DATA' => const Stock(),
                       'TRANSACTION_SELL' => const SalesScreen(),

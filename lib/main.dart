@@ -23,8 +23,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
-
     return MaterialApp(
       title: 'UD Skyblue Inventory 1.0 (uks)',
       debugShowCheckedModeBanner: false,
@@ -39,7 +37,7 @@ class MainApp extends StatelessWidget {
       home: FlutterSplashScreen.fadeIn(
         backgroundColor: const Color.fromARGB(255, 135, 206, 235),
         childWidget: Image.asset('assets/logo.png'),
-        nextScreen: user != null
+        nextScreen: Supabase.instance.client.auth.currentUser != null
         ? const Dashboard()
         : const Login(),
       ),
