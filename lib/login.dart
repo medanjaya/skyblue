@@ -74,6 +74,7 @@ class _LoginState extends State<Login> {
                     labelText: 'Username',
                     border: OutlineInputBorder(),
                   ),
+                  enabled: isAble,
                 ),
                 const SizedBox(height: 16.0),
                 TextField(
@@ -87,6 +88,7 @@ class _LoginState extends State<Login> {
                     labelText: 'Password',
                     border: OutlineInputBorder(),
                   ),
+                  enabled: isAble,
                 ),
                 const SizedBox(height: 24.0),
                 SizedBox(
@@ -100,19 +102,19 @@ class _LoginState extends State<Login> {
                             isAble = false;
                           }
                         );
-                        try {
+                        try { //TODO handle timeout login contohnya ketika tidak ada jaringan
                           await Supabase.instance.client.auth.signInWithPassword(
                             email: user.text,
                             password: pass.text,
                           )
                           .then(
-                            (v) {
-                              if (v.user != null) {
+                            (r) {
+                              if (r.user != null) {
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Selamat datang kembali, ${v.user!.email}.'
+                                      'Selamat datang kembali, ${r.user!.email}.'
                                     ),
                                     duration: const Duration(seconds: 3),
                                   ),

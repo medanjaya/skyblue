@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:skyblue/login.dart';
-import 'package:skyblue/stock.dart';
-import 'package:skyblue/screens/vendor.dart';
-import 'package:skyblue/screens/sales_screen.dart';
+import 'package:skyblue/page/vendor.dart';
+import 'package:skyblue/page/stock.dart';
+import 'package:skyblue/page/sell.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -21,6 +21,8 @@ class _DashboardState extends State<Dashboard> {
   Widget buildMenuItem(String key, IconData icon, String label) {
     final isSelected = current == key;
     
+    //FIXME listtile dan expansiontile
+    // Leading widget consumes the entire tile width (including ListTile.contentPadding).
     return ListTile(
       onTap: () {
         setState(
@@ -31,13 +33,19 @@ class _DashboardState extends State<Dashboard> {
       },
       leading: Icon(
         icon,
-        color: isSelected ? Colors.blue : Colors.black,
+        color: isSelected
+        ? Colors.blue
+        : Colors.black,
       ),
       title: Text(
         label,
         style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.blue : Colors.black,
+          fontWeight: isSelected
+          ? FontWeight.bold
+          : FontWeight.normal,
+          color: isSelected
+          ? Colors.blue
+          : Colors.black,
         ),
         softWrap: false,
       ),
@@ -51,20 +59,25 @@ class _DashboardState extends State<Dashboard> {
       onExpansionChanged: (v) {
         setState(
           () {
-            isExpand = v;
             current = key;
           }
         );
       },
       leading: Icon(
         icon,
-        color: isSelected ? Colors.blue : Colors.black,
+        color: isSelected
+        ? Colors.blue
+        : Colors.black,
       ),
       title: Text(
         label,
         style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.blue : Colors.black,
+          fontWeight: isSelected
+          ? FontWeight.bold
+          : FontWeight.normal,
+          color: isSelected
+          ? Colors.blue
+          : Colors.black,
         ),
         softWrap: false,
       ),
@@ -91,7 +104,9 @@ class _DashboardState extends State<Dashboard> {
       title: Text(
         label,
         style: TextStyle(
-          color: isSelected ? Colors.blue : Colors.black,
+          color: isSelected
+          ? Colors.blue
+          : Colors.black,
         ),
         softWrap: false,
       ),
@@ -104,7 +119,6 @@ class _DashboardState extends State<Dashboard> {
       body: Row(
         children: [
           InkWell(
-            //FIXME '(event is PointerAddedEvent) == (lastEvent is PointerRemovedEvent)': is not true.
             onTap: () {},
             onHover: (v) {
               setState(
@@ -113,7 +127,7 @@ class _DashboardState extends State<Dashboard> {
                 },
               );
             },
-            child: AnimatedContainer(
+            child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
               duration: const Duration(milliseconds: 300),
               width: isExpand ? 256.0 : 56.0,
               color: Colors.grey[300],
@@ -124,19 +138,10 @@ class _DashboardState extends State<Dashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 8.0,
-                      ),
-                      child: IconButton(
-                        onPressed: () {
-                          setState(
-                            () {
-                              isExpand = !isExpand;
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.menu), //FIXME hilangkan splash dan highlight
+                    const ListTile(
+                      leading: Icon(
+                        Icons.menu,
+                        color: Colors.black,
                       ),
                     ),
                     Expanded(
@@ -210,7 +215,7 @@ class _DashboardState extends State<Dashboard> {
                           () async {
                             await Supabase.instance.client.auth.signOut()
                             .then(
-                              (r) {
+                              (r) { //TODO ganti ke notif konfirmasi
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   const SnackBar(
@@ -261,7 +266,7 @@ class _DashboardState extends State<Dashboard> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     spacing: 16.0,
                     children: [
-                      Icon(Icons.dark_mode_outlined),
+                      Icon(Icons.dark_mode_outlined), //TODO ganti ke iconbutton lalu tambahkan fiturnya
                       Text(
                         'Administrator',
                         style: TextStyle(
@@ -282,19 +287,31 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: switch (current) { //TODO tambahkan menu lainnya
-                      'MASTER_VENDOR' => const Vendor(),
-                      'STOCK_DATA' => const Stock(),
-                      'TRANSACTION_SELL' => const SalesScreen(),
-                      String() => Center(
-                        child: Text(
-                          'Halaman $current',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: switch (current) { //TODO tambahkan menu lainnya
+                        //'DASHBOARD' => ,
+                        //'MASTER' => ,
+                        //'MASTER_ITEM' => ,
+                        'MASTER_VENDOR' => const Vendor(),
+                        //'MASTER_USER' => ,
+                        //'STOCK' => ,
+                        'STOCK_DATA' => const Stock(),
+                        //'STOCK_ADJUST' => ,
+                        //'TRANSACTION' => ,
+                        'TRANSACTION_SELL' => const Sell(),
+                        //'TRANSACTION_BUY' => ,
+                        //'REPORT' => ,
+                        String() => Center(
+                          child: Text(
+                            'Halaman $current',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    },
+                      },
+                    ),
                   ),
                 ),
               ],
