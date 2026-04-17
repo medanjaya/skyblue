@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:skyblue/login.dart';
-import 'package:skyblue/page/vendor.dart';
-import 'package:skyblue/page/stock.dart';
-import 'package:skyblue/page/sell.dart';
+import 'package:skyblue/page/home.dart';
+import 'package:skyblue/page/master/item.dart';
+import 'package:skyblue/page/master/vendor.dart';
+import 'package:skyblue/page/master/member.dart';
+import 'package:skyblue/page/stock/data.dart';
+import 'package:skyblue/page/stock/adjust.dart';
+import 'package:skyblue/page/transaction/sell.dart';
+import 'package:skyblue/page/transaction/buy.dart';
+import 'package:skyblue/page/report.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -16,7 +22,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   bool isExpand = true;
-  String current = 'DASHBOARD';
+  String current = 'HOME';
   
   Widget buildMenuItem(String key, IconData icon, String label) {
     final isSelected = current == key;
@@ -148,7 +154,7 @@ class _DashboardState extends State<Dashboard> {
                       child: ListView(
                         children: [
                           buildMenuItem(
-                            'DASHBOARD',
+                            'HOME',
                             Icons.home_outlined,
                             'DASHBOARD',
                           ),
@@ -166,7 +172,7 @@ class _DashboardState extends State<Dashboard> {
                                 'VENDOR',
                               ),
                               buildSubMenuItem(
-                                'MASTER_USER',
+                                'MASTER_MEMBER',
                                 'USER',
                               ),
                             ],
@@ -290,18 +296,18 @@ class _DashboardState extends State<Dashboard> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: switch (current) { //TODO tambahkan menu lainnya
-                        //'DASHBOARD' => ,
+                        'HOME' => const Home(),
                         //'MASTER' => ,
-                        //'MASTER_ITEM' => ,
+                        'MASTER_ITEM' => const Item(),
                         'MASTER_VENDOR' => const Vendor(),
-                        //'MASTER_USER' => ,
+                        'MASTER_MEMBER' => const Member(),
                         //'STOCK' => ,
-                        'STOCK_DATA' => const Stock(),
-                        //'STOCK_ADJUST' => ,
+                        'STOCK_DATA' => const Data(),
+                        'STOCK_ADJUST' => const Adjust(),
                         //'TRANSACTION' => ,
                         'TRANSACTION_SELL' => const Sell(),
-                        //'TRANSACTION_BUY' => ,
-                        //'REPORT' => ,
+                        'TRANSACTION_BUY' => const Buy(),
+                        'REPORT' => const Report(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',

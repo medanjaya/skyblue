@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Stock extends StatefulWidget {
-  const Stock({super.key});
+class Data extends StatefulWidget {
+  const Data({super.key});
 
   @override
-  State<Stock> createState() => _StockState();
+  State<Data> createState() => _DataState();
 }
 
-class _StockState extends State<Stock> {
+class _DataState extends State<Data> {
   final List<Map> fields = [
     {
       'key': 'code',
