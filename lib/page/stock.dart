@@ -8,31 +8,51 @@ class Stock extends StatefulWidget {
 }
 
 class _StockState extends State<Stock> {
-  final List<Map> filters = [
+  final List<Map> fields = [
     {
+      'key': 'code',
       'name': 'KODE BARANG',
       'controller': TextEditingController(),
     },
     {
+      'key': 'name',
       'name': 'NAMA BARANG',
       'controller': TextEditingController(),
     },
     {
+      'key': 'brand',
       'name': 'MEREK',
       'controller': TextEditingController(),
     },
     {
+      'key': 'type',
       'name': 'TIPE',
       'controller': TextEditingController(),
     },
     {
+      'key': 'status',
       'name': 'STATUS',
+      'controller': TextEditingController(),
+    },
+    {
+      'key': 'quantity',
+      'name': 'QTY',
+      'controller': TextEditingController(),
+    },
+    {
+      'key': 'unit',
+      'name': 'SATUAN',
+      'controller': TextEditingController(),
+    },
+    {
+      'key': 'detail',
+      'name': 'KETERANGAN',
       'controller': TextEditingController(),
     },
   ];
 
-  final List debugItems = List.generate(
-    100,
+  final List<Map> debugItems = List.generate(
+    2,
     (i) {
       return i.isOdd
       ? {
@@ -43,6 +63,7 @@ class _StockState extends State<Stock> {
         'status': 'Tersedia',
         'quantity': 100,
         'unit': 'Pcs',
+        'detail': '',
       }
       : {
         'code': 'SKB-002',
@@ -52,50 +73,47 @@ class _StockState extends State<Stock> {
         'status': 'Habis',
         'quantity': 50,
         'unit': 'Pcs',
+        'detail': '',
       };
     },
-  ); //FIXME ganti ke api
+  ); //TODO ganti ke api
 
-  int rows = 10;
-  int current = 1;
+  List display = [];
+  int rows = 10, current = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    display = List.from(debugItems);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final total = debugItems.length;
-    final first = (current - 1) * rows;
-    final last = (first + rows > total) ? total : first + rows;
-    final pages = debugItems.sublist(first, last);
+    final
+    total = display.length,
+    first = (current - 1) * rows,
+    last = (first + rows > total) ? total : first + rows,
+    pages = display.sublist(first, last);
     
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20.0,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 16.0,
-              ),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 135, 206, 235),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: const Text(
-                'Data Stok',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 16.0,
+          ),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 135, 206, 235),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: const Text(
+            'Data Stok',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
             ),
-            ElevatedButton(
-              onPressed: () {}, //TODO _showItemDialog()
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 135, 206, 235),
-              ),
-              child: const Text('Tambah Stok'),
-            ),
-          ],
+          ),
         ),
         Container(
           padding: const EdgeInsets.all(16.0),
@@ -119,9 +137,11 @@ class _StockState extends State<Stock> {
               Row(
                 spacing: 16.0,
                 children: List.generate(
-                  filters.length,
+                  fields.indexWhere(
+                    (e) => e['key'] == 'quantity',
+                  ),
                   (i) {
-                    final filter = filters[i];
+                    final field = fields[i];
     
                     return Expanded(
                       child: Column(
@@ -129,15 +149,17 @@ class _StockState extends State<Stock> {
                         spacing: 4.0,
                         children: [
                           Text(
-                            filter['name'],
+                            field['name'],
                             style: const TextStyle(
                               fontSize: 10.0,
                               color: Colors.grey,
                             ),
                           ),
                           TextField(
-                            onChanged: (v) {}, //TODO
-                            controller: filter['controller'],
+                            onChanged: (v) {
+                              filterItems();
+                            },
+                            controller: field['controller'],
                             decoration: const InputDecoration(
                               isDense: true,
                               contentPadding: EdgeInsets.symmetric(
@@ -157,14 +179,20 @@ class _StockState extends State<Stock> {
                 alignment: Alignment.bottomRight,
                 child: OutlinedButton(
                   onPressed: () {
-                    setState(() {});
-                  }, //TODO _filterData,
+                    for (final e in fields) {
+                      e['controller'].clear();
+                    }
+                    
+                    filterItems();
+                  },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
                   ),
                   child: const Text(
-                    'CARI',
-                    style: TextStyle(color: Colors.black),
+                    'RESET',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
@@ -225,7 +253,7 @@ class _StockState extends State<Stock> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: DataTable(
+                    child: DataTable( //FIXME jarak kolom dan tinggi berubah ketika kosong
                       columns: [
                         'ACTION',
                         'KODE BARANG',
@@ -247,31 +275,26 @@ class _StockState extends State<Stock> {
                           return DataRow(
                             cells: [
                               DataCell(
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {}, /* TODO _showItemDialog(
-                                        barang: e,
-                                      ), */
-                                      icon: const Icon(
-                                        Icons.edit_note,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {}, /* TODO _showConfirmDelete(e) */
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.red,
-                                      ), 
-                                    ),
-                                  ],
+                                IconButton(
+                                  onPressed: () {}, //TODO dialog informasi item
+                                  icon: const Icon(
+                                    Icons.info_outline,
+                                    color: Colors.blue,
+                                  ), 
                                 ),
                               ),
-                              DataCell(Text(e['code'])), //FIXME perbaiki format kode
-                              DataCell(Text(e['name'])),
-                              DataCell(Text(e['brand'])),
-                              DataCell(Text(e['type'])),
+                              DataCell(
+                                Text(e['code']),
+                              ),
+                              DataCell(
+                                Text(e['name']),
+                              ),
+                              DataCell(
+                                Text(e['brand']),
+                              ),
+                              DataCell(
+                                Text(e['type']),
+                              ),
                               DataCell(
                                 Text(
                                   e['status'],
@@ -282,8 +305,12 @@ class _StockState extends State<Stock> {
                                   ),
                                 ),
                               ),
-                              DataCell(Text(e['quantity'].toString())),
-                              DataCell(Text(e['unit'])),
+                              DataCell(
+                                Text(e['quantity'].toString()),
+                              ),
+                              DataCell(
+                                Text(e['unit']),
+                              ),
                             ],
                           );
                         },
@@ -336,6 +363,32 @@ class _StockState extends State<Stock> {
           ),
         ),
       ],
+    );
+  }
+
+  void filterItems() {
+    setState(
+      () {
+        display = List.from(
+          debugItems.where(
+            (e) {
+              final result = [];
+              
+              for (final f in fields) {
+                result.add(
+                  e[f['key']].toString().toLowerCase().contains(
+                    f['controller'].text.toLowerCase(),
+                  ),
+                );
+              }
+              
+              return result.every(
+                (e) => e == true,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

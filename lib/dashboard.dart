@@ -15,7 +15,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool isExpand = true; //FIXME kenapa harus true baru tidak eror?
+  bool isExpand = true;
   String current = 'DASHBOARD';
   
   Widget buildMenuItem(String key, IconData icon, String label) {
