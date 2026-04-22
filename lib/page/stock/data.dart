@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Data extends StatefulWidget {
@@ -10,42 +12,42 @@ class Data extends StatefulWidget {
 class _DataState extends State<Data> {
   final List<Map> fields = [
     {
-      'key': 'code',
+      'key': 'CODE',
       'name': 'KODE BARANG',
       'controller': TextEditingController(),
     },
     {
-      'key': 'name',
+      'key': 'NAME',
       'name': 'NAMA BARANG',
       'controller': TextEditingController(),
     },
     {
-      'key': 'brand',
+      'key': 'BRAND',
       'name': 'MEREK',
       'controller': TextEditingController(),
     },
     {
-      'key': 'type',
+      'key': 'TYPE',
       'name': 'TIPE',
       'controller': TextEditingController(),
     },
     {
-      'key': 'status',
+      'key': 'STATUS',
       'name': 'STATUS',
       'controller': TextEditingController(),
     },
     {
-      'key': 'quantity',
+      'key': 'QUANTITY',
       'name': 'QTY',
       'controller': TextEditingController(),
     },
     {
-      'key': 'unit',
+      'key': 'UNIT',
       'name': 'SATUAN',
       'controller': TextEditingController(),
     },
     {
-      'key': 'detail',
+      'key': 'DETAIL',
       'name': 'KETERANGAN',
       'controller': TextEditingController(),
     },
@@ -56,24 +58,24 @@ class _DataState extends State<Data> {
     (i) {
       return i.isOdd
       ? {
-        'code': 'SKB-001',
-        'name': 'Kaos Polos Blue',
-        'brand': 'Skyblue',
-        'type': 'Atasan',
-        'status': 'Tersedia',
-        'quantity': 100,
-        'unit': 'Pcs',
-        'detail': '',
+        'CODE': 'SKB-001',
+        'NAME': 'Kaos Polos Blue',
+        'BRAND': 'Skyblue',
+        'TYPE': 'Atasan',
+        'STATUS': 'Tersedia',
+        'QUANTITY': 100,
+        'UNIT': 'Pcs',
+        'DETAIL': '',
       }
       : {
-        'code': 'SKB-002',
-        'name': 'Hoodie Navy',
-        'brand': 'Skyblue',
-        'type': 'Jaket',
-        'status': 'Habis',
-        'quantity': 50,
-        'unit': 'Pcs',
-        'detail': '',
+        'CODE': 'SKB-002',
+        'NAME': 'Hoodie Navy',
+        'BRAND': 'Skyblue',
+        'TYPE': 'Jaket',
+        'STATUS': 'Habis',
+        'QUANTITY': 50,
+        'UNIT': 'Pcs',
+        'DETAIL': '',
       };
     },
   ); //TODO ganti ke api
@@ -138,7 +140,7 @@ class _DataState extends State<Data> {
                 spacing: 16.0,
                 children: List.generate(
                   fields.indexWhere(
-                    (e) => e['key'] == 'quantity',
+                    (e) => e['key'] == 'QUANTITY',
                   ),
                   (i) {
                     final field = fields[i];
@@ -253,7 +255,7 @@ class _DataState extends State<Data> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: DataTable( //FIXME jarak kolom dan tinggi berubah ketika kosong
+                    child: DataTable( //FIXME jarak kolom berubah ketika kosong
                       columns: [
                         'ACTION',
                         'KODE BARANG',
@@ -284,32 +286,32 @@ class _DataState extends State<Data> {
                                 ),
                               ),
                               DataCell(
-                                Text(e['code']),
+                                Text(e['CODE']),
                               ),
                               DataCell(
-                                Text(e['name']),
+                                Text(e['NAME']),
                               ),
                               DataCell(
-                                Text(e['brand']),
+                                Text(e['BRAND']),
                               ),
                               DataCell(
-                                Text(e['type']),
+                                Text(e['TYPE']),
                               ),
                               DataCell(
                                 Text(
-                                  e['status'],
+                                  e['STATUS'],
                                   style: TextStyle(
-                                    color: e['status'].toLowerCase() == 'habis'
+                                    color: e['STATUS'].toLowerCase() == 'habis'
                                     ? Colors.red
                                     : Colors.green,
                                   ),
                                 ),
                               ),
                               DataCell(
-                                Text(e['quantity'].toString()),
+                                Text(e['QUANTITY'].toString()),
                               ),
                               DataCell(
-                                Text(e['unit']),
+                                Text(e['UNIT']),
                               ),
                             ],
                           );
@@ -324,7 +326,7 @@ class _DataState extends State<Data> {
                     Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
                     Row(
                       children: List.generate(
-                        (total / rows).ceil(),
+                        max(1, (total / rows).ceil()),
                         (i) {
                           final page = i + 1;
             
@@ -339,7 +341,7 @@ class _DataState extends State<Data> {
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               margin: const EdgeInsets.only(
-                                left: 5,
+                                left: 8.0,
                               ),
                               decoration: BoxDecoration(
                                 color: current == page

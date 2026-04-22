@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:window_manager/window_manager.dart';
+
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
-import 'package:skyblue/dashboard.dart';
+import 'package:skyblue/home.dart';
 import 'package:skyblue/login.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   await Supabase.initialize(
     url: 'https://nodpqwqildvzjpnechui.supabase.co',
     anonKey: 'sb_publishable_AhZMwxayR5KdKMoAfJvmhQ_m5RWaUZX',
@@ -14,6 +18,9 @@ Future<void> main() async {
       detectSessionInUri: false,
     ),
   );
+
+  await windowManager.ensureInitialized();
+  //TODO await windowManager.setFullScreen(true);
 
   runApp(const MainApp());
 }
@@ -38,7 +45,7 @@ class MainApp extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 135, 206, 235),
         childWidget: Image.asset('assets/logo.png'),
         nextScreen: Supabase.instance.client.auth.currentUser != null
-        ? const Dashboard()
+        ? const Home()
         : const Login(),
       ),
     );

@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:skyblue/login.dart';
-import 'package:skyblue/page/home.dart';
+import 'package:skyblue/page/dashboard.dart';
 import 'package:skyblue/page/master/item.dart';
-import 'package:skyblue/page/master/vendor.dart';
 import 'package:skyblue/page/master/member.dart';
 import 'package:skyblue/page/stock/data.dart';
 import 'package:skyblue/page/stock/adjust.dart';
@@ -13,18 +12,217 @@ import 'package:skyblue/page/transaction/sell.dart';
 import 'package:skyblue/page/transaction/buy.dart';
 import 'package:skyblue/page/report.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<Home> createState() => _HomeState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _HomeState extends State<Home> {
   bool isExpand = true;
-  String current = 'HOME';
-  
-  Widget buildMenuItem(String key, IconData icon, String label) {
+  String current = 'DASHBOARD';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          InkWell(
+            onTap: () {},
+            onHover: (v) {
+              setState(
+                () {
+                  isExpand = v;
+                },
+              );
+            },
+            child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
+              duration: const Duration(milliseconds: 300),
+              width: isExpand ? 256.0 : 56.0,
+              color: Colors.grey[300], //FIXME param ini dengan cara yang ajaib menutup splashnya listtile
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ListTile(
+                      leading: Icon(
+                        Icons.menu,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          menuItem(
+                            'DASHBOARD',
+                            Icons.home_outlined,
+                            'DASHBOARD',
+                          ),
+                          expansionMenu(
+                            'MASTER',
+                            Icons.book_outlined,
+                            'MASTER',
+                            [
+                              subMenuItem(
+                                'MASTER_ITEM',
+                                'BARANG',
+                              ),
+                              subMenuItem(
+                                'MASTER_MEMBER',
+                                'USER',
+                              ),
+                            ],
+                          ),
+                          expansionMenu(
+                            'STOCK',
+                            Icons.inventory_outlined,
+                            'STOK',
+                            [
+                              subMenuItem(
+                                'STOCK_DATA',
+                                'DATA',
+                              ),
+                              subMenuItem(
+                                'STOCK_ADJUST',
+                                'PENYESUAIAN',
+                              ),
+                            ],
+                          ),
+                          expansionMenu(
+                            'TRANSACTION',
+                            Icons.shopping_cart_outlined,
+                            'TRANSAKSI',
+                            [
+                              subMenuItem(
+                                'TRANSACTION_SELL',
+                                'PENJUALAN',
+                              ),
+                              subMenuItem(
+                                'TRANSACTION_BUY',
+                                'PEMBELIAN',
+                              ),
+                            ],
+                          ),
+                          menuItem(
+                            'REPORT',
+                            Icons.description_outlined,
+                            'LAPORAN',
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () async {
+                        await Supabase.instance.client.auth.signOut()
+                        .then(
+                          (r) { //TODO ganti ke notif konfirmasi
+                            ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                              const SnackBar(
+                                content: Text('Sampai jumpa lain waktu.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            )
+                            .closed
+                            .then(
+                              (r) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Login(),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                      leading: const Icon(
+                        Icons.logout,
+                        color: Colors.black,
+                      ),
+                      title: const Text(
+                        'LOGOUT',
+                        softWrap: false,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 32.0,
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 16.0,
+                    children: [
+                      //TODO ganti ke iconbutton lalu tambahkan fiturnya
+                      Icon(Icons.dark_mode_outlined),
+                      Icon(Icons.person_outline),
+                      Text(
+                        'Administrator',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      bottom: 16.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: switch (current) {
+                        'DASHBOARD' => const Dashboard(),
+                        'MASTER_ITEM' => const Item(),
+                        'MASTER_MEMBER' => const Member(),
+                        'STOCK_DATA' => const Data(),
+                        'STOCK_ADJUST' => const Adjust(),
+                        'TRANSACTION_SELL' => const Sell(),
+                        'TRANSACTION_BUY' => const Buy(),
+                        'REPORT' => const Report(),
+                        String() => Center(
+                          child: Text(
+                            'Halaman $current',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget menuItem(String key, IconData icon, String label) {
     final isSelected = current == key;
     
     //FIXME listtile dan expansiontile
@@ -58,17 +256,10 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget buildExpansionMenu(String key, IconData icon, String label, List<Widget> children) {
+  Widget expansionMenu(String key, IconData icon, String label, List<Widget> children) {
     final isSelected = current.startsWith(key);
     
     return ExpansionTile(
-      onExpansionChanged: (v) {
-        setState(
-          () {
-            current = key;
-          }
-        );
-      },
       leading: Icon(
         icon,
         color: isSelected
@@ -93,7 +284,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget buildSubMenuItem(String key, String label) {
+  Widget subMenuItem(String key, String label) {
     final isSelected = current == key;
 
     return ListTile(
@@ -115,215 +306,6 @@ class _DashboardState extends State<Dashboard> {
           : Colors.black,
         ),
         softWrap: false,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          InkWell(
-            onTap: () {},
-            onHover: (v) {
-              setState(
-                () {
-                  isExpand = v;
-                },
-              );
-            },
-            child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
-              duration: const Duration(milliseconds: 300),
-              width: isExpand ? 256.0 : 56.0,
-              color: Colors.grey[300],
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ListTile(
-                      leading: Icon(
-                        Icons.menu,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          buildMenuItem(
-                            'HOME',
-                            Icons.home_outlined,
-                            'DASHBOARD',
-                          ),
-                          buildExpansionMenu(
-                            'MASTER',
-                            Icons.book_outlined,
-                            'MASTER',
-                            [
-                              buildSubMenuItem(
-                                'MASTER_ITEM',
-                                'BARANG',
-                              ),
-                              buildSubMenuItem(
-                                'MASTER_VENDOR',
-                                'VENDOR',
-                              ),
-                              buildSubMenuItem(
-                                'MASTER_MEMBER',
-                                'USER',
-                              ),
-                            ],
-                          ),
-                          buildExpansionMenu(
-                            'STOCK',
-                            Icons.inventory_outlined,
-                            'STOK',
-                            [
-                              buildSubMenuItem(
-                                'STOCK_DATA',
-                                'DATA',
-                              ),
-                              buildSubMenuItem(
-                                'STOCK_ADJUST',
-                                'PENYESUAIAN',
-                              ),
-                            ],
-                          ),
-                          buildExpansionMenu(
-                            'TRANSACTION',
-                            Icons.shopping_cart_outlined,
-                            'TRANSAKSI',
-                            [
-                              buildSubMenuItem(
-                                'TRANSACTION_SELL',
-                                'PENJUALAN',
-                              ),
-                              buildSubMenuItem(
-                                'TRANSACTION_BUY',
-                                'PEMBELIAN',
-                              ),
-                            ],
-                          ),
-                          buildMenuItem(
-                            'REPORT',
-                            Icons.description_outlined,
-                            'LAPORAN',
-                          ),
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        setState(
-                          () async {
-                            await Supabase.instance.client.auth.signOut()
-                            .then(
-                              (r) { //TODO ganti ke notif konfirmasi
-                                ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Sampai jumpa lain waktu.'),
-                                    duration: Duration(seconds: 3),
-                                  ),
-                                )
-                                .closed
-                                .then(
-                                  (r) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const Login(),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          }
-                        );
-                      },
-                      leading: const Icon(
-                        Icons.logout,
-                        color: Colors.black,
-                      ),
-                      title: const Text(
-                        'LOGOUT',
-                        softWrap: false,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16.0,
-                    horizontal: 32.0,
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 16.0,
-                    children: [
-                      Icon(Icons.dark_mode_outlined), //TODO ganti ke iconbutton lalu tambahkan fiturnya
-                      Text(
-                        'Administrator',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(
-                      left: 16.0,
-                      right: 16.0,
-                      bottom: 16.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: switch (current) { //TODO tambahkan menu lainnya
-                        'HOME' => const Home(),
-                        //'MASTER' => ,
-                        'MASTER_ITEM' => const Item(),
-                        'MASTER_VENDOR' => const Vendor(),
-                        'MASTER_MEMBER' => const Member(),
-                        //'STOCK' => ,
-                        'STOCK_DATA' => const Data(),
-                        'STOCK_ADJUST' => const Adjust(),
-                        //'TRANSACTION' => ,
-                        'TRANSACTION_SELL' => const Sell(),
-                        'TRANSACTION_BUY' => const Buy(),
-                        'REPORT' => const Report(),
-                        String() => Center(
-                          child: Text(
-                            'Halaman $current',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

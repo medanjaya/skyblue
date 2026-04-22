@@ -1,3 +1,5 @@
+//TODO gunakan dropdown ketika input kode/nama barang
+
 import 'package:flutter/material.dart';
 
 class Sell extends StatefulWidget {

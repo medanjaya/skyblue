@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:skyblue/dashboard.dart';
+import 'package:skyblue/home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -100,9 +100,10 @@ class _LoginState extends State<Login> {
                         setState(
                           () {
                             isAble = false;
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
                           }
                         );
-                        try { //TODO handle timeout login contohnya ketika tidak ada jaringan
+                        try {
                           await Supabase.instance.client.auth.signInWithPassword(
                             email: user.text,
                             password: pass.text,
@@ -125,7 +126,7 @@ class _LoginState extends State<Login> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const Dashboard(),
+                                        builder: (context) => const Home(),
                                       ),
                                     );
                                   },
@@ -135,24 +136,19 @@ class _LoginState extends State<Login> {
                           );
                         }
                         on AuthApiException catch (e) {
-                          setState(
-                            () {
-                              isAble = true;
-                            }
+                          showExceptionSnackBar(
+                            switch (e.code as String) {
+                              'invalid_credentials' => 'Username atau Password salah!',
+                              'validation_failed' => 'Masukkan Username dan Password terlebih dahulu!',
+                              String() => 'Ada yang salah, mohon coba beberapa saat lagi.',
+                            },
                           );
-                          ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                switch (e.code as String) {
-                                  'invalid_credentials' => 'Username atau Password salah!',
-                                  'validation_failed' => 'Masukkan Username dan Password terlebih dahulu!',
-                                  String() => 'Ada yang salah, coba beberapa saat lagi.',
-                                },
-                              ),
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
+                        }
+                        on AuthRetryableFetchException {
+                          showExceptionSnackBar('Tidak terhubung ke internet saat ini!');
+                        }
+                        catch (e) {
+                          showExceptionSnackBar('Ada yang salah, mohon hubungi pengembang.');
                         }
                       }
                     : null,
@@ -164,12 +160,18 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text(
+                    child: isAble
+                    ? const Text(
                       'Login', 
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,
                       ),
+                    )
+                    : const SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: CircularProgressIndicator(),
                     ),
                   ),
                 ),
@@ -177,6 +179,21 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void showExceptionSnackBar(String label) {
+    setState(
+      () {
+        isAble = true;
+      }
+    );
+    ScaffoldMessenger.of(context)
+    .showSnackBar(
+      SnackBar(
+        content: Text(label),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
