@@ -173,7 +173,7 @@ class _DataState extends State<Data> {
                           ),
                         ],
                       ),
-                    ); 
+                    );
                   },
                 ),
               ),

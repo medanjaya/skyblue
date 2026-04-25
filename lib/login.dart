@@ -56,7 +56,7 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 8.0),
                 const Text(
-                  'LOGIN TO YOUR ACCOUNT', 
+                  'MASUK KE AKUN ANDA', 
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
                     fontSize: 16.0,
@@ -162,7 +162,7 @@ class _LoginState extends State<Login> {
                     ),
                     child: isAble
                     ? const Text(
-                      'Login', 
+                      'MASUK', 
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,

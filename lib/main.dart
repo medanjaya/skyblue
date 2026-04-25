@@ -1,8 +1,12 @@
+//FIXME agar user tidak bisa resize ukuran windows dsb.
+// 1. flutter pub add window_manager
+// 2. import 'package:window_manager/window_manager.dart';
+// 3. di main() tambahkan await windowManager.ensureInitialized();
+// 4. lalu await windowManager.setFullScreen(true);
+
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:window_manager/window_manager.dart';
-
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
 import 'package:skyblue/home.dart';
@@ -18,9 +22,6 @@ Future<void> main() async {
       detectSessionInUri: false,
     ),
   );
-
-  await windowManager.ensureInitialized();
-  //TODO await windowManager.setFullScreen(true);
 
   runApp(const MainApp());
 }
