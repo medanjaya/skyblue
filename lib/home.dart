@@ -196,38 +196,24 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(
-                        left: 16.0,
-                        right: 16.0,
-                        bottom: 16.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: switch (current) {
-                          'DASHBOARD' => const Dashboard(),
-                          'MASTER_ITEM' => const Item(),
-                          'MASTER_MEMBER' => const Member(),
-                          'STOCK_DATA' => const Data(),
-                          'STOCK_ADJUST' => const Adjust(),
-                          'TRANSACTION_SELL' => const Sell(),
-                          'TRANSACTION_BUY' => const Buy(),
-                          'REPORT' => const Report(),
-                          String() => Center(
-                            child: Text(
-                              'Halaman $current',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                    child: switch (current) {
+                      'DASHBOARD' => const Dashboard(),
+                      'MASTER_ITEM' => const Item(),
+                      'MASTER_MEMBER' => const Member(),
+                      'STOCK_DATA' => const Data(),
+                      'STOCK_ADJUST' => const Adjust(),
+                      'TRANSACTION_SELL' => const Sell(),
+                      'TRANSACTION_BUY' => const Buy(),
+                      'REPORT' => const Report(),
+                      String() => Center(
+                        child: Text(
+                          'Halaman $current',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
-                        },
+                        ),
                       ),
-                    ),
+                    },
                   ),
                 ],
               ),
