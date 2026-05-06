@@ -18,6 +18,14 @@ class _AdjustState extends State<Adjust> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Penyesuaian Stok'),
+      ),
+      
+      body: const Center(
+        child: Text('Fitur penyesuaian stok akan segera hadir!'),
+      ),
+    );
   }
 }
