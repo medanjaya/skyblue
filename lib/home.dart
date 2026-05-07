@@ -5,12 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:skyblue/login.dart';
 import 'package:skyblue/page/dashboard.dart';
 import 'package:skyblue/page/master/item.dart';
-import 'package:skyblue/page/master/member.dart';
-import 'package:skyblue/page/stock/data.dart';
-import 'package:skyblue/page/stock/adjust.dart';
-import 'package:skyblue/page/transaction/sell.dart';
-import 'package:skyblue/page/transaction/buy.dart';
-import 'package:skyblue/page/report.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -39,8 +33,8 @@ class _HomeState extends State<Home> {
             },
             child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
               duration: const Duration(milliseconds: 300),
-              width: isExpand ? 256.0 : 56.0,
-              color: Colors.grey[300], //FIXME param ini dengan cara yang ajaib menutup splashnya listtile
+              color: const Color.fromARGB(40, 135, 206, 235), //FIXME kalau alphanya 255 nutupin splashnya listtile
+              width: isExpand ? 256.0 : 58.0, //FIXME kurangi magic number seperti ini
               child: OverflowBox(
                 alignment: Alignment.topLeft,
                 maxWidth: 256.0,
@@ -102,18 +96,33 @@ class _HomeState extends State<Home> {
                               [
                                 subMenuItem(
                                   'TRANSACTION_SELL',
-                                  'PENJUALAN',
+                                  'JUAL',
                                 ),
                                 subMenuItem(
                                   'TRANSACTION_BUY',
+                                  'BELI',
+                                ),
+                              ],
+                            ),
+                            expansionMenu(
+                              'REPORT',
+                              Icons.description_outlined,
+                              'LAPORAN',
+                              [
+                                subMenuItem(
+                                  'REPORT_SALES',
+                                  'PENJUALAN',
+                                ),
+                                subMenuItem(
+                                  'REPORT_PROCURE',
                                   'PEMBELIAN',
                                 ),
                               ],
                             ),
                             menuItem(
-                              'REPORT',
-                              Icons.description_outlined,
-                              'LAPORAN',
+                              'SYNC',
+                              Icons.sync_alt,
+                              'SINKRONISASI',
                             ),
                           ],
                         ),
@@ -161,7 +170,7 @@ class _HomeState extends State<Home> {
           ),
           Expanded(
             child: ColoredBox(
-              color: Colors.grey.shade50,
+              color: Colors.white,
               child: Column(
                 children: [
                   Container(
@@ -172,24 +181,39 @@ class _HomeState extends State<Home> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 16.0,
+                      spacing: 8.0,
                       children: [
                         IconButton(
                           onPressed: () {
-                            //TODO tambahkan terang gelap
+                            //TODO fitur terang gelap
                           },
                           icon: const Icon(Icons.dark_mode_outlined),
                         ),
                         IconButton(
                           onPressed: () {
-                            //TODO tambahkan profil ganti password dan lain lain
+                            //TODO fitur profil ganti password dan lain lain
                           },
                           icon: const Icon(Icons.person_outline),
                         ),
-                        const Text(
-                          'Administrator',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                        const SizedBox(
+                          width: 128.0,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Column( //TODO nama user dan role
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Guy Hawkins'),
+                                Text(
+                                  'Administrator',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -197,36 +221,28 @@ class _HomeState extends State<Home> {
                   ),
                   Expanded(
                     child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(40, 135, 206, 235),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
                       margin: const EdgeInsets.only(
                         left: 16.0,
                         right: 16.0,
                         bottom: 16.0,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: switch (current) {
-                          'DASHBOARD' => const Dashboard(),
-                          'MASTER_ITEM' => const Item(),
-                          'MASTER_MEMBER' => const Member(),
-                          'STOCK_DATA' => const Data(),
-                          'STOCK_ADJUST' => const Adjust(),
-                          'TRANSACTION_SELL' => const Sell(),
-                          'TRANSACTION_BUY' => const Buy(),
-                          'REPORT' => const Report(),
-                          String() => Center(
-                            child: Text(
-                              'Halaman $current',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      child: switch (current) {
+                        'DASHBOARD' => const Dashboard(),
+                        'MASTER_ITEM' => const Item(),
+                        String() => Center(
+                          child: Text(
+                            'Halaman $current',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        },
-                      ),
+                        ),
+                      },
                     ),
                   ),
                 ],
@@ -258,12 +274,12 @@ class _HomeState extends State<Home> {
       title: Text(
         label,
         style: TextStyle(
-          fontWeight: isSelected
-          ? FontWeight.bold
-          : FontWeight.normal,
           color: isSelected
           ? Colors.blue
           : Colors.black,
+          fontWeight: isSelected
+          ? FontWeight.bold
+          : FontWeight.normal,
         ),
         softWrap: false,
       ),
@@ -283,12 +299,12 @@ class _HomeState extends State<Home> {
       title: Text(
         label,
         style: TextStyle(
-          fontWeight: isSelected
-          ? FontWeight.bold
-          : FontWeight.normal,
           color: isSelected
           ? Colors.blue
           : Colors.black,
+          fontWeight: isSelected
+          ? FontWeight.bold
+          : FontWeight.normal,
         ),
         softWrap: false,
       ),

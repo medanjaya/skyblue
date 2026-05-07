@@ -1,9 +1,3 @@
-//FIXME agar user tidak bisa resize ukuran windows dsb.
-// 1. flutter pub add window_manager
-// 2. import 'package:window_manager/window_manager.dart';
-// 3. di main() tambahkan await windowManager.ensureInitialized();
-// 4. lalu await windowManager.setFullScreen(true);
-
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +5,12 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 
 import 'package:skyblue/home.dart';
 import 'package:skyblue/login.dart';
+
+/* FIXME agar user tidak bisa resize ukuran windows dsb.
+1. flutter pub add window_manager
+2. import 'package:window_manager/window_manager.dart';
+3. di main() tambahkan await windowManager.ensureInitialized();
+4. lalu await windowManager.setFullScreen(true); */
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,13 +38,13 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: false,
         colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.grey,
+          primarySwatch: Colors.blue, //FIXME paskan ini
         ),
       ),
 
       home: FlutterSplashScreen.fadeIn(
         backgroundColor: const Color.fromARGB(255, 135, 206, 235),
-        childWidget: Image.asset('assets/logo.png'),
+        childWidget: Image.asset('assets/splash.png'),
         nextScreen: Supabase.instance.client.auth.currentUser != null
         ? const Home()
         : const Login(),

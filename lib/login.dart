@@ -16,7 +16,10 @@ class _LoginState extends State<Login> {
   user = TextEditingController(),
   pass = TextEditingController();
 
-  bool isAble = true;
+  bool
+  isAble = true,
+  isHide = true,
+  isCheck = false;
   
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class _LoginState extends State<Login> {
             padding: const EdgeInsets.all(24.0),
             width: 384.0,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.85), 
+              color: const Color.fromARGB(225, 135, 206, 235), 
               borderRadius: BorderRadius.circular(20.0),
               boxShadow: const [
                 BoxShadow(
@@ -49,59 +52,78 @@ class _LoginState extends State<Login> {
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              spacing: 16.0,
               children: [
                 Image.asset(
                   'assets/logo.png',
-                  width: 60.0,
+                  width: 84.0,
                 ),
-                const SizedBox(height: 8.0),
-                const Text(
-                  'MASUK KE AKUN ANDA', 
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 16.0,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 24.0),
                 TextField(
                   controller: user,
                   decoration: const InputDecoration(
+                    labelText: 'Username',
+                    isDense: true,
                     prefixIcon: Icon(
                       Icons.person_outline,
-                      color: Colors.grey,
                     ),
-                    labelText: 'Username',
                     border: OutlineInputBorder(),
                   ),
                   enabled: isAble,
                 ),
-                const SizedBox(height: 16.0),
                 TextField(
                   controller: pass,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: Colors.grey,
-                    ),
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    isDense: true,
+                    prefixIcon: const Icon(
+                      Icons.lock_outline,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(
+                          () {
+                            isHide = !isHide;
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        isHide
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                      ),
+                    ),
+                    border: const OutlineInputBorder(),
                   ),
+                  obscureText: isHide,
                   enabled: isAble,
                 ),
-                const SizedBox(height: 24.0),
+                Row(
+                  spacing: 8.0,
+                  children: [
+                    Checkbox(
+                      onChanged: (v) {
+                        setState(
+                          () {
+                            isCheck = v!;
+                          },
+                        );
+                      },
+                      value: isCheck,
+                    ),
+                    const Text('Remember Me?'),
+                  ],
+                ),
                 SizedBox(
                   width: double.infinity,
                   height: 48.0,
                   child: ElevatedButton(
-                    onPressed: isAble
+                    onPressed: isAble //TODO fitur remember me dari isCheck
                     ? () async {
                         setState(
                           () {
                             isAble = false;
                             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          }
+                          },
                         );
                         try {
                           await Supabase.instance.client.auth.signInWithPassword(
@@ -154,7 +176,7 @@ class _LoginState extends State<Login> {
                     : null,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.black,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.white,
                       elevation: 2.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
@@ -164,8 +186,8 @@ class _LoginState extends State<Login> {
                     ? const Text(
                       'MASUK', 
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
                         fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     )
                     : const SizedBox(
@@ -187,7 +209,7 @@ class _LoginState extends State<Login> {
     setState(
       () {
         isAble = true;
-      }
+      },
     );
     ScaffoldMessenger.of(context)
     .showSnackBar(
