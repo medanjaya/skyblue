@@ -220,6 +220,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
+<<<<<<< HEAD
                     child: Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
@@ -244,6 +245,26 @@ class _HomeState extends State<Home> {
                         ),
                       },
                     ),
+=======
+                    child: switch (current) {
+                      'DASHBOARD' => const Dashboard(),
+                      'MASTER_ITEM' => const Item(),
+                      'MASTER_MEMBER' => const Member(),
+                      'STOCK_DATA' => const Data(),
+                      'STOCK_ADJUST' => const Adjust(),
+                      'TRANSACTION_SELL' => const Sell(),
+                      'TRANSACTION_BUY' => const Buy(),
+                      'REPORT' => const Report(),
+                      String() => Center(
+                        child: Text(
+                          'Halaman $current',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    },
+>>>>>>> skyblue/frederick
                   ),
                 ],
               ),
