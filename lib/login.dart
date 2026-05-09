@@ -63,9 +63,7 @@ class _LoginState extends State<Login> {
                   decoration: const InputDecoration(
                     labelText: 'Username',
                     isDense: true,
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                    ),
+                    prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(),
                   ),
                   enabled: isAble,
@@ -75,9 +73,7 @@ class _LoginState extends State<Login> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     isDense: true,
-                    prefixIcon: const Icon(
-                      Icons.lock_outline,
-                    ),
+                    prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(

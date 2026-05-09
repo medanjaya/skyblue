@@ -38,7 +38,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(30, 135, 206, 235),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: const Row(
@@ -55,7 +55,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(30, 135, 206, 235),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Column(
@@ -79,7 +79,7 @@ class _DashboardState extends State<Dashboard> {
                               return Container(
                                 padding: const EdgeInsets.all(16.0),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: const Color.fromARGB(40, 135, 206, 235),
                                   borderRadius: BorderRadius.circular(12.0),
                                 ),
                                 child: const Column(

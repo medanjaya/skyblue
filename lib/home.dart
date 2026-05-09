@@ -5,6 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:skyblue/login.dart';
 import 'package:skyblue/page/dashboard.dart';
 import 'package:skyblue/page/master/item.dart';
+import 'package:skyblue/page/master/member.dart';
+import 'package:skyblue/page/stock/data.dart';
+import 'package:skyblue/page/stock/adjust.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -220,8 +223,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
-<<<<<<< HEAD
-                    child: Container(
+                    child: Container( //FIXME URGENT pertimbangkan hapus container ini (yap)
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(40, 135, 206, 235),
@@ -235,6 +237,9 @@ class _HomeState extends State<Home> {
                       child: switch (current) {
                         'DASHBOARD' => const Dashboard(),
                         'MASTER_ITEM' => const Item(),
+                        'MASTER_MEMBER' => const Member(),
+                        'STOCK_DATA' => const Data(),
+                        'STOCK_ADJUST' => const Adjust(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',
@@ -245,26 +250,6 @@ class _HomeState extends State<Home> {
                         ),
                       },
                     ),
-=======
-                    child: switch (current) {
-                      'DASHBOARD' => const Dashboard(),
-                      'MASTER_ITEM' => const Item(),
-                      'MASTER_MEMBER' => const Member(),
-                      'STOCK_DATA' => const Data(),
-                      'STOCK_ADJUST' => const Adjust(),
-                      'TRANSACTION_SELL' => const Sell(),
-                      'TRANSACTION_BUY' => const Buy(),
-                      'REPORT' => const Report(),
-                      String() => Center(
-                        child: Text(
-                          'Halaman $current',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    },
->>>>>>> skyblue/frederick
                   ),
                 ],
               ),

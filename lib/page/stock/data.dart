@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 
-class Item extends StatefulWidget {
-  const Item({super.key});
+class Data extends StatefulWidget {
+  const Data({super.key});
 
   @override
-  State<Item> createState() => _ItemState();
+  State<Data> createState() => _DataState();
 }
 
-class _ItemState extends State<Item> {
+class _DataState extends State<Data> {
   final List<Map> fields = [
     {
       'key': 'CODE',
@@ -29,6 +29,11 @@ class _ItemState extends State<Item> {
       'controller': TextEditingController(),
     },
     {
+      'key': 'BRAND',
+      'name': 'MEREK',
+      'controller': TextEditingController(),
+    },
+    {
       'key': 'PRICE',
       'name': 'HARGA',
       'controller': TextEditingController(),
@@ -36,6 +41,11 @@ class _ItemState extends State<Item> {
     {
       'key': 'STATUS',
       'name': 'STATUS',
+      'controller': TextEditingController(),
+    },
+    {
+      'key': 'QUANTITY',
+      'name': 'KUANTITAS',
       'controller': TextEditingController(),
     },
   ];
@@ -48,15 +58,19 @@ class _ItemState extends State<Item> {
         'CODE': 'SKB-001',
         'NAME': 'Kaos Polos Blue',
         'CATEGORY': 'Atasan',
+        'BRAND': 'NO BRAND',
         'PRICE': 40000,
         'STATUS': 'Tersedia',
+        'QUANTITY': 264,
       }
       : {
         'CODE': 'SKB-002',
         'NAME': 'Hoodie Navy',
         'CATEGORY': 'Jaket',
+        'BRAND': 'LEONIDAS',
         'PRICE': 125000,
         'STATUS': 'Habis',
+        'QUANTITY': 0,
       };
     },
   ); //TODO ganti ke api
@@ -82,18 +96,7 @@ class _ItemState extends State<Item> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Data Barang'),
-            TextButton(
-              onPressed: () {
-                //TODO tambah barang, cek versi sebelumnya
-              },
-              child: const Text('Tambah Baru'),
-            ),
-          ],
-        ),
+        const Text('Data Stok'),
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -219,8 +222,10 @@ class _ItemState extends State<Item> {
                         'KODE',
                         'NAMA BARANG',
                         'KATEGORI',
+                        'MEREK',
                         'HARGA',
                         'STATUS',
+                        'KUANTITAS',
                       ].map(
                         (e) {
                           return DataColumn(
@@ -262,6 +267,9 @@ class _ItemState extends State<Item> {
                                 Text(e['CATEGORY']),
                               ),
                               DataCell(
+                                Text(e['BRAND']),
+                              ),
+                              DataCell(
                                 Text(NumberFormat.decimalPattern('id_ID').format(e['PRICE']).toString()),
                               ),
                               DataCell(
@@ -273,6 +281,9 @@ class _ItemState extends State<Item> {
                                     : Colors.green,
                                   ),
                                 ),
+                              ),
+                              DataCell(
+                                Text(NumberFormat.decimalPattern('id_ID').format(e['QUANTITY']).toString()),
                               ),
                             ],
                           );
