@@ -8,6 +8,8 @@ import 'package:skyblue/page/master/item.dart';
 import 'package:skyblue/page/master/member.dart';
 import 'package:skyblue/page/stock/data.dart';
 import 'package:skyblue/page/stock/adjust.dart';
+import 'package:skyblue/page/transaction/sell.dart';
+import 'package:skyblue/page/transaction/buy.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -34,10 +36,12 @@ class _HomeState extends State<Home> {
                 },
               );
             },
+            highlightColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
             child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
               duration: const Duration(milliseconds: 300),
-              color: const Color.fromARGB(40, 135, 206, 235), //FIXME kalau alphanya 255 nutupin splashnya listtile
-              width: isExpand ? 256.0 : 58.0, //FIXME kurangi magic number seperti ini
+              color: const Color.fromARGB(40, 135, 206, 235),
+              width: isExpand ? 256.0 : 58.0,
               child: OverflowBox(
                 alignment: Alignment.topLeft,
                 maxWidth: 256.0,
@@ -223,23 +227,17 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Expanded(
-                    child: Container( //FIXME URGENT pertimbangkan hapus container ini (yap)
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(40, 135, 206, 235),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      margin: const EdgeInsets.only(
-                        left: 16.0,
-                        right: 16.0,
-                        bottom: 16.0,
-                      ),
+                    child: Container(
+                      padding: const EdgeInsets.all(24.0),
+                      color: const Color.fromARGB(40, 135, 206, 235),
                       child: switch (current) {
                         'DASHBOARD' => const Dashboard(),
                         'MASTER_ITEM' => const Item(),
                         'MASTER_MEMBER' => const Member(),
                         'STOCK_DATA' => const Data(),
                         'STOCK_ADJUST' => const Adjust(),
+                        'TRANSACTION_SELL' => const Sell(),
+                        'TRANSACTION_BUY' => const Buy(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',
