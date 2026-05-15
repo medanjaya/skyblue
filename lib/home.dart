@@ -10,6 +10,8 @@ import 'package:skyblue/page/stock/data.dart';
 import 'package:skyblue/page/stock/adjust.dart';
 import 'package:skyblue/page/transaction/sell.dart';
 import 'package:skyblue/page/transaction/buy.dart';
+import 'package:skyblue/page/report/sales.dart';
+import 'package:skyblue/page/report/procure.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -238,6 +240,8 @@ class _HomeState extends State<Home> {
                         'STOCK_ADJUST' => const Adjust(),
                         'TRANSACTION_SELL' => const Sell(),
                         'TRANSACTION_BUY' => const Buy(),
+                        'REPORT_SALES' => const Sales(),
+                        'REPORT_PROCURE' => const Procure(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',
