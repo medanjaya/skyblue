@@ -12,6 +12,7 @@ import 'package:skyblue/page/transaction/sell.dart';
 import 'package:skyblue/page/transaction/buy.dart';
 import 'package:skyblue/page/report/sales.dart';
 import 'package:skyblue/page/report/procure.dart';
+import 'package:skyblue/page/sync.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -21,6 +22,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final ExpansionTileController
+  master = ExpansionTileController(),
+  stock = ExpansionTileController(),
+  transaction = ExpansionTileController(),
+  report = ExpansionTileController();
+
   bool isExpand = true;
   String current = 'DASHBOARD';
 
@@ -35,12 +42,13 @@ class _HomeState extends State<Home> {
               setState(
                 () {
                   isExpand = v;
+                  collapseExpansions();
                 },
               );
             },
             highlightColor: Colors.transparent,
             splashFactory: NoSplash.splashFactory,
-            child: AnimatedContainer( //FIXME ketika sidebar minimize expansiontile tetap terbuka
+            child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               color: const Color.fromARGB(40, 135, 206, 235),
               width: isExpand ? 256.0 : 58.0,
@@ -82,6 +90,7 @@ class _HomeState extends State<Home> {
                                   'USER',
                                 ),
                               ],
+                              master,
                             ),
                             expansionMenu(
                               'STOCK',
@@ -97,6 +106,7 @@ class _HomeState extends State<Home> {
                                   'PENYESUAIAN',
                                 ),
                               ],
+                              stock,
                             ),
                             expansionMenu(
                               'TRANSACTION',
@@ -112,6 +122,7 @@ class _HomeState extends State<Home> {
                                   'BELI',
                                 ),
                               ],
+                              transaction,
                             ),
                             expansionMenu(
                               'REPORT',
@@ -127,6 +138,7 @@ class _HomeState extends State<Home> {
                                   'PEMBELIAN',
                                 ),
                               ],
+                              report,
                             ),
                             menuItem(
                               'SYNC',
@@ -242,6 +254,7 @@ class _HomeState extends State<Home> {
                         'TRANSACTION_BUY' => const Buy(),
                         'REPORT_SALES' => const Sales(),
                         'REPORT_PROCURE' => const Procure(),
+                        'SYNC' => const Sync(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',
@@ -294,10 +307,11 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget expansionMenu(String key, IconData icon, String label, List<Widget> children) {
+  Widget expansionMenu(String key, IconData icon, String label, List<Widget> children, ExpansionTileController controller) {
     final isSelected = current.startsWith(key);
     
     return ExpansionTile(
+      controller: controller,
       leading: Icon(
         icon,
         color: isSelected
@@ -346,5 +360,12 @@ class _HomeState extends State<Home> {
         softWrap: false,
       ),
     );
+  }
+
+  void collapseExpansions() {
+    master.collapse();
+    stock.collapse();
+    transaction.collapse();
+    report.collapse();
   }
 }
