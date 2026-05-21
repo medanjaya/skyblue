@@ -20,7 +20,7 @@ class _SellState extends State<Sell> {
             spacing: 16.0,
             children: [
               const Text('Transaksi Penjualan'),
-              const TextField(),
+              const TextField(), //TODO gunakan dropdown ketika input kode/nama barang
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(

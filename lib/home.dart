@@ -13,6 +13,7 @@ import 'package:skyblue/page/transaction/buy.dart';
 import 'package:skyblue/page/report/sales.dart';
 import 'package:skyblue/page/report/procure.dart';
 import 'package:skyblue/page/sync.dart';
+import 'package:skyblue/page/sandbox.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -145,6 +146,11 @@ class _HomeState extends State<Home> {
                               Icons.sync_alt,
                               'SINKRONISASI',
                             ),
+                            menuItem(
+                              'SANDBOX',
+                              Icons.stop_circle_outlined,
+                              'SANDBOX',
+                            ),
                           ],
                         ),
                       ),
@@ -255,6 +261,7 @@ class _HomeState extends State<Home> {
                         'REPORT_SALES' => const Sales(),
                         'REPORT_PROCURE' => const Procure(),
                         'SYNC' => const Sync(),
+                        'SANDBOX' => const Sandbox(),
                         String() => Center(
                           child: Text(
                             'Halaman $current',
