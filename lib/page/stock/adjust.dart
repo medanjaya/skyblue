@@ -82,7 +82,6 @@ class _AdjustState extends State<Adjust> {
       body: SingleChildScrollView(
         child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),  
         child:  Column(
           children: [
             const Align(
