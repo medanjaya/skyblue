@@ -156,7 +156,14 @@ class _HomeState extends State<Home> {
                       ),
                       ListTile(
                         onTap: () async {
-                          await Supabase.instance.client.auth.signOut()
+                          ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                            const SnackBar(
+                              content: Text('Sampai jumpa lain waktu.'),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                          /* await Supabase.instance.client.auth.signOut()
                           .then(
                             (r) { //TODO ganti ke notif konfirmasi
                               ScaffoldMessenger.of(context)
@@ -178,7 +185,7 @@ class _HomeState extends State<Home> {
                                 },
                               );
                             },
-                          );
+                          ); */
                         },
                         leading: const Icon(
                           Icons.logout,
@@ -222,24 +229,39 @@ class _HomeState extends State<Home> {
                           },
                           icon: const Icon(Icons.person_outline),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: 128.0,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 8.0,
                             ),
-                            child: Column( //TODO nama user dan role
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Guy Hawkins'),
-                                Text(
-                                  'Administrator',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ],
+                            child: FutureBuilder(
+                              future: Supabase.instance.client
+                              .from('user')
+                              .select()
+                              .eq('id', Supabase.instance.client.auth.currentUser!.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final user = snapshot.data!.first;
+                                  
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(user['name']),
+                                      Text(
+                                        user['role'].join(', '),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }
+                                else {
+                                  return Text('');
+                                }
+                              }
                             ),
                           ),
                         ),

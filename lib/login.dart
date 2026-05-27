@@ -13,7 +13,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final TextEditingController
-  user = TextEditingController(),
+  email = TextEditingController(),
   pass = TextEditingController();
 
   bool
@@ -59,9 +59,9 @@ class _LoginState extends State<Login> {
                   width: 84.0,
                 ),
                 TextField(
-                  controller: user,
+                  controller: email,
                   decoration: const InputDecoration(
-                    labelText: 'Username',
+                    labelText: 'Email',
                     isDense: true,
                     prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(),
@@ -113,7 +113,7 @@ class _LoginState extends State<Login> {
                   width: double.infinity,
                   height: 48.0,
                   child: ElevatedButton(
-                    onPressed: isAble //TODO fitur remember me dari isCheck
+                    onPressed: isAble //TODO DELETE fitur remember me cuman bisa di pro plan
                     ? () async {
                         setState(
                           () {
@@ -123,19 +123,31 @@ class _LoginState extends State<Login> {
                         );
                         try {
                           await Supabase.instance.client.auth.signInWithPassword(
-                            email: user.text,
+                            email: email.text,
                             password: pass.text,
                           )
                           .then(
-                            (r) {
+                            (r) async {
                               if (r.user != null) {
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'Selamat datang kembali, ${r.user!.email}.'
+                                      'Selamat datang kembali, ${
+                                        await Supabase.instance.client
+                                        .from('user')
+                                        .select()
+                                        .eq('id', r.user!.id)
+                                        .then(
+                                          (r) {
+                                            return r.first['name'];
+                                          }
+                                        )
+                                      }.',
                                     ),
-                                    duration: const Duration(seconds: 3),
+                                    duration: const Duration(
+                                      seconds: 3,
+                                    ),
                                   ),
                                 )
                                 .closed
@@ -156,8 +168,8 @@ class _LoginState extends State<Login> {
                         on AuthApiException catch (e) {
                           showExceptionSnackBar(
                             switch (e.code as String) {
-                              'invalid_credentials' => 'Username atau Password salah!',
-                              'validation_failed' => 'Masukkan Username dan Password terlebih dahulu!',
+                              'invalid_credentials' => 'Email atau Password salah!',
+                              'validation_failed' => 'Masukkan Email dan Password terlebih dahulu!',
                               String() => 'Ada yang salah, mohon coba beberapa saat lagi.',
                             },
                           );
@@ -211,7 +223,9 @@ class _LoginState extends State<Login> {
     .showSnackBar(
       SnackBar(
         content: Text(label),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(
+          seconds: 3,
+        ),
       ),
     );
   }
