@@ -14,8 +14,12 @@ class _AdjustState extends State<Adjust> {
   String? selectedProductId;
   String? selectedProductName;
 
-  final TextEditingController searchController = 
-  TextEditingController();  
+  final TextEditingController searchController = TextEditingController();
+  final TextEditingController keteranganController = TextEditingController();
+
+  String? tipePenyesuaian;
+  final TextEditingController jumlahPenyesuaianController = TextEditingController();
+  int prediksiStok = 0;
 
   List<Map<String, dynamic>> produk = [
     {
@@ -37,6 +41,7 @@ class _AdjustState extends State<Adjust> {
       'tipe_penyesuaian': 'Penambahan',
       'jumlah_penyesuaian': 5,
       'tanggal': "20 Januari 2024",
+      'Keterangan': "Penyesuaian stok karena penerimaan barang dari supplier."
     },
     {
       'id': '2',
@@ -44,16 +49,93 @@ class _AdjustState extends State<Adjust> {
       'tipe_penyesuaian': 'Pengurangan',
       'jumlah_penyesuaian': 3,
       'tanggal': "21 Januari 2024",
+      'Keterangan': "Penyesuaian stok karena kerusakan barang."
     }
   ];
 
   List<Map<String, dynamic>> riwayatProduk = [];
   List<Map<String, dynamic>> filteredProducts = [];
 
+  void hitungPrediksiStok() {
+    if (selectedProductId == null || tipePenyesuaian == null || jumlahPenyesuaianController.text.isEmpty) {
+      prediksiStok = 0;
+      return;
+    }
+
+    final currentProduct = produk.firstWhere((product) => product['id'] == selectedProductId);
+    final currentStock = currentProduct['Stok'] as int;
+    final adjustmentAmount = int.tryParse(jumlahPenyesuaianController.text) ?? 0;
+
+    setState(() {
+       if (tipePenyesuaian == 'penambahan') {
+        prediksiStok = currentStock + adjustmentAmount;
+      } else if (tipePenyesuaian == 'pengurangan') {
+        prediksiStok = currentStock - adjustmentAmount;
+      }
+    });
+  }
+
+  void simpanPenyesuaian() {
+    if (selectedProductId == null || tipePenyesuaian == null || jumlahPenyesuaianController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mohon lengkapi semua informasi penyesuaian stok.')),
+      );
+      return;
+    }
+
+    final adjustmentAmount = int.tryParse(jumlahPenyesuaianController.text) ?? 0;
+    if (adjustmentAmount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Jumlah penyesuaian harus lebih dari 0.')),
+      );
+      return;
+    }
+
+    setState(() {
+      final productIndex = produk.indexWhere((product) => product['id'] == selectedProductId);
+      if (productIndex != -1) {
+        produk[productIndex]['Stok'] = prediksiStok;
+
+      final formatTipe = tipePenyesuaian == 'penambahan' ? 'Penambahan' : 'Pengurangan';
+      riwayatTerbaru.insert(0, {
+        'id': selectedProductId,
+        'nama_produk': selectedProductName,
+        'tipe_penyesuaian': formatTipe,
+        'jumlah_penyesuaian': adjustmentAmount,
+        'tanggal': DateTime.now().toString(),
+        'Keterangan': keteranganController.text.isEmpty ? null : keteranganController.text,
+      });
+
+      riwayatProduk = riwayatTerbaru.where((riwayat) => riwayat['id'] == selectedProductId).toList();
+
+      tipePenyesuaian = null;
+      jumlahPenyesuaianController.clear();
+      keteranganController.clear();
+      prediksiStok = 0;
+    }
+  });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Penyesuaian stok berhasil disimpan.')),
+    );
+  }
+
+  void batalPenyesuaian() {
+    setState(() {
+      selectedProductId = null;
+      selectedProductName = null;
+      tipePenyesuaian = null;
+      jumlahPenyesuaianController.clear();
+      keteranganController.clear();
+      prediksiStok = 0;
+      riwayatProduk = [];
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    filteredProducts = produk;
+    filteredProducts = [];
   }
 
   void searchProducts(String query) {
@@ -72,6 +154,8 @@ class _AdjustState extends State<Adjust> {
   @override
   void dispose() {
     searchController.dispose();
+    jumlahPenyesuaianController.dispose();
+    keteranganController.dispose();
     super.dispose();
   }
 
@@ -82,18 +166,15 @@ class _AdjustState extends State<Adjust> {
       body: SingleChildScrollView(
         child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),  
         child:  Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Penyesuaian Stok',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF007BFF),
-                ),
+            const Text(
+              'Penyesuaian Stok',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF007BFF),
               ),
             ),
             const SizedBox(height: 16),
@@ -118,76 +199,157 @@ class _AdjustState extends State<Adjust> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        const Text(
-                          'Pilih Produk',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF007BFF),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: searchController,
-                          onChanged: searchProducts,
-                          decoration: InputDecoration(
-                            hintText: 'Cari produk...',
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pilih Produk',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF007BFF),
+                              ),
                             ),
-                            isDense: true,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: searchController,
+                              onChanged: searchProducts,
+                              decoration: InputDecoration(
+                                hintText: 'Cari produk...',
+                                prefixIcon: const Icon(Icons.search, size: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                isDense: true,
+                              ),
                             ),
-                            child: filteredProducts.isEmpty
-                                ? const Center(
+                            const SizedBox(height: 16),
+
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: selectedProductId == null 
+                                    ? const Center(
+                                        child: Text(
+                                          'pilih produk untuk melihat info produk',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Row(
+                                              children: [
+                                                Icon(Icons.info_outline_rounded, color: Color(0xFF007BFF)),
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  "Detail Info Produk",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFF007BFF),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'ID Produk: $selectedProductId',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Nama Produk: $selectedProductName',
+                                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              'Stok Saat Ini: ${produk.firstWhere((product) => product['id'] == selectedProductId)['Stok']}',
+                                              style: const TextStyle( fontSize: 14, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        if (searchController.text.isNotEmpty)
+                          Positioned(
+                            top: 80,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              constraints: const BoxConstraints(maxHeight: 300),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: filteredProducts.isEmpty
+                                  ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Tidak ada produk ditemukan',
+                                      'Tidak ada produk yang ditemukan.',
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.grey,
                                         fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold
                                       ),
                                     ),
                                   )
-                                : ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const AlwaysScrollableScrollPhysics(),
-                                    itemCount: filteredProducts.length,
-                                    itemBuilder: (context, index) {
-                                      final product = filteredProducts[index];
-                                      return Card(
-                                        child: ListTile(
+                                  : ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: filteredProducts.length,
+                                      itemBuilder: (context, index) {
+                                        final product = filteredProducts[index];
+                                        return ListTile(
+                                          dense: true,
                                           title: Text(product['nama_produk']),
-                                          subtitle: Text('Stok: ${product['Stok']}',
-                                          ),
+                                          subtitle:
+                                              Text('Stok: ${product['Stok']}'),
                                           onTap: () {
                                             setState(() {
                                               selectedProductId = product['id'];
                                               selectedProductName = product['nama_produk'];
 
+                                              tipePenyesuaian = null;
+                                              jumlahPenyesuaianController.clear();
+                                              keteranganController.clear();
+
                                               riwayatProduk = riwayatTerbaru
                                                   .where((riwayat) =>
-                                                      riwayat['nama_produk'] ==
-                                                      selectedProductName)
-                                                  .toList();
+                                                      riwayat['id'] == selectedProductId)
+                                                  .toList();                                         
+                                              searchController.clear();
+                                              hitungPrediksiStok();
                                             });
                                           },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          )
                       ],
                     ),
                   ),
@@ -226,13 +388,19 @@ class _AdjustState extends State<Adjust> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Pilih produk untuk melihat detail penyesuaian stok.',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
+                            selectedProductId == null
+                                ? const Column(
+                                    children: [
+                                      Text(
+                                        'Pilih produk untuk melihat detail penyesuaian stok.',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
                             const SizedBox(height: 16),
                                 
                                 
@@ -258,7 +426,10 @@ class _AdjustState extends State<Adjust> {
                                         label: 'Pengurangan',
                                       ),
                                     ],
-                                    onSelected: (value) {},
+                                    onSelected: (value) {
+                                      tipePenyesuaian = value?.toString();
+                                      hitungPrediksiStok();
+                                    },
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -266,6 +437,11 @@ class _AdjustState extends State<Adjust> {
                                 //Jumlah Penyesuaian
                                 Expanded(
                                   child: TextField(
+                                    controller: jumlahPenyesuaianController,
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      hitungPrediksiStok();
+                                    },
                                     decoration: InputDecoration(
                                       labelText: 'Jumlah Penyesuaian',
                                       border: OutlineInputBorder(
@@ -290,10 +466,10 @@ class _AdjustState extends State<Adjust> {
                                         color: Colors.grey[100],
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: const Column(
+                                      child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(
+                                          const Text(
                                             'Prediksi Jumlah Stok',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -301,10 +477,10 @@ class _AdjustState extends State<Adjust> {
                                               color: Color(0xFF007BFF),
                                             ),
                                           ),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 8),
                                           Text(
-                                            '10',
-                                            style: TextStyle(
+                                            selectedProductId == null ? '-' : prediksiStok.toString(),
+                                            style: const TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black,
@@ -336,9 +512,10 @@ class _AdjustState extends State<Adjust> {
                                         ),
                                         const SizedBox(height: 8),
                                         SizedBox(
-                                          width: 240,
+                                          width: 360,
                                           child: TextField(
-                                            maxLines: 3,
+                                            controller: keteranganController,
+                                            maxLines: 4,
                                             decoration: InputDecoration(
                                               hintText: 'Masukkan keterangan (opsional)',
                                               border: OutlineInputBorder(
@@ -361,9 +538,10 @@ class _AdjustState extends State<Adjust> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: batalPenyesuaian,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.grey[300],
+                                    foregroundColor: Colors.black,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -373,9 +551,10 @@ class _AdjustState extends State<Adjust> {
                                 ),
                                 const SizedBox(width: 16),
                                 ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: simpanPenyesuaian,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF007BFF),
+                                    foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -431,7 +610,7 @@ class _AdjustState extends State<Adjust> {
                           ),
                           child: const Center(
                             child: Text(
-                              'Tidak ada riwayat penyesuaian untuk produk ini.',
+                              'Tidak ada riwayat penyesuaian stok.',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontStyle: FontStyle.italic,
@@ -452,9 +631,11 @@ class _AdjustState extends State<Adjust> {
                                 child: const Row(
                                   children:  [
                                     Expanded(flex: 2, child: Text('Tanggal & Waktu', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    Expanded(flex: 1, child: Text('ID Produk', style: TextStyle(fontWeight: FontWeight.bold))),
                                     Expanded(flex: 2, child: Text('Nama', style: TextStyle(fontWeight: FontWeight.bold))),
                                     Expanded(flex: 2, child: Text('Tipe Penyesuaian', style: TextStyle(fontWeight: FontWeight.bold))),
                                     Expanded(flex: 1, child: Text('Jumlah', style: TextStyle(fontWeight: FontWeight.bold))),
+                                    Expanded(flex: 3, child: Text('Keterangan', style: TextStyle(fontWeight: FontWeight.bold)))
                                   ],
                                 ),
                               ),
@@ -473,6 +654,7 @@ class _AdjustState extends State<Adjust> {
                             child: Row(
                               children: [
                                 Expanded(flex: 2, child: Text(riwayat['tanggal'])),
+                                Expanded(flex: 1, child: Text(riwayat['id'])),
                                 Expanded(flex: 2, child: Text(riwayat['nama_produk'])),
                                 Expanded(flex: 2,
                                   child: Row(
@@ -492,6 +674,7 @@ class _AdjustState extends State<Adjust> {
                                     ],
                                   ) ),
                                 Expanded(flex: 1, child: Text(riwayat['jumlah_penyesuaian'].toString())),
+                                Expanded(flex: 3, child: Text(riwayat['Keterangan']?.toString() ?? '-')),
                               ],
                             ),
                           );
