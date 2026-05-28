@@ -132,18 +132,23 @@ class _LoginState extends State<Login> {
                                 ScaffoldMessenger.of(context)
                                 .showSnackBar(
                                   SnackBar(
-                                    content: Text(
-                                      'Selamat datang kembali, ${
-                                        await Supabase.instance.client
-                                        .from('user')
-                                        .select()
-                                        .eq('id', r.user!.id)
-                                        .then(
-                                          (r) {
-                                            return r.first['name'];
-                                          }
-                                        )
-                                      }.',
+                                    content: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0,
+                                      ),
+                                      child: Text(
+                                        'Selamat datang kembali, ${
+                                          await Supabase.instance.client
+                                          .from('user')
+                                          .select()
+                                          .eq('id', r.user!.id)
+                                          .then(
+                                            (r) {
+                                              return r.first['name'];
+                                            }
+                                          )
+                                        }.',
+                                      ),
                                     ),
                                     duration: const Duration(
                                       seconds: 3,
@@ -222,7 +227,12 @@ class _LoginState extends State<Login> {
     ScaffoldMessenger.of(context)
     .showSnackBar(
       SnackBar(
-        content: Text(label),
+        content: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 4.0,
+          ),
+          child: Text(label),
+        ),
         duration: const Duration(
           seconds: 3,
         ),

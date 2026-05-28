@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
+import 'package:skyblue/provider.dart';
 import 'package:skyblue/home.dart';
 import 'package:skyblue/login.dart';
 
@@ -23,7 +26,12 @@ Future<void> main() async {
     ),
   );
 
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -31,16 +39,27 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
+    
     return MaterialApp(
       title: 'UD Skyblue Inventory 1.0 (uks)',
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
         useMaterial3: false,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blue, //FIXME paskan ini
-        ),
+        brightness: Brightness.light,
+        primaryColor: Colors.white,
+        textTheme: Typography.blackCupertino,
       ),
+
+      darkTheme: ThemeData(
+        useMaterial3: false,
+        brightness: Brightness.dark,
+        primaryColor: Colors.black,
+        textTheme: Typography.whiteCupertino,
+      ),
+
+      themeMode: theme.mode,
 
       home: FlutterSplashScreen.fadeIn(
         backgroundColor: const Color.fromARGB(255, 135, 206, 235),

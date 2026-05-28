@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
+import 'package:skyblue/provider.dart';
 import 'package:skyblue/login.dart';
 import 'package:skyblue/page/dashboard.dart';
 import 'package:skyblue/page/master/item.dart';
@@ -34,6 +36,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       body: Row(
         children: [
@@ -51,7 +55,9 @@ class _HomeState extends State<Home> {
             splashFactory: NoSplash.splashFactory,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              color: const Color.fromARGB(40, 135, 206, 235),
+              color: theme.isOn
+              ? const Color.fromARGB(255, 40, 40, 40)
+              : const Color.fromARGB(255, 245, 245, 245),
               width: isExpand ? 256.0 : 58.0,
               child: OverflowBox(
                 alignment: Alignment.topLeft,
@@ -156,20 +162,16 @@ class _HomeState extends State<Home> {
                       ),
                       ListTile(
                         onTap: () async {
-                          ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                            const SnackBar(
-                              content: Text('Sampai jumpa lain waktu.'),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                          /* await Supabase.instance.client.auth.signOut()
+                          await Supabase.instance.client.auth.signOut()
                           .then(
-                            (r) { //TODO ganti ke notif konfirmasi
+                            (r) {
                               ScaffoldMessenger.of(context)
                               .showSnackBar(
                                 const SnackBar(
-                                  content: Text('Sampai jumpa lain waktu.'),
+                                  content: Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Text('Telah keluar dari dashboard, sampai jumpa lain waktu.'),
+                                  ),
                                   duration: Duration(seconds: 3),
                                 ),
                               )
@@ -185,7 +187,7 @@ class _HomeState extends State<Home> {
                                 },
                               );
                             },
-                          ); */
+                          );
                         },
                         leading: const Icon(
                           Icons.logout,
@@ -203,100 +205,108 @@ class _HomeState extends State<Home> {
             ),
           ),
           Expanded(
-            child: ColoredBox(
-              color: Colors.white,
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16.0,
-                      horizontal: 32.0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 8.0,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            //TODO fitur terang gelap
-                          },
-                          icon: const Icon(Icons.dark_mode_outlined),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 32.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 8.0,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          theme.toggle();
+                        },
+                        icon: Icon(
+                          theme.isOn
+                          ? Icons.dark_mode_outlined
+                          : Icons.light_mode_outlined,
                         ),
-                        IconButton(
-                          onPressed: () {
-                            //TODO fitur profil ganti password dan lain lain
-                          },
-                          icon: const Icon(Icons.person_outline),
-                        ),
-                        SizedBox(
-                          width: 128.0,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: FutureBuilder(
-                              future: Supabase.instance.client
-                              .from('user')
-                              .select()
-                              .eq('id', Supabase.instance.client.auth.currentUser!.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  final user = snapshot.data!.first;
-                                  
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(user['name']),
-                                      Text(
-                                        user['role'].join(', '),
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12.0,
-                                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(
+                            () {
+                              current = 'PROFILE';
+                            }
+                          );
+                        },
+                        icon: const Icon(Icons.person_outline),
+                      ),
+                      SizedBox(
+                        width: 128.0,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
+                          child: FutureBuilder(
+                            future: Supabase.instance.client
+                            .from('user')
+                            .select()
+                            .eq('id', Supabase.instance.client.auth.currentUser?.id ?? ''),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final user = snapshot.data!.first;
+                                
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(user['name']),
+                                    Text(
+                                      user['role'].join(', '),
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12.0,
                                       ),
-                                    ],
-                                  );
-                                }
-                                else {
-                                  return Text('');
-                                }
+                                    ),
+                                  ],
+                                );
                               }
-                            ),
+                              else {
+                                return const Text('Offline');
+                              }
+                            },
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(24.0),
-                      color: const Color.fromARGB(40, 135, 206, 235),
-                      child: switch (current) {
-                        'DASHBOARD' => const Dashboard(),
-                        'MASTER_ITEM' => const Item(),
-                        'MASTER_MEMBER' => const Member(),
-                        'STOCK_DATA' => const Data(),
-                        'STOCK_ADJUST' => const Adjust(),
-                        'TRANSACTION_SELL' => const Sell(),
-                        'TRANSACTION_BUY' => const Buy(),
-                        'REPORT_SALES' => const Sales(),
-                        'REPORT_PROCURE' => const Procure(),
-                        'SYNC' => const Sync(),
-                        'SANDBOX' => const Sandbox(),
-                        String() => Center(
-                          child: Text(
-                            'Halaman $current',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(24.0),
+                    color: theme.isOn
+                    ? const Color.fromARGB(255, 40, 40, 40)
+                    : const Color.fromARGB(255, 245, 245, 245),
+                    child: switch (current) {
+                      //TODO fitur profil ganti password dan lain lain, 'PROFILE' => const Profile(),
+                      'DASHBOARD' => const Dashboard(),
+                      'MASTER_ITEM' => const Item(),
+                      'MASTER_MEMBER' => const Member(),
+                      'STOCK_DATA' => const Data(),
+                      'STOCK_ADJUST' => const Adjust(),
+                      'TRANSACTION_SELL' => const Sell(),
+                      'TRANSACTION_BUY' => const Buy(),
+                      'REPORT_SALES' => const Sales(),
+                      'REPORT_PROCURE' => const Procure(),
+                      'SYNC' => const Sync(),
+                      'SANDBOX' => const Sandbox(),
+                      String() => Center(
+                        child: Text(
+                          'Halaman $current',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      },
-                    ),
+                      ),
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

@@ -1,6 +1,5 @@
-//TODO yapiter lagi kerjain ini
-
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 
 class Adjust extends StatefulWidget {
