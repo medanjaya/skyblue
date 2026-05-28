@@ -1,4 +1,4 @@
-package com.example.skyblue
+package com.skyblue
 
 import io.flutter.embedding.android.FlutterActivity
 

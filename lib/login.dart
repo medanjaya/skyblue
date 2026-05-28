@@ -18,8 +18,7 @@ class _LoginState extends State<Login> {
 
   bool
   isAble = true,
-  isHide = true,
-  isCheck = false;
+  isHide = true;
   
   @override
   Widget build(BuildContext context) {
@@ -93,27 +92,11 @@ class _LoginState extends State<Login> {
                   obscureText: isHide,
                   enabled: isAble,
                 ),
-                Row(
-                  spacing: 8.0,
-                  children: [
-                    Checkbox(
-                      onChanged: (v) {
-                        setState(
-                          () {
-                            isCheck = v!;
-                          },
-                        );
-                      },
-                      value: isCheck,
-                    ),
-                    const Text('Remember Me?'),
-                  ],
-                ),
                 SizedBox(
                   width: double.infinity,
                   height: 48.0,
                   child: ElevatedButton(
-                    onPressed: isAble //TODO DELETE fitur remember me cuman bisa di pro plan
+                    onPressed: isAble
                     ? () async {
                         setState(
                           () {
@@ -188,8 +171,6 @@ class _LoginState extends State<Login> {
                       }
                     : null,
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.white,
                       elevation: 2.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),

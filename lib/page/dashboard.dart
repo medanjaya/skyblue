@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -8,6 +10,14 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final SupabaseClient sb = Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    print(sb.auth.currentSession);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
           children: [
             Text('Dashboard Overview'),
             Text(
-              'Welcome back, Morning Shift Lead',
+              'Ringkasan operasional bulan ini',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 12.0,
@@ -38,7 +48,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: const Row(
@@ -55,7 +65,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Column(
@@ -109,7 +119,7 @@ class _DashboardState extends State<Dashboard> {
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
             child: Column(

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 
+import 'package:intl/intl.dart';
+
 import 'package:skyblue/provider.dart';
 import 'package:skyblue/login.dart';
 import 'package:skyblue/page/dashboard.dart';
@@ -25,6 +27,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final SupabaseClient sb = Supabase.instance.client;
+
   final ExpansionTileController
   master = ExpansionTileController(),
   stock = ExpansionTileController(),
@@ -55,24 +59,32 @@ class _HomeState extends State<Home> {
             splashFactory: NoSplash.splashFactory,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              color: theme.isOn
-              ? const Color.fromARGB(255, 40, 40, 40)
-              : const Color.fromARGB(255, 245, 245, 245),
               width: isExpand ? 256.0 : 58.0,
               child: OverflowBox(
                 alignment: Alignment.topLeft,
                 maxWidth: 256.0,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16.0,
+                  padding: const EdgeInsets.only(
+                    top: 12.0,
+                    bottom: 16.0,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const ListTile(
-                        leading: Icon(
-                          Icons.menu,
-                          color: Colors.black,
+                      ListTile(
+                        leading: InkWell(
+                          onTap: () {
+                            setState(
+                              () {
+                                isExpand = !isExpand;
+                                collapseExpansions();
+                              },
+                            );
+                          },
+                          child: Icon(
+                            Icons.menu,
+                            color: Theme.of(context).primaryIconTheme.color,
+                          ),
                         ),
                       ),
                       Expanded(
@@ -162,7 +174,7 @@ class _HomeState extends State<Home> {
                       ),
                       ListTile(
                         onTap: () async {
-                          await Supabase.instance.client.auth.signOut()
+                          await sb.auth.signOut()
                           .then(
                             (r) {
                               ScaffoldMessenger.of(context)
@@ -189,9 +201,9 @@ class _HomeState extends State<Home> {
                             },
                           );
                         },
-                        leading: const Icon(
+                        leading: Icon(
                           Icons.logout,
-                          color: Colors.black,
+                          color: Theme.of(context).primaryIconTheme.color,
                         ),
                         title: const Text(
                           'KELUAR',
@@ -213,71 +225,94 @@ class _HomeState extends State<Home> {
                     horizontal: 32.0,
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 8.0,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          theme.toggle();
-                        },
-                        icon: Icon(
-                          theme.isOn
-                          ? Icons.dark_mode_outlined
-                          : Icons.light_mode_outlined,
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: Stream.periodic(
+                            const Duration(seconds: 1),
+                          ),
+                          builder: (context, snapshot) {
+                            return Row(
+                              spacing: 24.0,
+                              children: [
+                                const Icon(Icons.access_time),
+                                Text(
+                                  DateFormat('MM/dd/yyyy hh:mm:ss').format(DateTime.now()),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          setState(
-                            () {
-                              current = 'PROFILE';
-                            }
-                          );
-                        },
-                        icon: const Icon(Icons.person_outline),
-                      ),
-                      SizedBox(
-                        width: 128.0,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                          ),
-                          child: FutureBuilder(
-                            future: Supabase.instance.client
-                            .from('user')
-                            .select()
-                            .eq('id', Supabase.instance.client.auth.currentUser?.id ?? ''),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                final user = snapshot.data!.first;
-                                
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(user['name']),
-                                    Text(
-                                      user['role'].join(', '),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 12.0,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }
-                              else {
-                                return const Text('Offline');
-                              }
+                      Row(
+                        spacing: 8.0,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              theme.toggle();
                             },
+                            icon: Icon(
+                              theme.isOn
+                              ? Icons.dark_mode_outlined
+                              : Icons.light_mode_outlined,
+                            ),
+                            splashRadius: 24.0,
                           ),
-                        ),
+                          IconButton(
+                            onPressed: () {
+                              setState(
+                                () {
+                                  current = 'PROFILE';
+                                }
+                              );
+                            },
+                            icon: const Icon(Icons.person_outline),
+                            splashRadius: 24.0,
+                          ),
+                          SizedBox(
+                            width: 128.0,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: FutureBuilder(
+                                future: sb
+                                .from('user')
+                                .select()
+                                .eq('id', sb.auth.currentUser?.id ?? ''),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    final user = snapshot.data!.first;
+                                    
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(user['name']),
+                                        Text(
+                                          user['role'].join(', '),
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                  else {
+                                    return const Text('Offline');
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 Expanded(
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.all(24.0),
                     color: theme.isOn
                     ? const Color.fromARGB(255, 40, 40, 40)
@@ -329,14 +364,14 @@ class _HomeState extends State<Home> {
         icon,
         color: isSelected
         ? Colors.blue
-        : Colors.black,
+        : Theme.of(context).primaryIconTheme.color,
       ),
       title: Text(
         label,
         style: TextStyle(
           color: isSelected
           ? Colors.blue
-          : Colors.black,
+          : Theme.of(context).primaryIconTheme.color,
           fontWeight: isSelected
           ? FontWeight.bold
           : FontWeight.normal,
@@ -355,14 +390,14 @@ class _HomeState extends State<Home> {
         icon,
         color: isSelected
         ? Colors.blue
-        : Colors.black,
+        : Theme.of(context).primaryIconTheme.color,
       ),
       title: Text(
         label,
         style: TextStyle(
           color: isSelected
           ? Colors.blue
-          : Colors.black,
+          : Theme.of(context).primaryIconTheme.color,
           fontWeight: isSelected
           ? FontWeight.bold
           : FontWeight.normal,
@@ -394,7 +429,7 @@ class _HomeState extends State<Home> {
         style: TextStyle(
           color: isSelected
           ? Colors.blue
-          : Colors.black,
+          : Theme.of(context).primaryIconTheme.color,
         ),
         softWrap: false,
       ),
