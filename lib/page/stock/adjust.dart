@@ -1,6 +1,7 @@
 //TODO yapiter lagi kerjain ini
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Adjust extends StatefulWidget {
   const Adjust({super.key});
@@ -57,14 +58,14 @@ class _AdjustState extends State<Adjust> {
   List<Map<String, dynamic>> filteredProducts = [];
 
   void hitungPrediksiStok() {
-    if (selectedProductId == null || tipePenyesuaian == null || jumlahPenyesuaianController.text.isEmpty) {
-      prediksiStok = 0;
-      return;
-    }
-
     final currentProduct = produk.firstWhere((product) => product['id'] == selectedProductId);
     final currentStock = currentProduct['Stok'] as int;
     final adjustmentAmount = int.tryParse(jumlahPenyesuaianController.text) ?? 0;
+
+    if (selectedProductId == null || tipePenyesuaian == null || jumlahPenyesuaianController.text.isEmpty) {
+      prediksiStok = currentStock;
+      return;
+    }
 
     setState(() {
        if (tipePenyesuaian == 'penambahan') {
@@ -102,7 +103,7 @@ class _AdjustState extends State<Adjust> {
         'nama_produk': selectedProductName,
         'tipe_penyesuaian': formatTipe,
         'jumlah_penyesuaian': adjustmentAmount,
-        'tanggal': DateTime.now().toString(),
+        'tanggal': DateFormat('dd MMMM yyyy HH:mm:ss').format(DateTime.now()),
         'Keterangan': keteranganController.text.isEmpty ? null : keteranganController.text,
       });
 
