@@ -41,8 +41,13 @@ Future<void> authPartner() async {
     (r) {
       final
       path = '/api/v2/auth/token/get',
-      sign = hmac.convert(utf8.encode(partner + path + time));
+      sign = hmac.convert(utf8.encode(partner + path + time)),
       
+      code = Uri.parse(r).queryParameters['code'],
+      shop = Uri.parse(r).queryParameters['shop_id'];
+      
+      prefs.setString('shop', shop!);
+
       http.post(
         Uri.https(
           host,
@@ -56,8 +61,8 @@ Future<void> authPartner() async {
         body: jsonEncode(
           {
             'partner_id': partner,
-            'code': Uri.parse(r).queryParameters['code'],
-            'shop_id': Uri.parse(r).queryParameters['shop_id'],
+            'code': code,
+            'shop_id': shop,
           },
         ),
       )
@@ -69,6 +74,86 @@ Future<void> authPartner() async {
           prefs.setString('refresh', result['refresh_token']);
         },
       );
+    },
+  );
+}
+
+Future<void> getItemList() async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/get_item_list',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  http.get(
+    Uri.https(
+      host,
+      path,
+      {
+        'partner_id': partner,
+        'timestamp': time,
+        'access_token': token,
+        'shop_id': shop,
+        'sign': sign.toString(),
+        'offset': '0',
+        'page_size': '100',
+        'update_time_from': '1423958400',
+        'update_time_to': time,
+      },
+    ),
+  )
+  .then(
+    (r) {
+      print(r.body);
+    },
+  );
+}
+
+Future<void> getOrderList() async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/order/get_order_list',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  http.get(
+    Uri.https(
+      host,
+      path,
+      {
+        'partner_id': partner,
+        'timestamp': time,
+        'access_token': token,
+        'shop_id': shop,
+        'sign': sign.toString(),
+        'time_range_field': 'create_time',
+        'time_from': '1423958400',
+        'time_to': time,
+        'page_size': '100',
+      },
+    ),
+  )
+  .then(
+    (r) {
+      print(r.body);
     },
   );
 }

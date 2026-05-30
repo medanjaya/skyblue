@@ -288,7 +288,11 @@ class _SyncState extends State<Sync> {
   void init() async {
     final prefs = await SharedPreferences.getInstance();
 
-    partner.text = prefs.getString('partner') ?? '';
-    secret.text = prefs.getString('secret') ?? '';
+    setState(
+      () {
+        partner.text = prefs.getString('partner') ?? '';
+        secret.text = prefs.getString('secret') ?? '';
+      }
+    );
   }
 }

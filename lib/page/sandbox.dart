@@ -12,7 +12,7 @@ class Sandbox extends StatefulWidget {
 }
 
 class _SandboxState extends State<Sandbox> {
-  String token =  '', refresh = '';
+  String token =  '', refresh = '', shop = '';
   
   @override
   void initState() {
@@ -27,11 +27,24 @@ class _SandboxState extends State<Sandbox> {
       children: [
         Text('TOKEN: $token'),
         Text('REFRESH: $refresh'),
+        Text('SHOP: $shop'),
         IconButton(
           onPressed: () {
             authPartner();
           },
           icon: const Icon(Icons.login),
+        ),
+        IconButton(
+          onPressed: () {
+            getItemList();
+          },
+          icon: const Icon(Icons.download),
+        ),
+        IconButton(
+          onPressed: () {
+            getOrderList();
+          },
+          icon: const Icon(Icons.list_alt),
         ),
       ],
     );
@@ -39,8 +52,13 @@ class _SandboxState extends State<Sandbox> {
 
   void init() async {
     final prefs = await SharedPreferences.getInstance();
-
-    token = prefs.getString('token') ?? '';
-    refresh = prefs.getString('refresh') ?? '';
+    
+    setState(
+      () {
+        token = prefs.getString('token') ?? '';
+        refresh = prefs.getString('refresh') ?? '';
+        shop = prefs.getString('shop') ?? '';
+      }
+    );
   }
 }
