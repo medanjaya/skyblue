@@ -1,44 +1,26 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
 final String host = 'openplatform.sandbox.test-stable.shopee.sg';
 
 Future<void> authPartner() async {
   final
-  partner = '1201347',
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
   path = '/api/v2/shop/auth_partner',
   time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
   
-  hmac = Hmac(
-    sha256,
-    base64Decode('c2hwazU2NjI0NzQ5NzM3OTZmNTc3NDU0NDU1MTc4NmE2YTZkNDg2ODc0NTI1MzYyNzc2ZDY2NjI2MjQyNjc3NA=='),
-  ),
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time));
 
-  sign = hmac.convert(
-    utf8.encode(partner + path + time),
-  );
-
-  print(
-    'linknya: ${
-      Uri.https(
-        host,
-        path,
-        {
-          'sign': sign.toString(),
-          'partner_id': partner,
-          'timestamp': time,
-          'redirect': 'https://open.shopee.com',
-        },
-      ).toString()
-    }',
-  );
-  
-  //FIXME jika di tab auth ada bar putih di atas, ubah titleBarHeight ke 0 di webview.dart;
-  // cari di direct dependencies flutter_web_auth_2
   FlutterWebAuth2.authenticate(
     url: Uri.https(
       host,
@@ -57,14 +39,9 @@ Future<void> authPartner() async {
   )
   .then(
     (r) {
-      print('hasil url: $r');
-      
       final
       path = '/api/v2/auth/token/get',
-
-      sign = hmac.convert(
-        utf8.encode(partner + path + time),
-      );
+      sign = hmac.convert(utf8.encode(partner + path + time));
       
       http.post(
         Uri.https(
@@ -86,7 +63,10 @@ Future<void> authPartner() async {
       )
       .then(
         (r) {
-          print('hasil token: ${r.body}');
+          final result = jsonDecode(r.body);
+
+          prefs.setString('token', result['access_token']);
+          prefs.setString('refresh', result['refresh_token']);
         },
       );
     },

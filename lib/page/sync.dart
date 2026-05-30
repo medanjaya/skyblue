@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -123,7 +125,7 @@ class _SyncState extends State<Sync> {
                     final prefs = await SharedPreferences.getInstance();
                     
                     prefs.setString('partner', partner.text);
-                    prefs.setString('secret', secret.text);
+                    prefs.setString('secret', base64Encode(utf8.encode(secret.text)));
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
