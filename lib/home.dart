@@ -27,8 +27,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final SupabaseClient sb = Supabase.instance.client;
-
   final ExpansionTileController
   master = ExpansionTileController(),
   stock = ExpansionTileController(),
@@ -40,6 +38,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final sb = Supabase.instance.client;
     final theme = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
@@ -73,7 +72,7 @@ class _HomeState extends State<Home> {
                     spacing: 12.0,
                     children: [
                       ListTile(
-                        leading: InkWell( //FIXME ada ini jadinya highlight dashboard nampak ketika tidak expand
+                        leading: InkWell(
                           onTap: () {
                             setState(
                               () {

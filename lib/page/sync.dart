@@ -13,8 +13,6 @@ class Sync extends StatefulWidget {
 }
 
 class _SyncState extends State<Sync> {
-  final SupabaseClient sb = Supabase.instance.client;
-
   final TextEditingController
   partner = TextEditingController(),
   secret = TextEditingController();
@@ -29,6 +27,8 @@ class _SyncState extends State<Sync> {
 
   @override
   Widget build(BuildContext context) {
+    final sb = Supabase.instance.client;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
@@ -129,13 +129,13 @@ class _SyncState extends State<Sync> {
                       const SnackBar(
                         content: Padding(
                           padding: EdgeInsets.all(4.0),
-                          child: Text('Kunci diperbaharui, mohon untuk tidak disebarkan.'),
+                          child: Text('Kunci diperbarui, mohon untuk tidak disebarkan.'),
                         ),
                         duration: Duration(seconds: 3),
                       ),
                     );
                   },
-                  child: const Text('Perbaharui'),
+                  child: const Text('Perbarui'),
                 ),
               ),
             ],
@@ -190,67 +190,81 @@ class _SyncState extends State<Sync> {
                   .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final acts = snapshot.data;
+                      final acts = snapshot.data!;
                       
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (context, i) {
-                          final act = acts[i];
-                      
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Text(
-                                  DateFormat('dd/MM/yyyy hh:mm:ss').format(
-                                    DateTime.parse(act['created_at']),
+                      if (acts.isNotEmpty) {
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, i) {
+                            final act = acts[i];
+                        
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                      DateTime.parse(act['created_at']),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Text(act['type']),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                  spacing: 8.0,
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      color:
-                                      act['status']
-                                      ? Colors.green
-                                      : Colors.red,
-                                      size: 18,
-                                    ),
-                                    Text(
-                                      act['status']
-                                      ? 'Success'
-                                      : 'Error',
-                                    ),
-                                  ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(act['type']),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(act['log']),
-                              ),
-                            ],
-                          );
-                        },
-                        separatorBuilder: (context, i) {
-                          return const Divider();
-                        },
-                        itemCount: acts!.length,
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    spacing: 8.0,
+                                    children: [
+                                      Icon(
+                                        Icons.circle,
+                                        color:
+                                        act['status']
+                                        ? Colors.green
+                                        : Colors.red,
+                                        size: 18,
+                                      ),
+                                      Text(
+                                        act['status']
+                                        ? 'Success'
+                                        : 'Error',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(act['log']),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, i) {
+                            return const Divider();
+                          },
+                          itemCount: acts.length,
+                        );
+                      }
+
+                      return const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Tidak ada riwayat untuk ditampilkan',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
                       );
                     }
                     else {
                       return const Expanded(
                         child: Center(
                           child: Text(
-                            'Tidak ada aktivitas untuk ditampilkan.',
+                            'Sedang memperbaharui riwayat aktivitas..',
                             style: TextStyle(
                               color: Colors.grey,
                               fontStyle: FontStyle.italic,

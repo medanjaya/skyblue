@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
 class Member extends StatefulWidget {
@@ -12,46 +13,15 @@ class Member extends StatefulWidget {
 }
 
 class _MemberState extends State<Member> {
-  final List<Map> debugItems = List.generate(
-    10,
-    (i) {
-      return i.isOdd
-      ? {
-        'UUID': '1234-5678-9010-1112',
-        'NAME': 'James Rusli',
-        'EMAIL': 'james.rusli@skyblue.co.id',
-        'ROLE': 'Administrator',
-        'STATUS': 'Aktif',
-      }
-      : {
-        'UUID': '1314-1516-1718-0987',
-        'NAME': 'Aditya Saputra',
-        'EMAIL': 'aditya.saputra@skyblue.co.id',
-        'ROLE': 'POS',
-        'STATUS': 'Nonaktif',
-      };
-    },
-  ); //TODO ganti ke supabase
-
   final TextEditingController name = TextEditingController();
 
   List display = [];
   int rows = 5, current = 1;
 
   @override
-  void initState() {
-    super.initState();
-    display = List.from(debugItems);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final
-    total = display.length,
-    first = (current - 1) * rows,
-    last = (first + rows > total) ? total : first + rows,
-    pages = display.sublist(first, last);
-
+    final sb = Supabase.instance.client;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
@@ -68,61 +38,6 @@ class _MemberState extends State<Member> {
             ),
           ],
         ),
-        SizedBox(
-          height: 72.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: 16.0,
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text('Total User'),
-                      Text(NumberFormat('###,000').format(1248).toString()),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text('Aktif Saat Ini'),
-                      Text(NumberFormat('###,000').format(42).toString()),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text('Admin'),
-                      Text(NumberFormat('###,000').format(23).toString()),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(16.0),
@@ -130,193 +45,247 @@ class _MemberState extends State<Member> {
               color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 8.0,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      spacing: 8.0,
-                      children: [
-                        const Text('Show'),
-                        Container(
-                          height: 32.0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black54,
-                            ),
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: DropdownButton(
-                            onChanged: (v) {
-                              setState(
-                                () {
-                                  rows = v!;
-                                  current = 1;
-                                },
-                              );
-                            },
-                            value: rows,
-                            underline: const SizedBox(),
-                            items: [5, 10, 20].map(
-                              (e) {
-                                return DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e.toString()),
-                                );  
-                              },
-                            ).toList(),
-                          ),
-                        ),
-                        const Text('entries'),
-                      ],
+            child: StreamBuilder(
+              stream: sb
+              .from('user')
+              .select()
+              .asStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  display = List.from(
+                    snapshot.data!.where(
+                      (e) {
+                        return e['name'].toString().toLowerCase().contains(
+                          name.text.toLowerCase(),
+                        );
+                      },
                     ),
-                    SizedBox(
-                      width: 256.0,
-                      child: TextField(
-                        onChanged: (v) {
-                          setState(
-                            () {
-                              display = List.from(
-                                debugItems.where(
-                                  (e) {
-                                    return e['NAME'].toString().toLowerCase().contains(
-                                      name.text.toLowerCase(),
+                  );
+
+                  final
+                  total = display.length,
+                  first = (current - 1) * rows,
+                  last = (first + rows > total) ? total : first + rows,
+                  pages = display.sublist(first, last);
+                  
+                  return Column(
+                    spacing: 16.0,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            spacing: 8.0,
+                            children: [
+                              const Text('Show'),
+                              Container(
+                                height: 32.0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black54,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                                child: DropdownButton(
+                                  onChanged: (v) {
+                                    setState(
+                                      () {
+                                        rows = v!;
+                                        current = 1;
+                                      },
                                     );
                                   },
+                                  value: rows,
+                                  underline: const SizedBox(),
+                                  items: [5, 10, 20].map(
+                                    (e) {
+                                      return DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e.toString()),
+                                      );  
+                                    },
+                                  ).toList(),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                        controller: name,
-                        decoration: const InputDecoration(
-                          labelText: 'Nama User',
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 8.0,
+                              ),
+                              const Text('entries'),
+                            ],
                           ),
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(),
-                        ),
+                          SizedBox(
+                            width: 256.0,
+                            child: TextField(
+                              onChanged: (v) {
+                                setState(() {});
+                              },
+                              controller: name,
+                              decoration: const InputDecoration(
+                                labelText: 'Nama User',
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 8.0,
+                                ),
+                                prefixIcon: Icon(Icons.search),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: DataTable( //FIXME jarak kolom berubah ketika kosong
-                      columns: [
-                        'ACTION',
-                        'UUID',
-                        'NAMA USER',
-                        'EMAIL',
-                        'PERAN',
-                        'STATUS',
-                      ].map(
-                        (e) {
-                          return DataColumn(
-                            label: Text(e),
-                          );
-                        }
-                      ).toList(),
-                      rows: pages.map(
-                        (e) {
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {}, //TODO edit user
+                      Column(
+                        children: [
+                          const Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Text('AKSI'),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('NAMA'),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text('EMAIL'),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('ROLE'),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('STATUS'),
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          display.isNotEmpty
+                          ? ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, i) {
+                              final user = pages[i];
+                          
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: IconButton(
+                                      onPressed: () {}, //TODO edit item
                                       icon: const Icon(
                                         Icons.edit_note,
                                         color: Colors.red,
                                       ), 
                                     ),
-                                    IconButton(
-                                      onPressed: () {}, //TODO informasi user
-                                      icon: const Icon(
-                                        Icons.info_outline,
-                                        color: Colors.blue,
-                                      ), 
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              DataCell(
-                                Text(e['UUID']),
-                              ),
-                              DataCell(
-                                Text(e['NAME']),
-                              ),
-                              DataCell(
-                                Text(e['EMAIL']),
-                              ),
-                              DataCell(
-                                Text(e['ROLE']),
-                              ),
-                              DataCell(
-                                Text(
-                                  e['STATUS'],
-                                  style: TextStyle(
-                                    color: e['STATUS'].toLowerCase() == 'nonaktif'
-                                    ? Colors.red
-                                    : Colors.green,
                                   ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ).toList(),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
-                    Row(
-                      children: List.generate(
-                        max(1, (total / rows).ceil()),
-                        (i) {
-                          final page = i + 1;
-            
-                          return InkWell(
-                            onTap: () {
-                              setState(
-                                () {
-                                  current = page;
-                                }
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(user['name']),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(user['email']),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(user['role'].join(', ')),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      spacing: 8.0,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color:
+                                          user['is_active']
+                                          ? Colors.green
+                                          : Colors.red,
+                                          size: 18,
+                                        ),
+                                        Text(
+                                          user['is_active']
+                                          ? 'Active'
+                                          : 'Disactivated',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               );
                             },
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              margin: const EdgeInsets.only(
-                                left: 8.0,
+                            separatorBuilder: (context, i) {
+                              return const Divider();
+                            },
+                            itemCount: pages.length,
+                          )
+                          : const Expanded(
+                            child: Center(
+                              child: Text(
+                                'Tidak ada riwayat untuk ditampilkan',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
-                              decoration: BoxDecoration(
-                                color: current == page
-                                ? const Color.fromARGB(120, 135, 206, 235)
-                                : const Color.fromARGB(40, 135, 206, 235),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              child: Text(page.toString()),
                             ),
-                          );
-                        }
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
+                          Row(
+                            children: List.generate(
+                              max(1, (total / rows).ceil()),
+                              (i) {
+                                final page = i + 1;
+                  
+                                return InkWell(
+                                  onTap: () {
+                                    setState(
+                                      () {
+                                        current = page;
+                                      }
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    margin: const EdgeInsets.only(
+                                      left: 8.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: current == page
+                                      ? const Color.fromARGB(120, 135, 206, 235)
+                                      : const Color.fromARGB(40, 135, 206, 235),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                    child: Text(page.toString()),
+                                  ),
+                                );
+                              }
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+                else {
+                  return const Center(
+                    child: Text(
+                      'Sedang memperbaharui daftar user..',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  );
+                }
+              },
             ),
           ),
         ),
