@@ -112,8 +112,7 @@ class _LoginState extends State<Login> {
                           .then(
                             (r) async {
                               if (r.user != null) {
-                                ScaffoldMessenger.of(context)
-                                .showSnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -205,8 +204,7 @@ class _LoginState extends State<Login> {
         isAble = true;
       },
     );
-    ScaffoldMessenger.of(context)
-    .showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Padding(
           padding: const EdgeInsets.symmetric(

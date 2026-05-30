@@ -100,7 +100,7 @@ class _DataState extends State<Data> {
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Column(
@@ -168,7 +168,7 @@ class _DataState extends State<Data> {
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
             child: Column(

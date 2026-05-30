@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:intl/intl.dart';
+
 class Sync extends StatefulWidget {
   const Sync({super.key});
 
@@ -8,6 +13,8 @@ class Sync extends StatefulWidget {
 }
 
 class _SyncState extends State<Sync> {
+  final SupabaseClient sb = Supabase.instance.client;
+
   final TextEditingController
   partner = TextEditingController(),
   secret = TextEditingController();
@@ -15,20 +22,26 @@ class _SyncState extends State<Sync> {
   bool isHide = true;
 
   @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
       children: [
-        const Text('Sinkronisasi API'),
+        const Text('Sinkronisasi Shopee'),
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Column(
-            spacing: 8.0,
+            spacing: 12.0,
             children: [
               const Row(
                 spacing: 8.0,
@@ -94,20 +107,36 @@ class _SyncState extends State<Sync> {
                         horizontal: 8.0,
                       ),
                       suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(
-                            () {
-                              secret.clear();
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.clear),
+                        onPressed: () {},
+                        icon: const Icon(Icons.security),
                       ),
                       border: const OutlineInputBorder(),
                     ),
                     obscureText: true,
                   ),
                 ],
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: TextButton(
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    
+                    prefs.setString('partner', partner.text);
+                    prefs.setString('secret', secret.text);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Text('Kunci diperbaharui, mohon untuk tidak disebarkan.'),
+                        ),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  },
+                  child: const Text('Perbaharui'),
+                ),
               ),
             ],
           ),
@@ -116,46 +145,121 @@ class _SyncState extends State<Sync> {
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Aktivitas Terbaru'),
-                DataTable(
-                  columns: [
-                    'TANGGAL',
-                    'EVENT',
-                    'STATUS',
-                    'LOG',
-                  ]
-                  .map(
-                    (e) {
-                      return DataColumn(
-                        label: Text(e),
-                      );
-                    }
-                  )
-                  .toList(),
-                  rows: [
-                    const DataRow( //TODO transaksi terbaru
-                      cells: [
-                        DataCell(
-                          Text('a'),
+                const Column(
+                  spacing: 16.0,
+                  children: [
+                    Row(
+                      spacing: 8.0,
+                      children: [
+                        Icon(Icons.history),
+                        Text('Aktivitas Terbaru'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text('TANGGAL'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('TIPE EVENT'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('STATUS'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 2,
+                          child: Text('PESAN'),
                         ),
                       ],
                     ),
                   ],
+                ),
+                const Divider(),
+                StreamBuilder(
+                  stream: sb
+                  .from('act')
+                  .select()
+                  .asStream(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final acts = snapshot.data;
+                      
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        itemBuilder: (context, i) {
+                          final act = acts[i];
+                      
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                    DateTime.parse(act['created_at']),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text(act['type']),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  spacing: 8.0,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      color:
+                                      act['status']
+                                      ? Colors.green
+                                      : Colors.red,
+                                      size: 18,
+                                    ),
+                                    Text(
+                                      act['status']
+                                      ? 'Success'
+                                      : 'Error',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(act['log']),
+                              ),
+                            ],
+                          );
+                        },
+                        separatorBuilder: (context, i) {
+                          return const Divider();
+                        },
+                        itemCount: acts!.length,
+                      );
+                    }
+                    else {
+                      return const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Tidak ada aktivitas untuk ditampilkan.',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -163,5 +267,12 @@ class _SyncState extends State<Sync> {
         ),
       ],
     );
+  }
+
+  void init() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    partner.text = prefs.getString('partner') ?? '';
+    secret.text = prefs.getString('secret') ?? '';
   }
 }

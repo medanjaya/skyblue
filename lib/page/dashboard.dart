@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -10,13 +10,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  final SupabaseClient sb = Supabase.instance.client;
-
-  @override
-  void initState() {
-    super.initState();
-    print(sb.auth.currentSession);
-  }
+  final DeviceInfoPlugin device = DeviceInfoPlugin();
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +47,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [ //TODO cek status semua user
                       Text('Device'),
                       Text('Type'),

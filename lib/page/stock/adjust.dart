@@ -162,7 +162,6 @@ class _AdjustState extends State<Adjust> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEAF3FB),
       body: SingleChildScrollView(
         child: Container(
         width: double.infinity,
@@ -189,7 +188,7 @@ class _AdjustState extends State<Adjust> {
                     height: 400,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
@@ -295,7 +294,7 @@ class _AdjustState extends State<Adjust> {
                               constraints: const BoxConstraints(maxHeight: 300),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).primaryColor,
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
@@ -366,7 +365,7 @@ class _AdjustState extends State<Adjust> {
                         padding: const EdgeInsets.all(16),
                         height: 400,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
@@ -554,7 +553,7 @@ class _AdjustState extends State<Adjust> {
                                   onPressed: simpanPenyesuaian,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF007BFF),
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: Theme.of(context).primaryColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -577,7 +576,7 @@ class _AdjustState extends State<Adjust> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(

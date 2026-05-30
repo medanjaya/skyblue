@@ -84,7 +84,7 @@ class _ProcureState extends State<Procure> {
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: const Column(
@@ -100,7 +100,7 @@ class _ProcureState extends State<Procure> {
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
             child: Column(

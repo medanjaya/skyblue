@@ -70,9 +70,10 @@ class _HomeState extends State<Home> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 12.0,
                     children: [
                       ListTile(
-                        leading: InkWell(
+                        leading: InkWell( //FIXME ada ini jadinya highlight dashboard nampak ketika tidak expand
                           onTap: () {
                             setState(
                               () {
@@ -177,8 +178,7 @@ class _HomeState extends State<Home> {
                           await sb.auth.signOut()
                           .then(
                             (r) {
-                              ScaffoldMessenger.of(context)
-                              .showSnackBar(
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Padding(
                                     padding: EdgeInsets.all(4.0),
@@ -237,7 +237,7 @@ class _HomeState extends State<Home> {
                               children: [
                                 const Icon(Icons.access_time),
                                 Text(
-                                  DateFormat('MM/dd/yyyy hh:mm:ss').format(DateTime.now()),
+                                  DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()),
                                 ),
                               ],
                             );
@@ -385,6 +385,15 @@ class _HomeState extends State<Home> {
     final isSelected = current.startsWith(key);
     
     return ExpansionTile(
+      onExpansionChanged: (v) {
+        if (v) {
+          setState(
+            () {
+              isExpand = true;
+            },
+          );
+        }
+      },
       controller: controller,
       leading: Icon(
         icon,
