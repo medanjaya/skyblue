@@ -169,60 +169,102 @@ class _ProcureState extends State<Procure> {
                   ],
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: DataTable( //FIXME jarak kolom berubah ketika kosong
-                      columns: [
-                        'NOMOR PO',
-                        'TANGGAL',
-                        'CUSTOMER',
-                        'SUMBER',
-                        'BARANG',
-                        'NOMINAL',
-                        'STATUS',
-                      ].map(
-                        (e) {
-                          return DataColumn(
-                            label: Text(e),
-                          );
-                        }
-                      ).toList(),
-                      rows: pages.map(
-                        (e) {
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Text(e['ID']),
-                              ),
-                              DataCell(
-                                Text(e['TIME'].toString()),
-                              ),
-                              DataCell(
-                                Text(e['CUSTOMER']),
-                              ),
-                              DataCell(
-                                Text(e['SOURCE']),
-                              ),
-                              DataCell(
-                                Text(NumberFormat.decimalPattern('id_ID').format(e['ITEM'].length).toString()),
-                              ),
-                              DataCell(
-                                Text(NumberFormat.decimalPattern('id_ID').format(e['PRICE']).toString()),
-                              ),
-                              DataCell(
-                                Text(
-                                  e['STATUS'],
-                                  style: TextStyle(
-                                    color: e['STATUS'].toLowerCase() == 'cancelled'
-                                    ? Colors.red
-                                    : Colors.green,
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text('NOMOR PO'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('TANGGAL'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('CUSTOMER'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('SUMBER'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('BARANG'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('NOMINAL'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('STATUS'),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, i) {
+                            final item = pages[i];
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['ID']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['TIME'].toString()),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['CUSTOMER']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['SOURCE']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    NumberFormat.decimalPattern('id_ID')
+                                    .format(item['ITEM'].length)
+                                    .toString(),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      ).toList(),
-                    ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    NumberFormat.decimalPattern('id_ID')
+                                    .format(item['PRICE'])
+                                    .toString(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    item['STATUS'],
+                                    style: TextStyle(
+                                      color: item['STATUS'].toLowerCase() == 'cancelled'
+                                      ? Colors.red
+                                      : Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, i) {
+                            return const Divider();
+                          },
+                          itemCount: pages.length,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Row(

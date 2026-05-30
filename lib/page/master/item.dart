@@ -212,73 +212,107 @@ class _ItemState extends State<Item> {
                   ],
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: DataTable( //FIXME jarak kolom berubah ketika kosong
-                      columns: [
-                        'ACTION',
-                        'KODE',
-                        'NAMA BARANG',
-                        'KATEGORI',
-                        'HARGA',
-                        'STATUS',
-                      ].map(
-                        (e) {
-                          return DataColumn(
-                            label: Text(e),
-                          );
-                        }
-                      ).toList(),
-                      rows: pages.map(
-                        (e) {
-                          return DataRow(
-                            cells: [
-                              DataCell(
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {}, //TODO edit item
-                                      icon: const Icon(
-                                        Icons.edit_note,
-                                        color: Colors.red,
-                                      ), 
-                                    ),
-                                    IconButton(
-                                      onPressed: () {}, //TODO informasi item
-                                      icon: const Icon(
-                                        Icons.info_outline,
-                                        color: Colors.blue,
-                                      ), 
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              DataCell(
-                                Text(e['CODE']),
-                              ),
-                              DataCell(
-                                Text(e['NAME']),
-                              ),
-                              DataCell(
-                                Text(e['CATEGORY']),
-                              ),
-                              DataCell(
-                                Text(NumberFormat.decimalPattern('id_ID').format(e['PRICE']).toString()),
-                              ),
-                              DataCell(
-                                Text(
-                                  e['STATUS'],
-                                  style: TextStyle(
-                                    color: e['STATUS'].toLowerCase() == 'habis'
-                                    ? Colors.red
-                                    : Colors.green,
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text('ACTION'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('KODE'),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text('NAMA BARANG'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('KATEGORI'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('HARGA'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('STATUS'),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, i) {
+                            final item = pages[i];
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {}, //TODO edit item
+                                        icon: const Icon(
+                                          Icons.edit_note,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {}, //TODO informasi item
+                                        icon: const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      ).toList(),
-                    ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['CODE']),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(item['NAME']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(item['CATEGORY']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    NumberFormat.decimalPattern('id_ID')
+                                    .format(item['PRICE'])
+                                    .toString(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    item['STATUS'],
+                                    style: TextStyle(
+                                      color: item['STATUS'].toLowerCase() == 'habis'
+                                      ? Colors.red
+                                      : Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, i) {
+                            return const Divider();
+                          },
+                          itemCount: pages.length,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Row(

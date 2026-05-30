@@ -78,6 +78,49 @@ Future<void> authPartner() async {
   );
 }
 
+Future<void> refreshToken() async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/auth/access_token/get',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time)),
+
+  refresh = prefs.getString('refresh') ?? '',
+  shop = prefs.getString('shop') ?? '';
+
+  http.post(
+    Uri.https(
+      host,
+      path,
+      {
+        'partner_id': partner,
+        'timestamp': time,
+        'sign': sign.toString(),
+      },
+    ),
+    body: jsonEncode(
+      {
+        'partner_id': partner,
+        'refresh_token': refresh,
+        'shop_id': shop,
+      },
+    ),
+  )
+  .then(
+    (r) {
+      final result = jsonDecode(r.body);
+
+      prefs.setString('refresh', result['refresh_token']);
+    },
+  );
+}
+
 Future<void> getItemList() async {
   final
   prefs = await SharedPreferences.getInstance(),
@@ -126,6 +169,7 @@ Future<void> getOrderList() async {
   secret = prefs.getString('secret') ?? '',
 
   path = '/api/v2/order/get_order_list',
+  from = '${DateTime.now().subtract(const Duration(days: 15)).millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
   time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
   
   token = prefs.getString('token') ?? '',
@@ -145,7 +189,7 @@ Future<void> getOrderList() async {
         'shop_id': shop,
         'sign': sign.toString(),
         'time_range_field': 'create_time',
-        'time_from': '1423958400',
+        'time_from': from,
         'time_to': time,
         'page_size': '100',
       },

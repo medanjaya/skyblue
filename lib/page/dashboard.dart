@@ -120,48 +120,84 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Transaksi Terbaru'),
-                DataTable(
-                  columns: [
-                    'ID TRANSAKSI',
-                    'TANGGAL',
-                    'CUSTOMER',
-                    'JUMLAH ITEM',
-                    'STATUS',
-                    'NOMINAL',
-                  ]
-                  .map(
-                    (e) {
-                      return DataColumn(
-                        label: Text(e),
-                      );
-                    }
-                  )
-                  .toList(),
-                  rows: [
-                    const DataRow( //TODO transaksi terbaru
-                      cells: [
-                        DataCell(
-                          Text('a'),
+                const Column(
+                  spacing: 16.0,
+                  children: [
+                    Row(
+                      spacing: 8.0,
+                      children: [
+                        Icon(Icons.history),
+                        Text('Transaksi Terbaru'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text('ID TRANSAKSI'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('TANGGAL'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('CUSTOMER'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('JUMLAH ITEM'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('STATUS'),
                         ),
-                        DataCell(
-                          Text('a'),
+                        Expanded(
+                          flex: 1,
+                          child: Text('NOMINAL'),
                         ),
                       ],
                     ),
                   ],
+                ),
+                const Divider(),
+                ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, i) {
+                    return const Row( //TODO transaksi terbaru
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text('a'),
+                        ),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, i) {
+                    return const Divider();
+                  },
+                  itemCount: 1,
                 ),
               ],
             ),

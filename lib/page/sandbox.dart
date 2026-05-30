@@ -36,6 +36,12 @@ class _SandboxState extends State<Sandbox> {
         ),
         IconButton(
           onPressed: () {
+            refreshToken();
+          },
+          icon: const Icon(Icons.refresh),
+        ),
+        IconButton(
+          onPressed: () {
             getItemList();
           },
           icon: const Icon(Icons.download),
