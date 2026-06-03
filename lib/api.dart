@@ -31,7 +31,8 @@ Future<void> authPartner() async {
         'timestamp': time,
         'redirect': 'https://open.shopee.com',
       },
-    ).toString(),
+    )
+    .toString(),
     callbackUrlScheme: 'https',
     options: const FlutterWebAuth2Options(
       httpsHost: 'open.shopee.com',
@@ -168,10 +169,10 @@ Future getItemList() async {
   hmac = Hmac(sha256, base64Decode(secret)),
   sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
 
-  refreshToken()
+  return refreshToken()
   .then(
     (r) {
-      http.get(
+      return http.get(
         Uri.https(
           host,
           path,
@@ -185,7 +186,14 @@ Future getItemList() async {
             'page_size': '100',
             'update_time_from': '1423958400',
             'update_time_to': time,
-            'item_status': ['NORMAL', 'BANNED', 'UNLIST', 'REVIEWING', 'SELLER_DELETE', 'SHOPEE_DELETE'],
+            'item_status': [
+              'NORMAL',
+              'BANNED',
+              'UNLIST',
+              'REVIEWING',
+              'SELLER_DELETE',
+              'SHOPEE_DELETE',
+            ],
           },
         ),
       )
@@ -199,7 +207,7 @@ Future getItemList() async {
           
           sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
 
-          http.get(
+          return http.get(
             Uri.https(
               host,
               path,
@@ -214,7 +222,8 @@ Future getItemList() async {
                   (i) {
                     return result[i]['item_id'].toString();
                   },
-                ),
+                )
+                .join(','),
               },
             ),
           )
@@ -255,10 +264,10 @@ Future getOrderList() async {
     .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
   }';
 
-  refreshToken()
+  return refreshToken()
   .then(
     (r) {
-      http.get(
+      return http.get(
         Uri.https(
           host,
           path,
@@ -285,7 +294,7 @@ Future getOrderList() async {
           
           sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
 
-          http.get(
+          return http.get(
             Uri.https(
               host,
               path,
@@ -300,7 +309,14 @@ Future getOrderList() async {
                   (i) {
                     return result[i]['order_sn'];
                   },
-                ),
+                )
+                .join(','),
+                'response_optional_fields': [
+                  'buyer_username',
+                  'item_list',
+                  'total_amount',
+                ]
+                .join(','),
               },
             ),
           )

@@ -205,7 +205,8 @@ class _ItemState extends State<Item> {
                               child: Text(e.toString()),
                             );  
                           },
-                        ).toList(),
+                        )
+                        .toList(),
                       ),
                     ),
                     const Text('entries'),

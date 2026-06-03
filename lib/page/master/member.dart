@@ -106,7 +106,8 @@ class _MemberState extends State<Member> {
                                         child: Text(e.toString()),
                                       );  
                                     },
-                                  ).toList(),
+                                  )
+                                  .toList(),
                                 ),
                               ),
                               const Text('entries'),

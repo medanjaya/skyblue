@@ -143,7 +143,8 @@ class _ProcureState extends State<Procure> {
                                   child: Text(e.toString()),
                                 );  
                               },
-                            ).toList(),
+                            )
+                            .toList(),
                           ),
                         ),
                         const Text('entries'),

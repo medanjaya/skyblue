@@ -208,7 +208,8 @@ class _DataState extends State<Data> {
                               child: Text(e.toString()),
                             );  
                           },
-                        ).toList(),
+                        )
+                        .toList(),
                       ),
                     ),
                     const Text('entries'),

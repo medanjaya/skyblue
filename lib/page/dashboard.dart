@@ -258,8 +258,8 @@ class _DashboardState extends State<Dashboard> {
                           child: Text('CUSTOMER'),
                         ),
                         Expanded(
-                          flex: 1,
-                          child: Text('JUMLAH ITEM'),
+                          flex: 2,
+                          child: Text('ITEM'),
                         ),
                         Expanded(
                           flex: 1,
@@ -297,17 +297,38 @@ class _DashboardState extends State<Dashboard> {
                                   flex: 1,
                                   child: Text(
                                     DateFormat('dd/MM/yyyy hh:mm').format(
-                                      DateTime.parse(order['create_time']),
+                                      DateTime.parse(order['create_time'].toString()),
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   flex: 1,
-                                  child: Text('a'),
+                                  child: Text(order['buyer_username']),
                                 ),
                                 Expanded(
-                                  flex: 1,
-                                  child: Text(order['buyer_username']),
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: List.generate(
+                                      order['item_list'].length,
+                                      (i) {
+                                        final item = order['item_list'][i];
+
+                                        return Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text('x${item['model_quantity_purchased']}'),
+                                            ),
+                                            Expanded(
+                                              flex: 8,
+                                              child: Text(item['item_name']),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    ),
+                                  ),
                                 ),
                                 Expanded(
                                   flex: 1,
@@ -315,7 +336,11 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                                 Expanded(
                                   flex: 1,
-                                  child: Text('a'),
+                                  child: Text(
+                                    NumberFormat.decimalPattern('id_ID')
+                                    .format(order['total_amount'] ?? 0)
+                                    .toString(),
+                                  ),
                                 ),
                               ],
                             );
