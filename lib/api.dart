@@ -72,6 +72,18 @@ Future<void> authPartner() async {
 
           prefs.setString('token', result['access_token']);
           prefs.setString('refresh', result['refresh_token']);
+          
+          prefs.setString(
+            'expiry',
+            '${
+              DateTime.now().add(
+                const Duration(
+                  hours: 4,
+                ),
+              )
+              .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
+            }'
+          );
         },
       );
     },
@@ -82,6 +94,8 @@ Future<void> refreshToken() async {
   final
   prefs = await SharedPreferences.getInstance(),
 
+  expiry = prefs.getString('expiry') ?? '',
+  
   partner = prefs.getString('partner') ?? '',
   secret = prefs.getString('secret') ?? '',
 
@@ -94,7 +108,8 @@ Future<void> refreshToken() async {
   refresh = prefs.getString('refresh') ?? '',
   shop = prefs.getString('shop') ?? '';
 
-  http.post(
+  int.parse(expiry) > int.parse(time)
+  ? http.post(
     Uri.https(
       host,
       path,
@@ -106,9 +121,9 @@ Future<void> refreshToken() async {
     ),
     body: jsonEncode(
       {
-        'partner_id': partner,
+        'partner_id': int.parse(partner),
         'refresh_token': refresh,
-        'shop_id': shop,
+        'shop_id': int.parse(shop),
       },
     ),
   )
@@ -116,12 +131,28 @@ Future<void> refreshToken() async {
     (r) {
       final result = jsonDecode(r.body);
 
+      prefs.setString('token', result['access_token']);
       prefs.setString('refresh', result['refresh_token']);
+
+      prefs.setString(
+        'expiry',
+        '${
+          DateTime.now().add(
+            const Duration(
+              hours: 3,
+              minutes: 59,
+              seconds: 59,
+            ),
+          )
+          .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
+        }'
+      );
     },
-  );
+  )
+  : authPartner();
 }
 
-Future<void> getItemList() async {
+Future getItemList() async {
   final
   prefs = await SharedPreferences.getInstance(),
 
@@ -137,31 +168,69 @@ Future<void> getItemList() async {
   hmac = Hmac(sha256, base64Decode(secret)),
   sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
 
-  http.get(
-    Uri.https(
-      host,
-      path,
-      {
-        'partner_id': partner,
-        'timestamp': time,
-        'access_token': token,
-        'shop_id': shop,
-        'sign': sign.toString(),
-        'offset': '0',
-        'page_size': '100',
-        'update_time_from': '1423958400',
-        'update_time_to': time,
-      },
-    ),
-  )
+  refreshToken()
   .then(
     (r) {
-      print(r.body);
+      http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+            'offset': '0',
+            'page_size': '100',
+            'update_time_from': '1423958400',
+            'update_time_to': time,
+            'item_status': ['NORMAL', 'BANNED', 'UNLIST', 'REVIEWING', 'SELLER_DELETE', 'SHOPEE_DELETE'],
+          },
+        ),
+      )
+      .then(
+        (r) {
+          final
+          result = jsonDecode(r.body)['response']['item'],
+          
+          path = '/api/v2/product/get_item_base_info',
+          time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+          
+          sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+          http.get(
+            Uri.https(
+              host,
+              path,
+              {
+                'partner_id': partner,
+                'timestamp': time,
+                'access_token': token,
+                'shop_id': shop,
+                'sign': sign.toString(),
+                'item_id_list': List.generate(
+                  result.length,
+                  (i) {
+                    return result[i]['item_id'].toString();
+                  },
+                ),
+              },
+            ),
+          )
+          .then(
+            (r) {
+              print(r.body);
+              return jsonDecode(r.body)['response']['item_list'];
+            }
+          );
+        },
+      );
     },
   );
 }
 
-Future<void> getOrderList() async {
+Future getOrderList() async {
   final
   prefs = await SharedPreferences.getInstance(),
 
@@ -169,35 +238,80 @@ Future<void> getOrderList() async {
   secret = prefs.getString('secret') ?? '',
 
   path = '/api/v2/order/get_order_list',
-  from = '${DateTime.now().subtract(const Duration(days: 15)).millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
   time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
   
   token = prefs.getString('token') ?? '',
   shop = prefs.getString('shop') ?? '',
 
   hmac = Hmac(sha256, base64Decode(secret)),
-  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop)),
 
-  http.get(
-    Uri.https(
-      host,
-      path,
-      {
-        'partner_id': partner,
-        'timestamp': time,
-        'access_token': token,
-        'shop_id': shop,
-        'sign': sign.toString(),
-        'time_range_field': 'create_time',
-        'time_from': from,
-        'time_to': time,
-        'page_size': '100',
-      },
-    ),
-  )
+  from = '${
+    DateTime.now().subtract(
+      const Duration(
+        days: 15,
+      ),
+    )
+    .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
+  }';
+
+  refreshToken()
   .then(
     (r) {
-      print(r.body);
+      http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+            'time_range_field': 'create_time',
+            'time_from': from,
+            'time_to': time,
+            'page_size': '100',
+          },
+        ),
+      )
+      .then(
+        (r) {
+          final
+          result = jsonDecode(r.body)['response']['order_list'],
+          
+          path = '/api/v2/order/get_order_detail',
+          time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+          
+          sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+          http.get(
+            Uri.https(
+              host,
+              path,
+              {
+                'partner_id': partner,
+                'timestamp': time,
+                'access_token': token,
+                'shop_id': shop,
+                'sign': sign.toString(),
+                'order_sn_list': List.generate(
+                  result.length,
+                  (i) {
+                    return result[i]['order_sn'];
+                  },
+                ),
+              },
+            ),
+          )
+          .then(
+            (r) {
+              print(r.body);
+              return jsonDecode(r.body)['response']['order_list'];
+            }
+          );
+        },
+      );
     },
   );
 }

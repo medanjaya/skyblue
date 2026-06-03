@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:skyblue/api.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -14,6 +18,8 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final sb = Supabase.instance.client;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 16.0,
@@ -45,13 +51,120 @@ class _DashboardState extends State<Dashboard> {
                     color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [ //TODO cek status semua user
-                      Text('Device'),
-                      Text('Type'),
-                      Text('Last Signed In'),
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text('NAMA'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('PERANGKAT'),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text('TERAKHIR MASUK'),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      StreamBuilder(
+                        stream: sb
+                        .from('user')
+                        .select()
+                        .asStream(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final users = snapshot.data!;
+                            
+                            if (users.isNotEmpty) {
+                              return ListView.separated(
+                                shrinkWrap: true,
+                                itemBuilder: (context, i) {
+                                  final user = users[i];
+                              
+                                  return Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Text(user['name']),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          spacing: 8.0,
+                                          children: [
+                                            Icon(
+                                              switch (user['type'].toString()) {
+                                                'android' => Icons.android,
+                                                'ios' => Icons.phone_iphone,
+                                                'linux' => Icons.terminal,
+                                                'macos' => Icons.tablet_mac,
+                                                'web' => Icons.language,
+                                                'windows' => Icons.window,
+                                                String() => Icons.question_mark,
+                                              },
+                                            ),
+                                            user['device'].isNotEmpty
+                                            ? Text(user['device'])
+                                            : const Text(
+                                              'Tidak dikenali',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                          DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                            DateTime.parse(user['last_signed_at']),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                                separatorBuilder: (context, i) {
+                                  return const Divider();
+                                },
+                                itemCount: users.length,
+                              );
+                            }
+
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Tidak ada user untuk ditampilkan',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          else {
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Sedang memperbarui aktivitas user..',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -161,43 +274,85 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
                 const Divider(),
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemBuilder: (context, i) {
-                    return const Row( //TODO transaksi terbaru
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
+                FutureBuilder(
+                  future: getOrderList(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final orders = snapshot.data!;
+                      
+                      if (orders.isNotEmpty) {
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, i) {
+                            final order = orders[i];
+                        
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(order['order_sn']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    DateFormat('dd/MM/yyyy hh:mm').format(
+                                      DateTime.parse(order['create_time']),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text('a'),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(order['buyer_username']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(order['order_status']),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text('a'),
+                                ),
+                              ],
+                            );
+                          },
+                          separatorBuilder: (context, i) {
+                            return const Divider();
+                          },
+                          itemCount: orders.length,
+                        );
+                      }
+
+                      return const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Tidak ada riwayat untuk ditampilkan',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
+                      );
+                    }
+                    else {
+                      return const Expanded(
+                        child: Center(
+                          child: Text(
+                            'Sedang memperbarui riwayat transaksi..',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text('a'),
-                        ),
-                      ],
-                    );
+                      );
+                    }
                   },
-                  separatorBuilder: (context, i) {
-                    return const Divider();
-                  },
-                  itemCount: 1,
                 ),
               ],
             ),

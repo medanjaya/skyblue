@@ -15,6 +15,8 @@ import 'package:skyblue/login.dart';
 3. di main() tambahkan await windowManager.ensureInitialized();
 4. lalu await windowManager.setFullScreen(true); */
 
+//FIXME ganti ke background biru kembali, cek commit sebelumnya
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
