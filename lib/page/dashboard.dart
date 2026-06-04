@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:skyblue/api.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:intl/intl.dart';
+
+import 'package:skyblue/api.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -80,61 +81,63 @@ class _DashboardState extends State<Dashboard> {
                             final users = snapshot.data!;
                             
                             if (users.isNotEmpty) {
-                              return ListView.separated(
-                                shrinkWrap: true,
-                                itemBuilder: (context, i) {
-                                  final user = users[i];
-                              
-                                  return Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(user['name']),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Row(
-                                          spacing: 8.0,
-                                          children: [
-                                            Icon(
-                                              switch (user['type'].toString()) {
-                                                'android' => Icons.android,
-                                                'ios' => Icons.phone_iphone,
-                                                'linux' => Icons.terminal,
-                                                'macos' => Icons.tablet_mac,
-                                                'web' => Icons.language,
-                                                'windows' => Icons.window,
-                                                String() => Icons.question_mark,
-                                              },
-                                            ),
-                                            user['device'].isNotEmpty
-                                            ? Text(user['device'])
-                                            : const Text(
-                                              'Tidak dikenali',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                          ],
+                              return Expanded(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, i) {
+                                    final user = users[i];
+                                
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(user['name']),
                                         ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          DateFormat('dd/MM/yyyy hh:mm:ss').format(
-                                            DateTime.parse(user['last_signed_at']),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Row(
+                                            spacing: 8.0,
+                                            children: [
+                                              Icon(
+                                                switch (user['type'].toString()) {
+                                                  'android' => Icons.android,
+                                                  'ios' => Icons.phone_iphone,
+                                                  'linux' => Icons.terminal,
+                                                  'macos' => Icons.tablet_mac,
+                                                  'web' => Icons.language,
+                                                  'windows' => Icons.window,
+                                                  String() => Icons.question_mark,
+                                                },
+                                              ),
+                                              user['device'].isNotEmpty
+                                              ? Text(user['device'])
+                                              : const Text(
+                                                'Tidak dikenali',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                                separatorBuilder: (context, i) {
-                                  return const Divider();
-                                },
-                                itemCount: users.length,
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                              DateTime.parse(user['last_signed_at']),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  separatorBuilder: (context, i) {
+                                    return const Divider();
+                                  },
+                                  itemCount: users.length,
+                                ),
                               );
                             }
 
@@ -281,74 +284,76 @@ class _DashboardState extends State<Dashboard> {
                       final orders = snapshot.data!;
                       
                       if (orders.isNotEmpty) {
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          itemBuilder: (context, i) {
-                            final order = orders[i];
-                        
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(order['order_sn']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    DateFormat('dd/MM/yyyy hh:mm').format(
-                                      DateTime.parse(order['create_time'].toString()),
+                        return Expanded(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, i) {
+                              final order = orders[i];
+                          
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(order['order_sn']),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      DateFormat('dd/MM/yyyy hh:mm').format(
+                                        DateTime.parse(order['create_time'].toString()),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(order['buyer_username']),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: List.generate(
-                                      order['item_list'].length,
-                                      (i) {
-                                        final item = order['item_list'][i];
-
-                                        return Row(
-                                          children: [
-                                            Expanded(
-                                              flex: 1,
-                                              child: Text('x${item['model_quantity_purchased']}'),
-                                            ),
-                                            Expanded(
-                                              flex: 8,
-                                              child: Text(item['item_name']),
-                                            ),
-                                          ],
-                                        );
-                                      }
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(order['buyer_username']),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: List.generate(
+                                        order['item_list'].length,
+                                        (i) {
+                                          final item = order['item_list'][i];
+                          
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Text('x${item['model_quantity_purchased']}'),
+                                              ),
+                                              Expanded(
+                                                flex: 8,
+                                                child: Text(item['item_name']),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(order['order_status']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(order['total_amount'] ?? 0)
-                                    .toString(),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(order['order_status']),
                                   ),
-                                ),
-                              ],
-                            );
-                          },
-                          separatorBuilder: (context, i) {
-                            return const Divider();
-                          },
-                          itemCount: orders.length,
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      NumberFormat.decimalPattern('id_ID')
+                                      .format(order['total_amount'])
+                                      .toString(),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, i) {
+                              return const Divider();
+                            },
+                            itemCount: orders.length,
+                          ),
                         );
                       }
 

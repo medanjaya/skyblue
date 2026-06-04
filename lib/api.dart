@@ -229,7 +229,7 @@ Future getItemList() async {
           )
           .then(
             (r) {
-              print(r.body);
+              //FIXME print(r.body);
               return jsonDecode(r.body)['response']['item_list'];
             }
           );
@@ -322,7 +322,7 @@ Future getOrderList() async {
           )
           .then(
             (r) {
-              print(r.body);
+              //FIXME print(r.body);
               return jsonDecode(r.body)['response']['order_list'];
             }
           );
