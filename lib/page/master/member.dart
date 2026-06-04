@@ -28,8 +28,18 @@ class _MemberState extends State<Member> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Data User'),
+            const Text('Data User', style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)
+            ),),
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF007BFF),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 16.0,
+                ),
+              ),
               onPressed: () {
                 //TODO tambah user, cek versi sebelumnya
               },
@@ -139,23 +149,33 @@ class _MemberState extends State<Member> {
                             children: [
                               Expanded(
                                 flex: 1,
-                                child: Text('AKSI'),
+                                child: Text('AKSI', style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),),
                               ),
                               Expanded(
                                 flex: 1,
-                                child: Text('NAMA'),
+                                child: Text('NAMA', style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),),
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Text('EMAIL'),
+                                child: Text('EMAIL', style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),),
                               ),
                               Expanded(
                                 flex: 1,
-                                child: Text('ROLE'),
+                                child: Text('ROLE', style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),),
                               ),
                               Expanded(
                                 flex: 1,
-                                child: Text('STATUS'),
+                                child: Text('STATUS', style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),),
                               ),
                             ],
                           ),
@@ -171,12 +191,16 @@ class _MemberState extends State<Member> {
                                 children: [
                                   Expanded(
                                     flex: 1,
-                                    child: IconButton(
-                                      onPressed: () {}, //TODO edit item
-                                      icon: const Icon(
-                                        Icons.edit_note,
-                                        color: Colors.red,
-                                      ), 
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: IconButton(
+                                        onPressed: () {}, //TODO edit item
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.red,
+                                          size: 18.0,
+                                        ), 
+                                      ),
                                     ),
                                   ),
                                   Expanded(
@@ -207,7 +231,7 @@ class _MemberState extends State<Member> {
                                         Text(
                                           user['is_active']
                                           ? 'Active'
-                                          : 'Disactivated',
+                                          : 'Inactivate',
                                         ),
                                       ],
                                     ),
