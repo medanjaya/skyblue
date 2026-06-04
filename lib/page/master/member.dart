@@ -31,8 +31,8 @@ class _MemberState extends State<Member> {
             const Text('Data User', style: TextStyle(
               fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)
             ),),
-            TextButton(
-              style: TextButton.styleFrom(
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF007BFF),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
@@ -43,7 +43,8 @@ class _MemberState extends State<Member> {
               onPressed: () {
                 //TODO tambah user, cek versi sebelumnya
               },
-              child: const Text('Tambah Baru'),
+              icon: const Icon(Icons.add),
+              label: const Text('Tambah Baru'),
             ),
           ],
         ),
@@ -216,25 +217,45 @@ class _MemberState extends State<Member> {
                                     flex: 1,
                                     child: Text(user['role'].join(', ')),
                                   ),
-                                  Expanded(
+                                  Flexible(
                                     flex: 1,
-                                    child: Row(
-                                      spacing: 8.0,
-                                      children: [
-                                        Icon(
-                                          Icons.circle,
-                                          color:
-                                          user['is_active']
-                                          ? Colors.green
-                                          : Colors.red,
-                                          size: 18,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0,
+                                          horizontal: 8.0,
                                         ),
-                                        Text(
-                                          user['is_active']
-                                          ? 'Active'
-                                          : 'Inactivate',
+                                        decoration: BoxDecoration(
+                                          color: user['is_active']
+                                          ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                          : const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(10.0),
                                         ),
-                                      ],
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        spacing: 8.0,
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color:
+                                            user['is_active']
+                                            ? Colors.green
+                                            : Colors.red,
+                                            size: 18,
+                                          ),
+                                            Text(
+                                              user['is_active']
+                                              ? 'Active'
+                                              : 'Inactivate',
+                                              style: TextStyle(
+                                                color: user['is_active']
+                                                ? Colors.green            
+                                                : Colors.red,
+                                              ),
+                                            ),
+                                        ],
+                                      ), ),
                                     ),
                                   ),
                                 ],
