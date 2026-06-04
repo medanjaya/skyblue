@@ -266,7 +266,7 @@ class _SyncState extends State<Sync> {
                       return const Expanded(
                         child: Center(
                           child: Text(
-                            'Sedang memperbaharui riwayat aktivitas..',
+                            'Sedang memperbarui riwayat aktivitas..',
                             style: TextStyle(
                               color: Colors.grey,
                               fontStyle: FontStyle.italic,

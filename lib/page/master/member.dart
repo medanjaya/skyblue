@@ -116,7 +116,8 @@ class _MemberState extends State<Member> {
                                         child: Text(e.toString()),
                                       );  
                                     },
-                                  ).toList(),
+                                  )
+                                  .toList(),
                                 ),
                               ),
                               const Text('entries'),
@@ -300,7 +301,7 @@ class _MemberState extends State<Member> {
                 else {
                   return const Center(
                     child: Text(
-                      'Sedang memperbaharui daftar user..',
+                      'Sedang memperbarui daftar user..',
                       style: TextStyle(
                         color: Colors.grey,
                         fontStyle: FontStyle.italic,

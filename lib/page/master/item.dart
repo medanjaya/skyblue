@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 
+import 'package:skyblue/api.dart';
+
 class Item extends StatefulWidget {
   const Item({super.key});
 
@@ -40,34 +42,13 @@ class _ItemState extends State<Item> {
     },
   ];
 
-  final List<Map> debugItems = List.generate(
-    100,
-    (i) {
-      return i.isOdd
-      ? {
-        'CODE': 'SKB-001',
-        'NAME': 'Kaos Polos Blue',
-        'CATEGORY': 'Atasan',
-        'PRICE': 40000,
-        'STATUS': 'Tersedia',
-      }
-      : {
-        'CODE': 'SKB-002',
-        'NAME': 'Hoodie Navy',
-        'CATEGORY': 'Jaket',
-        'PRICE': 125000,
-        'STATUS': 'Habis',
-      };
-    },
-  ); //TODO ganti ke api
-
   List display = [];
   int rows = 10, current = 1;
 
   @override
   void initState() {
     super.initState();
-    display = List.from(debugItems);
+    init();
   }
 
   @override
@@ -228,7 +209,8 @@ class _ItemState extends State<Item> {
                               )),
                             );  
                           },
-                        ).toList(),
+                        )
+                        .toList(),
                       ),
                     ),
                     const Text('entries', style: TextStyle(
@@ -280,74 +262,105 @@ class _ItemState extends State<Item> {
                         ],
                       ),
                       const Divider(),
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, i) {
-                            final item = pages[i];
+                      FutureBuilder(
+                        future: getItemList(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final items = snapshot.data!;
+                            
+                            if (items.isNotEmpty) {
+                              return Expanded(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, i) {
+                                    final item = items[i];
+                                
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {}, //TODO edit item
+                                                icon: const Icon(
+                                                  Icons.edit_note,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {}, //TODO informasi item
+                                                icon: const Icon(
+                                                  Icons.info_outline,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['item_id'].toString()),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text(item['item_name']),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['category_id'].toString()),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            item['price_info'].toString(),
+                                            /* NumberFormat.decimalPattern('id_ID')
+                                            .format(item['price_info'][0]['current_price'])
+                                            .toString(), */
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['item_status']),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  separatorBuilder: (context, i) {
+                                    return const Divider();
+                                  },
+                                  itemCount: pages.length,
+                                ),
+                              );
+                            }
 
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {}, //TODO edit item
-                                        icon: const Icon(
-                                          Icons.edit_note,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {}, //TODO informasi item
-                                        icon: const Icon(
-                                          Icons.info_outline,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                    ],
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Tidak ada barang untuk ditampilkan',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['CODE']),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(item['NAME']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['CATEGORY']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(item['PRICE'])
-                                    .toString(),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    item['STATUS'],
-                                    style: TextStyle(
-                                      color: item['STATUS'].toLowerCase() == 'habis'
-                                      ? Colors.red
-                                      : Colors.green,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             );
-                          },
-                          separatorBuilder: (context, i) {
-                            return const Divider();
-                          },
-                          itemCount: pages.length,
-                        ),
+                          }
+                          else {
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Sedang memperbarui daftar barang..',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -403,7 +416,7 @@ class _ItemState extends State<Item> {
     setState(
       () {
         display = List.from(
-          debugItems.where(
+          display.where( //FIXME
             (e) {
               final result = [];
               
@@ -422,6 +435,16 @@ class _ItemState extends State<Item> {
           ),
         );
       },
+    );
+  }
+
+  void init() async {
+    final items = await getItemList();
+
+    setState(
+      () {
+        display = List.from(items);
+      }
     );
   }
 }

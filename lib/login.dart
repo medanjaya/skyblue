@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:skyblue/home.dart';
 
@@ -112,39 +113,89 @@ class _LoginState extends State<Login> {
                           .then(
                             (r) async {
                               if (r.user != null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0,
-                                      ),
-                                      child: Text(
-                                        'Selamat datang kembali, ${
-                                          await Supabase.instance.client
-                                          .from('user')
-                                          .select()
-                                          .eq('id', r.user!.id)
-                                          .then(
-                                            (r) {
-                                              return r.first['name'];
-                                            }
-                                          )
-                                        }.',
-                                      ),
-                                    ),
-                                    duration: const Duration(
-                                      seconds: 3,
-                                    ),
-                                  ),
+                                final
+                                info = await DeviceInfoPlugin().deviceInfo,
+                                time = DateTime.now().toIso8601String();
+                                
+                                await Supabase.instance.client
+                                .from('user')
+                                .update(
+                                  switch (info.runtimeType.toString()) {
+                                    'AndroidDeviceInfo' => {
+                                      'device': info.data['model'],
+                                      'type': 'android',
+                                      'last_signed_at': time,
+                                    },
+                                    'IosDeviceInfo' => {
+                                      'device': info.data['modelName'],
+                                      'type': 'ios',
+                                      'last_signed_at': time,
+                                    },
+                                    'LinuxDeviceInfo' => {
+                                      'device': info.data['prettyName'],
+                                      'type': 'linux',
+                                      'last_signed_at': time,
+                                    },
+                                    'MacOsDeviceInfo' => {
+                                      'device': info.data['computerName'],
+                                      'type': 'macos',
+                                      'last_signed_at': time,
+                                    },
+                                    'WebBrowserInfo' => {
+                                      'device': info.data['browserName'],
+                                      'type': 'web',
+                                      'last_signed_at': time,
+                                    },
+                                    'WindowsDeviceInfo' => {
+                                      'device': info.data['computerName'],
+                                      'type': 'windows',
+                                      'last_signed_at': time,
+                                    },
+                                    String() => {
+                                      'device': '',
+                                      'type': '',
+                                      'last_signed_at': time,
+                                    },
+                                  },
                                 )
-                                .closed
+                                .eq('id', r.user!.id)
                                 .then(
-                                  (r) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const Home(),
+                                  (v) async {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                          ),
+                                          child: Text(
+                                            'Selamat datang kembali, ${
+                                              await Supabase.instance.client
+                                              .from('user')
+                                              .select()
+                                              .eq('id', r.user!.id)
+                                              .then(
+                                                (r) {
+                                                  return r.first['name'];
+                                                }
+                                              )
+                                            }.',
+                                          ),
+                                        ),
+                                        duration: const Duration(
+                                          seconds: 3,
+                                        ),
                                       ),
+                                    )
+                                    .closed
+                                    .then(
+                                      (r) {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const Home(),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 );

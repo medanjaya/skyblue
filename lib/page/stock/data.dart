@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 
+import 'package:skyblue/api.dart';
+
 class Data extends StatefulWidget {
   const Data({super.key});
 
@@ -50,38 +52,13 @@ class _DataState extends State<Data> {
     },
   ];
 
-  final List<Map> debugItems = List.generate(
-    100,
-    (i) {
-      return i.isOdd
-      ? {
-        'CODE': 'SKB-001',
-        'NAME': 'Kaos Polos Blue',
-        'CATEGORY': 'Atasan',
-        'BRAND': 'NO BRAND',
-        'PRICE': 40000,
-        'STATUS': 'Tersedia',
-        'QUANTITY': 264,
-      }
-      : {
-        'CODE': 'SKB-002',
-        'NAME': 'Hoodie Navy',
-        'CATEGORY': 'Jaket',
-        'BRAND': 'LEONIDAS',
-        'PRICE': 125000,
-        'STATUS': 'Habis',
-        'QUANTITY': 0,
-      };
-    },
-  ); //TODO ganti ke api
-
   List display = [];
   int rows = 10, current = 1;
 
   @override
   void initState() {
     super.initState();
-    display = List.from(debugItems);
+    init();
   }
 
   @override
@@ -208,7 +185,8 @@ class _DataState extends State<Data> {
                               child: Text(e.toString()),
                             );  
                           },
-                        ).toList(),
+                        )
+                        .toList(),
                       ),
                     ),
                     const Text('entries'),
@@ -254,86 +232,113 @@ class _DataState extends State<Data> {
                         ],
                       ),
                       const Divider(),
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, i) {
-                            final item = pages[i];
+                      FutureBuilder(
+                        future: getItemList(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final items = snapshot.data!;
+                            
+                            if (items.isNotEmpty) {
+                              return Expanded(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, i) {
+                                    final item = items[i];
+                                
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          flex: 1,
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {}, //TODO edit item
+                                                icon: const Icon(
+                                                  Icons.edit_note,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {}, //TODO informasi item
+                                                icon: const Icon(
+                                                  Icons.info_outline,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['item_id'].toString()),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text(item['item_name']),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['category_id'].toString()),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['brand'].toString()),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            item['price_info'].toString(),
+                                            /* NumberFormat.decimalPattern('id_ID')
+                                            .format(item['price_info'][0]['current_price'])
+                                            .toString(), */
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['item_status']),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? ''),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  separatorBuilder: (context, i) {
+                                    return const Divider();
+                                  },
+                                  itemCount: pages.length,
+                                ),
+                              );
+                            }
 
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {}, //TODO edit item
-                                        icon: const Icon(
-                                          Icons.edit_note,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {}, //TODO informasi item
-                                        icon: const Icon(
-                                          Icons.info_outline,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                    ],
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Tidak ada barang untuk ditampilkan',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['CODE']),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(item['NAME']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['CATEGORY']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['BRAND']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(item['PRICE'])
-                                    .toString(),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    item['STATUS'],
-                                    style: TextStyle(
-                                      color: item['STATUS'].toLowerCase() == 'habis'
-                                      ? Colors.red
-                                      : Colors.green,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(item['QUANTITY'])
-                                    .toString(),
-                                  ),
-                                ),
-                              ],
+                              ),
                             );
-                          },
-                          separatorBuilder: (context, i) {
-                            return const Divider();
-                          },
-                          itemCount: pages.length,
-                        ),
+                          }
+                          else {
+                            return const Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Sedang memperbarui daftar barang..',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -386,8 +391,8 @@ class _DataState extends State<Data> {
   void filterItems() {
     setState(
       () {
-        display = List.from(
-          debugItems.where(
+        display = List.from( //FIXME
+          display.where(
             (e) {
               final result = [];
               
@@ -406,6 +411,16 @@ class _DataState extends State<Data> {
           ),
         );
       },
+    );
+  }
+
+  void init() async {
+    final items = await getItemList();
+
+    setState(
+      () {
+        display = List.from(items);
+      }
     );
   }
 }

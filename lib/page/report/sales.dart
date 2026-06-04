@@ -285,7 +285,8 @@ class _SalesState extends State<Sales> {
                                   child: Text(e.toString()),
                                 );  
                               },
-                            ).toList(),
+                            )
+                            .toList(),
                           ),
                         ),
                         const Text('entries'),
