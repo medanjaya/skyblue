@@ -87,7 +87,9 @@ class _MemberState extends State<Member> {
                           Row(
                             spacing: 8.0,
                             children: [
-                              const Text('Show'),
+                              const Text('Show', style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),),
                               Container(
                                 height: 32.0,
                                 padding: const EdgeInsets.symmetric(
@@ -114,14 +116,18 @@ class _MemberState extends State<Member> {
                                     (e) {
                                       return DropdownMenuItem(
                                         value: e,
-                                        child: Text(e.toString()),
+                                        child: Text(e.toString(), style: const TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.w400,
+                                        ),),
                                       );  
                                     },
                                   )
                                   .toList(),
                                 ),
                               ),
-                              const Text('entries'),
+                              const Text('entries', style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),),
                             ],
                           ),
                           SizedBox(
@@ -282,7 +288,9 @@ class _MemberState extends State<Member> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
+                          Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries',style: const TextStyle(
+                            fontWeight: FontWeight.w600, color: Colors.grey,
+                          ),),
                           Row(
                             children: List.generate(
                               max(1, (total / rows).ceil()),
