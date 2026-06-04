@@ -236,7 +236,7 @@ class _HomeState extends State<Home> {
                               children: [
                                 const Icon(Icons.access_time),
                                 Text(
-                                  DateFormat('dd/MM/yyyy hh:mm:ss').format(DateTime.now()),
+                                  DateFormat('dd MMM yyyy HH:mm:ss').format(DateTime.now()),
                                 ),
                               ],
                             );

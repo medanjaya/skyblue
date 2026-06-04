@@ -66,8 +66,20 @@ class _ItemState extends State<Item> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Data Barang'),
+            const Text('Data Barang', style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF007BFF),
+            )),
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF007BFF),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 16.0,
+                ),
+              ),
               onPressed: () {
                 //TODO tambah barang, cek versi sebelumnya
               },
@@ -85,7 +97,11 @@ class _ItemState extends State<Item> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 16.0,
             children: [
-              const Text('Filter Data'),
+              const Text('Filter Data', style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF007BFF),
+              )),
               Row(
                 spacing: 16.0,
                 children: List.generate(
@@ -103,7 +119,7 @@ class _ItemState extends State<Item> {
                           Text(
                             field['name'],
                             style: const TextStyle(
-                              fontSize: 10.0,
+                              fontSize: 12.0, fontWeight: FontWeight.w600, color: Colors.grey,
                             ),
                           ),
                           TextField(
@@ -128,7 +144,7 @@ class _ItemState extends State<Item> {
               ),
               Align(
                 alignment: Alignment.bottomRight,
-                child: TextButton(
+                child: TextButton.icon(
                   onPressed: () {
                     for (final e in fields) {
                       e['controller'].clear();
@@ -136,7 +152,10 @@ class _ItemState extends State<Item> {
                     
                     filterItems();
                   },
-                  child: const Text('Reset Filter'),
+                  icon: const Icon(Icons.refresh, size: 16.0),
+                  label: const Text('Reset Filter', style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  )),
                 ),
               ),
             ],
@@ -156,7 +175,9 @@ class _ItemState extends State<Item> {
                 Row(
                   spacing: 8.0,
                   children: [
-                    const Text('Show'),
+                    const Text('Show', style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                    )),
                     Container(
                       height: 32.0,
                       padding: const EdgeInsets.symmetric(
@@ -183,14 +204,18 @@ class _ItemState extends State<Item> {
                           (e) {
                             return DropdownMenuItem(
                               value: e,
-                              child: Text(e.toString()),
+                              child: Text(e.toString(), style: const TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.w400,
+                              )),
                             );  
                           },
                         )
                         .toList(),
                       ),
                     ),
-                    const Text('entries'),
+                    const Text('entries', style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                    )),
                   ],
                 ),
                 Expanded(
@@ -200,27 +225,39 @@ class _ItemState extends State<Item> {
                         children: [
                           Expanded(
                             flex: 1,
-                            child: Text('ACTION'),
+                            child: Text('ACTION', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('KODE'),
+                            child: Text('KODE', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                           Expanded(
                             flex: 2,
-                            child: Text('NAMA BARANG'),
+                            child: Text('NAMA BARANG', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('KATEGORI'),
+                            child: Text('KATEGORI', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('HARGA'),
+                            child: Text('HARGA', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('STATUS'),
+                            child: Text('STATUS', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            )),
                           ),
                         ],
                       ),
@@ -331,7 +368,9 @@ class _ItemState extends State<Item> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
+                    Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries', style: const TextStyle(
+                      fontWeight: FontWeight.w600, color: Colors.grey,
+                    )),
                     Row(
                       children: List.generate(
                         max(1, (total / rows).ceil()),
