@@ -16,37 +16,37 @@ class Data extends StatefulWidget {
 class _DataState extends State<Data> {
   final List<Map> fields = [
     {
-      'key': 'CODE',
+      'key': 'item_id',
       'name': 'KODE',
       'controller': TextEditingController(),
     },
     {
-      'key': 'NAME',
+      'key': 'item_name',
       'name': 'NAMA BARANG',
       'controller': TextEditingController(),
     },
     {
-      'key': 'CATEGORY',
+      'key': 'category_id',
       'name': 'KATEGORI',
       'controller': TextEditingController(),
     },
     {
-      'key': 'BRAND',
+      'key': 'BRAND', //FIXME
       'name': 'MEREK',
       'controller': TextEditingController(),
     },
     {
-      'key': 'PRICE',
+      'key': 'PRICE', //FIXME
       'name': 'HARGA',
       'controller': TextEditingController(),
     },
     {
-      'key': 'STATUS',
+      'key': 'item_status',
       'name': 'STATUS',
       'controller': TextEditingController(),
     },
     {
-      'key': 'QUANTITY',
+      'key': 'QUANTITY', //FIXME
       'name': 'KUANTITAS',
       'controller': TextEditingController(),
     },
@@ -56,19 +56,7 @@ class _DataState extends State<Data> {
   int rows = 10, current = 1;
 
   @override
-  void initState() {
-    super.initState();
-    init();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final
-    total = display.length,
-    first = (current - 1) * rows,
-    last = (first + rows > total) ? total : first + rows,
-    pages = display.sublist(first, last);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
@@ -107,7 +95,7 @@ class _DataState extends State<Data> {
                           ),
                           TextField(
                             onChanged: (v) {
-                              filterItems();
+                              setState(() {});
                             },
                             controller: field['controller'],
                             decoration: const InputDecoration(
@@ -133,7 +121,7 @@ class _DataState extends State<Data> {
                       e['controller'].clear();
                     }
                     
-                    filterItems();
+                    setState(() {});
                   },
                   child: const Text('Reset Filter'),
                 ),
@@ -148,102 +136,184 @@ class _DataState extends State<Data> {
               color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 8.0,
-              children: [
-                Row(
-                  spacing: 8.0,
-                  children: [
-                    const Text('Show'),
-                    Container(
-                      height: 32.0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black54,
-                        ),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: DropdownButton(
-                        onChanged: (v) {
-                          setState(
-                            () {
-                              rows = v!;
-                              current = 1;
-                            },
+            child: StreamBuilder(
+              stream: getItemList(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final items = snapshot.data!;
+
+                  display = List.from(
+                    items.where(
+                      (e) {
+                        final result = [];
+                        
+                        for (final f in fields) {
+                          result.add(
+                            e[f['key']].toString().toLowerCase().contains(
+                              f['controller'].text.toLowerCase(),
+                            ),
                           );
-                        },
-                        value: rows,
-                        underline: const SizedBox(),
-                        items: [10, 25, 50].map(
-                          (e) {
-                            return DropdownMenuItem(
-                              value: e,
-                              child: Text(e.toString()),
-                            );  
-                          },
-                        )
-                        .toList(),
-                      ),
+                        }
+                        
+                        return result.every(
+                          (e) => e == true,
+                        );
+                      },
                     ),
-                    const Text('entries'),
-                  ],
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      const Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Text('ACTION'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('KODE'),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text('NAMA BARANG'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('KATEGORI'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('MEREK'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('HARGA'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('STATUS'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('KUANTITAS'),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      FutureBuilder(
-                        future: getItemList(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            final items = snapshot.data!;
-                            
-                            if (items.isNotEmpty) {
-                              return Expanded(
+                  );
+
+                  final
+                  total = display.length,
+                  first = (current - 1) * rows,
+                  last = (first + rows > total) ? total : first + rows,
+                  pages = display.sublist(first, last);
+                  
+                  if (items.isNotEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: 8.0,
+                      children: [
+                        Row(
+                          spacing: 8.0,
+                          children: [
+                            const Text(
+                              'Show',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Container(
+                              height: 32.0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black54,
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: DropdownButton(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      rows = v!;
+                                      current = 1;
+                                    },
+                                  );
+                                },
+                                value: rows,
+                                underline: const SizedBox(),
+                                items: [10, 25, 50].map(
+                                  (e) {
+                                    return DropdownMenuItem(
+                                      value: e,
+                                      child: Text(
+                                        e.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    );  
+                                  },
+                                )
+                                .toList(),
+                              ),
+                            ),
+                            const Text(
+                              'entries',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              const Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'ACTION',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'KODE',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'NAMA BARANG',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'KATEGORI',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'MEREK',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'HARGA',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'STATUS',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'KUANTITAS',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Divider(),
+                              Expanded(
                                 child: ListView.separated(
                                   shrinkWrap: true,
                                   itemBuilder: (context, i) {
-                                    final item = items[i];
+                                    final item = pages[i];
                                 
                                     return Row(
                                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -283,15 +353,14 @@ class _DataState extends State<Data> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Text(item['brand'].toString()),
+                                          child: Text(item['brand']['original_brand_name'].toString()),
                                         ),
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            item['price_info'].toString(),
-                                            /* NumberFormat.decimalPattern('id_ID')
-                                            .format(item['price_info'][0]['current_price'])
-                                            .toString(), */
+                                            NumberFormat.decimalPattern('id_ID')
+                                            .format(item['price_info']?[0]['current_price'] ?? 0)
+                                            .toString(),
                                           ),
                                         ),
                                         Expanded(
@@ -300,7 +369,7 @@ class _DataState extends State<Data> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? ''),
+                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'),
                                         ),
                                       ],
                                     );
@@ -310,117 +379,82 @@ class _DataState extends State<Data> {
                                   },
                                   itemCount: pages.length,
                                 ),
-                              );
-                            }
-
-                            return const Expanded(
-                              child: Center(
-                                child: Text(
-                                  'Tidak ada barang untuk ditampilkan',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
                               ),
-                            );
-                          }
-                          else {
-                            return const Expanded(
-                              child: Center(
-                                child: Text(
-                                  'Sedang memperbarui daftar barang..',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Showing ${total == 0 ? 0 : first + 1} to $last from $total entries',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
                               ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
-                    Row(
-                      children: List.generate(
-                        max(1, (total / rows).ceil()),
-                        (i) {
-                          final page = i + 1;
-            
-                          return InkWell(
-                            onTap: () {
-                              setState(
-                                () {
-                                  current = page;
-                                }
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              margin: const EdgeInsets.only(
-                                left: 8.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: current == page
-                                ? const Color.fromARGB(120, 135, 206, 235)
-                                : const Color.fromARGB(40, 135, 206, 235),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              child: Text(page.toString()),
                             ),
-                          );
-                        }
+                            Row(
+                              children: List.generate(
+                                max(1, (total / rows).ceil()),
+                                (i) {
+                                  final page = i + 1;
+                    
+                                  return InkWell(
+                                    onTap: () {
+                                      setState(
+                                        () {
+                                          current = page;
+                                        }
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      margin: const EdgeInsets.only(
+                                        left: 8.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: current == page
+                                        ? const Color.fromARGB(120, 135, 206, 235)
+                                        : const Color.fromARGB(40, 135, 206, 235),
+                                        borderRadius: BorderRadius.circular(4.0),
+                                      ),
+                                      child: Text(page.toString()),
+                                    ),
+                                  );
+                                }
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: Text(
+                      'Tidak ada barang untuk ditampilkan',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  );
+                }
+                else {
+                  return const Center(
+                    child: Text(
+                      'Sedang memperbarui daftar barang..',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ),
       ],
-    );
-  }
-
-  void filterItems() {
-    setState(
-      () {
-        display = List.from( //FIXME
-          display.where(
-            (e) {
-              final result = [];
-              
-              for (final f in fields) {
-                result.add(
-                  e[f['key']].toString().toLowerCase().contains(
-                    f['controller'].text.toLowerCase(),
-                  ),
-                );
-              }
-              
-              return result.every(
-                (e) => e == true,
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  void init() async {
-    final items = await getItemList();
-
-    setState(
-      () {
-        display = List.from(items);
-      }
     );
   }
 }

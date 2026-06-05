@@ -188,8 +188,9 @@ class _SyncState extends State<Sync> {
                 StreamBuilder(
                   stream: sb
                   .from('act')
-                  .select()
-                  .asStream(),
+                  .stream(
+                    primaryKey: ['id'],
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final acts = snapshot.data!;
@@ -249,7 +250,6 @@ class _SyncState extends State<Sync> {
                           itemCount: acts.length,
                         );
                       }
-
                       return const Expanded(
                         child: Center(
                           child: Text(
