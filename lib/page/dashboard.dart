@@ -440,42 +440,45 @@ class _DashboardState extends State<Dashboard> {
                                       .toString(),
                                     ),
                                   ),
-                                  Flexible(
+                                  Expanded(
                                     flex: 1,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                        vertical: 4.0,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 4.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: switch (order['order_status'].toString()) {
+                                            'Pending' => Colors.orange.withOpacity(0.1),
+                                            'On progress' => Colors.green.withOpacity(0.1),
+                                            'Cancelled' => Colors.red.withOpacity(0.1),
+                                            String() => Colors.grey.withOpacity(0.1),
+                                          },
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 8,
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                               color:
+                                              order['order_status'] == 'Pending'
+                                                ? Colors.orange
+                                                : order['order_status'] == 'On progress'
+                                                ? Colors.green
+                                                : order['order_status'] == 'Cancelled'
+                                                ? Colors.red
+                                                : Colors.grey,
+                                              size: 10,
+                                            ),
+                                            Text(order['order_status']
+                                            ),
+                                          ],
+                                        )
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: switch (order['order_status'].toString()) {
-                                          'Pending' => Colors.orange.withOpacity(0.1),
-                                          'On progress' => Colors.green.withOpacity(0.1),
-                                          'Cancelled' => Colors.red.withOpacity(0.1),
-                                          String() => Colors.grey.withOpacity(0.1),
-                                        },
-                                        borderRadius: BorderRadius.circular(12.0),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        spacing: 8,
-                                        children: [
-                                          Icon(
-                                            Icons.circle,
-                                             color:
-                                            order['order_status'] == 'Pending'
-                                              ? Colors.orange
-                                              : order['order_status'] == 'On progress'
-                                              ? Colors.green
-                                              : order['order_status'] == 'Cancelled'
-                                              ? Colors.red
-                                              : Colors.grey,
-                                            size: 10,
-                                          ),
-                                          Text(order['order_status']
-                                          ),
-                                        ],
-                                      )
                                     ),
                                   ),
                                 ],
