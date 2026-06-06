@@ -61,7 +61,7 @@ class _DataState extends State<Data> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
       children: [
-        const Text('Data Stok'),
+        const Text('Data Stok', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -72,7 +72,7 @@ class _DataState extends State<Data> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 16.0,
             children: [
-              const Text('Filter Data'),
+              const Text('Filter Data', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
               Row(
                 spacing: 16.0,
                 children: List.generate(
@@ -90,7 +90,9 @@ class _DataState extends State<Data> {
                           Text(
                             field['name'],
                             style: const TextStyle(
-                              fontSize: 10.0,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
                             ),
                           ),
                           TextField(
@@ -115,7 +117,7 @@ class _DataState extends State<Data> {
               ),
               Align(
                 alignment: Alignment.bottomRight,
-                child: TextButton(
+                child: TextButton.icon(
                   onPressed: () {
                     for (final e in fields) {
                       e['controller'].clear();
@@ -123,7 +125,8 @@ class _DataState extends State<Data> {
                     
                     setState(() {});
                   },
-                  child: const Text('Reset Filter'),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reset Filter'),
                 ),
               ),
             ],
@@ -325,7 +328,7 @@ class _DataState extends State<Data> {
                                               IconButton(
                                                 onPressed: () {}, //TODO edit item
                                                 icon: const Icon(
-                                                  Icons.edit_note,
+                                                  Icons.edit,
                                                   color: Colors.red,
                                                 ),
                                               ),
@@ -365,7 +368,52 @@ class _DataState extends State<Data> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Text(item['item_status']),
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                vertical: 4.0,
+                                                horizontal: 8.0,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: (item['item_status'] == 'NORMAL')
+                                                ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                                : (item['item_status'] == 'HABIS')
+                                                ? const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1)
+                                                : (item['item_status'] == 'MENIPIS')
+                                                ? const Color.fromARGB(120, 255, 165, 0).withOpacity(0.1)
+                                                : const Color.fromARGB(120, 128, 128, 128).withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.circle,
+                                                    color: item['item_status'] == 'NORMAL'
+                                                    ? const Color.fromARGB(255, 0, 128, 0)
+                                                    : (item['item_status'] == 'HABIS')
+                                                    ? const Color.fromARGB(255, 255, 0, 0)
+                                                    : (item['item_status'] == 'MENIPIS')
+                                                    ? const Color.fromARGB(255, 165, 165, 0)
+                                                    : const Color.fromARGB(255, 128, 128, 128),
+                                                    size: 10,
+                                                  ),
+                                                  const SizedBox(width: 4.0,),
+                                                  Text(item['item_status'], style: TextStyle(
+                                                    color: item['item_status'] == 'NORMAL'
+                                                    ? const Color.fromARGB(255, 0, 128, 0)
+                                                    : (item['item_status'] == 'HABIS')
+                                                    ? const Color.fromARGB(255, 255, 0, 0)
+                                                    : (item['item_status'] == 'MENIPIS')
+                                                    ? const Color.fromARGB(255, 165, 165, 0)
+                                                    : const Color.fromARGB(255, 128, 128, 128),
+                                                    fontWeight: FontWeight.w600,),  
+                                                  ),
+                                                ],
+                                              )
+                                            ) 
+                                          ),
                                         ),
                                         Expanded(
                                           flex: 1,

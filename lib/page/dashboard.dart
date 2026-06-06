@@ -28,7 +28,11 @@ class _DashboardState extends State<Dashboard> {
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Dashboard Overview'),
+            Text('Dashboard Overview', style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF007BFF),
+            )),
             Text(
               'Ringkasan operasional bulan ini',
               style: TextStyle(
@@ -58,15 +62,21 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Expanded(
                             flex: 1,
-                            child: Text('NAMA'),
+                            child: Text('NAMA', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('PERANGKAT'),
+                            child: Text('PERANGKAT', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),),
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text('TERAKHIR MASUK'),
+                            child: Text('TERAKHIR MASUK', style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),),
                           ),
                         ],
                       ),
@@ -185,8 +195,10 @@ class _DashboardState extends State<Dashboard> {
                       const Row(
                         spacing: 8.0,
                         children: [
-                          Icon(Icons.warning_amber),
-                          Text('Stok Hampir Habis'),
+                          Icon(Icons.warning_amber, color: Colors.amber),
+                          Text('Stok Hampir Habis', style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black,
+                          ),),
                         ],
                       ),
                       Expanded(
@@ -315,34 +327,46 @@ class _DashboardState extends State<Dashboard> {
                       spacing: 8.0,
                       children: [
                         Icon(Icons.history),
-                        Text('Transaksi Terbaru'),
+                        Text('Transaksi Terbaru', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),),
                       ],
                     ),
                     Row(
                       children: [
                         Expanded(
                           flex: 1,
-                          child: Text('ID'),
+                          child: Text('ID TRANSAKSI', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('TANGGAL'),
+                          child: Text('TANGGAL', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('CUSTOMER'),
+                          child: Text('CUSTOMER', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('BARANG'),
+                          child: Text('ITEM', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('STATUS'),
+                          child: Text('NOMINAL', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('NOMINAL'),
+                          child: Text('STATUS', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                       ],
                     ),
@@ -410,14 +434,51 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: Text(order['order_status']),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
                                     child: Text(
                                       NumberFormat.decimalPattern('id_ID')
                                       .format(order['total_amount'])
                                       .toString(),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 4.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: switch (order['order_status'].toString()) {
+                                            'Pending' => Colors.orange.withOpacity(0.1),
+                                            'On progress' => Colors.green.withOpacity(0.1),
+                                            'Cancelled' => Colors.red.withOpacity(0.1),
+                                            String() => Colors.grey.withOpacity(0.1),
+                                          },
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 8,
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                               color:
+                                              order['order_status'] == 'Pending'
+                                                ? Colors.orange
+                                                : order['order_status'] == 'On progress'
+                                                ? Colors.green
+                                                : order['order_status'] == 'Cancelled'
+                                                ? Colors.red
+                                                : Colors.grey,
+                                              size: 10,
+                                            ),
+                                            Text(order['order_status']
+                                            ),
+                                          ],
+                                        )
+                                      ),
                                     ),
                                   ),
                                 ],

@@ -375,43 +375,60 @@ class _ItemState extends State<Item> {
                                             .toString(),
                                           ),
                                         ),
-                                        Flexible(
+                                        Expanded(
                                           flex: 1,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0,
-                                              horizontal: 16.0,
-                                            ),
-                                            decoration: BoxDecoration( //FIXME pakai switch
-                                              color: item['item_status'] == 'NORMAL'
-                                              ? const Color.fromARGB(120, 0, 128, 0)
-                                              .withValues(alpha: 0.1)
-                                              : item['item_status'] == 'BANNED'
-                                              ? const Color.fromARGB(120, 255, 0, 0)
-                                              .withValues(alpha: 0.1)
-                                              : item['item_status'] == 'UNLIST'
-                                              ? const Color.fromARGB(120, 255, 165, 0)
-                                              .withValues(alpha: 0.1)
-                                              : item['item_status'] == 'REVIEWING'
-                                              ? const Color.fromARGB(120, 255, 255, 0)
-                                              .withValues(alpha: 0.1)
-                                              : const Color.fromARGB(120, 128, 128, 128)
-                                              .withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(10.0),
-                                            ),
-                                            child: Text(
-                                              item['item_status'],
-                                              style: TextStyle( //FIXME pakai switch juga
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                vertical: 4.0,
+                                                horizontal: 16.0,
+                                              ),
+                                              decoration: BoxDecoration(
                                                 color: item['item_status'] == 'NORMAL'
-                                                ? Colors.green
+                                                ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
                                                 : item['item_status'] == 'BANNED'
-                                                ? Colors.red
+                                                ? const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1)
                                                 : item['item_status'] == 'UNLIST'
-                                                ? Colors.orange
+                                                ? const Color.fromARGB(120, 255, 165, 0).withOpacity(0.1)
                                                 : item['item_status'] == 'REVIEWING'
-                                                ? Colors.yellow
-                                                : Colors.grey,
-                                                fontWeight: FontWeight.w600,
+                                                ? const Color.fromARGB(120, 255, 255, 0).withOpacity(0.1)
+                                                : const Color.fromARGB(120, 128, 128, 128).withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                spacing: 8,
+                                                children: [
+                                                  Icon(
+                                                    Icons.circle,
+                                                    color: item['item_status'] == 'NORMAL'
+                                                    ? Colors.green
+                                                    : item['item_status'] == 'BANNED'
+                                                    ? Colors.red
+                                                    : item['item_status'] == 'UNLIST'
+                                                    ? Colors.orange
+                                                    : item['item_status'] == 'REVIEWING'
+                                                    ? Colors.yellow
+                                                    : Colors.grey,
+                                                    size: 10,
+                                                  ),
+                                                  Text(
+                                                    item['item_status'],
+                                                    style: TextStyle(
+                                                      color: item['item_status'] == 'NORMAL'
+                                                      ? Colors.green
+                                                      : item['item_status'] == 'BANNED'
+                                                      ? Colors.red
+                                                      : item['item_status'] == 'UNLIST'
+                                                      ? Colors.orange
+                                                      : item['item_status'] == 'REVIEWING'
+                                                      ? Colors.yellow
+                                                      : Colors.grey,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
