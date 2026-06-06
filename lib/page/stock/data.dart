@@ -391,23 +391,23 @@ class _DataState extends State<Data> {
                                                   Icon(
                                                     Icons.circle,
                                                     color: item['item_status'] == 'NORMAL'
-                                                    ? const Color.fromARGB(255, 0, 128, 0)
+                                                    ? Colors.green
                                                     : (item['item_status'] == 'HABIS')
-                                                    ? const Color.fromARGB(255, 255, 0, 0)
+                                                    ? Colors.red
                                                     : (item['item_status'] == 'MENIPIS')
-                                                    ? const Color.fromARGB(255, 165, 165, 0)
-                                                    : const Color.fromARGB(255, 128, 128, 128),
+                                                    ? Colors.orange
+                                                    : Colors.grey,
                                                     size: 10,
                                                   ),
                                                   const SizedBox(width: 4.0,),
                                                   Text(item['item_status'], style: TextStyle(
                                                     color: item['item_status'] == 'NORMAL'
-                                                    ? const Color.fromARGB(255, 0, 128, 0)
+                                                    ? Colors.green
                                                     : (item['item_status'] == 'HABIS')
-                                                    ? const Color.fromARGB(255, 255, 0, 0)
+                                                    ? Colors.red
                                                     : (item['item_status'] == 'MENIPIS')
-                                                    ? const Color.fromARGB(255, 165, 165, 0)
-                                                    : const Color.fromARGB(255, 128, 128, 128),
+                                                    ? Colors.orange
+                                                    : Colors.grey,
                                                     fontWeight: FontWeight.w600,),  
                                                   ),
                                                 ],

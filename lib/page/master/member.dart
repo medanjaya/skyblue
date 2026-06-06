@@ -209,23 +209,41 @@ class _MemberState extends State<Member> {
                                     ),
                                     Expanded(
                                       flex: 1,
-                                      child: Row(
-                                        spacing: 8.0,
-                                        children: [
-                                          Icon(
-                                            Icons.circle,
-                                            color:
-                                            user['is_active']
-                                            ? Colors.green
-                                            : Colors.red,
-                                            size: 10,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                            horizontal: 8.0,
                                           ),
-                                          Text(
-                                            user['is_active']
-                                            ? 'Active'
-                                            : 'Disactivated',
+                                          decoration: BoxDecoration(
+                                            color: user['is_active']
+                                            ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                            : const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
-                                        ],
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            spacing: 8.0,
+                                            children: [
+                                              Icon(
+                                                Icons.circle,
+                                                color:
+                                                user['is_active'] == true
+                                                ? Colors.green
+                                                : Colors.red,
+                                                size: 10,
+                                              ),
+                                              Text(user['is_active'] == true ? 'Active' : 'Inactive', style: TextStyle(
+                                                color:
+                                                user['is_active'] == true
+                                                ? Colors.green
+                                                : Colors.red,
+                                              ),
+                                              ),
+                                            ],  
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],

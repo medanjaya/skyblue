@@ -450,12 +450,14 @@ class _DashboardState extends State<Dashboard> {
                                           vertical: 4.0,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: switch (order['order_status'].toString()) {
-                                            'Pending' => Colors.orange.withOpacity(0.1),
-                                            'On progress' => Colors.green.withOpacity(0.1),
-                                            'Cancelled' => Colors.red.withOpacity(0.1),
-                                            String() => Colors.grey.withOpacity(0.1),
-                                          },
+                                          color: order['order_status'] == 'Pending'
+                                            ? const Color.fromARGB(120, 255, 165, 0).withOpacity(0.1)
+                                            : order['order_status'] == 'PROCESSED'
+                                            ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                            : order['order_status'] == 'CANCELLED'
+                                            ? const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1)
+                                            : const Color.fromARGB(120, 128, 128, 128).withOpacity(0.1),
+                                          
                                           borderRadius: BorderRadius.circular(12.0),
                                         ),
                                         child: Row(
@@ -467,14 +469,23 @@ class _DashboardState extends State<Dashboard> {
                                                color:
                                               order['order_status'] == 'Pending'
                                                 ? Colors.orange
-                                                : order['order_status'] == 'On progress'
+                                                : order['order_status'] == 'PROCESSED'
                                                 ? Colors.green
-                                                : order['order_status'] == 'Cancelled'
+                                                : order['order_status'] == 'CANCELLED'
                                                 ? Colors.red
                                                 : Colors.grey,
                                               size: 10,
                                             ),
-                                            Text(order['order_status']
+                                            Text(order['order_status'], style: TextStyle(
+                                              color:
+                                              order['order_status'] == 'Pending'
+                                                ? Colors.orange
+                                                : order['order_status'] == 'PROCESSED'
+                                                ? Colors.green
+                                                : order['order_status'] == 'CANCELLED'
+                                                ? Colors.red
+                                                : Colors.grey,
+                                            )
                                             ),
                                           ],
                                         )
