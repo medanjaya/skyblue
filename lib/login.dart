@@ -142,7 +142,7 @@ class _LoginState extends State<Login> {
                                       'last_signed_at': time,
                                     },
                                     'WebBrowserInfo' => {
-                                      'device': info.data['browserName'],
+                                      'device': info.data['browserName'].name, //FIXME cek ini nanti
                                       'type': 'web',
                                       'last_signed_at': time,
                                     },

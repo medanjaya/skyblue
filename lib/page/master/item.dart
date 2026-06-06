@@ -382,21 +382,26 @@ class _ItemState extends State<Item> {
                                               vertical: 4.0,
                                               horizontal: 16.0,
                                             ),
-                                            decoration: BoxDecoration(
+                                            decoration: BoxDecoration( //FIXME pakai switch
                                               color: item['item_status'] == 'NORMAL'
-                                              ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                              ? const Color.fromARGB(120, 0, 128, 0)
+                                              .withValues(alpha: 0.1)
                                               : item['item_status'] == 'BANNED'
-                                              ? const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1)
+                                              ? const Color.fromARGB(120, 255, 0, 0)
+                                              .withValues(alpha: 0.1)
                                               : item['item_status'] == 'UNLIST'
-                                              ? const Color.fromARGB(120, 255, 165, 0).withOpacity(0.1)
+                                              ? const Color.fromARGB(120, 255, 165, 0)
+                                              .withValues(alpha: 0.1)
                                               : item['item_status'] == 'REVIEWING'
-                                              ? const Color.fromARGB(120, 255, 255, 0).withOpacity(0.1)
-                                              : const Color.fromARGB(120, 128, 128, 128).withOpacity(0.1),
+                                              ? const Color.fromARGB(120, 255, 255, 0)
+                                              .withValues(alpha: 0.1)
+                                              : const Color.fromARGB(120, 128, 128, 128)
+                                              .withValues(alpha: 0.1),
                                               borderRadius: BorderRadius.circular(10.0),
                                             ),
                                             child: Text(
                                               item['item_status'],
-                                              style: TextStyle(
+                                              style: TextStyle( //FIXME pakai switch juga
                                                 color: item['item_status'] == 'NORMAL'
                                                 ? Colors.green
                                                 : item['item_status'] == 'BANNED'
