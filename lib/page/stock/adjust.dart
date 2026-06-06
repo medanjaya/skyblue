@@ -200,7 +200,7 @@ class _AdjustState extends State<Adjust> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final display = snapshot.data!;
+                  display = snapshot.data!;
 
                   final
                   total = display.length,

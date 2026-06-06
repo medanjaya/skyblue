@@ -140,7 +140,7 @@ class _DataState extends State<Data> {
               stream: getItemList(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final items = snapshot.data!;
+                  final List items = snapshot.data!;
 
                   display = List.from(
                     items.where(

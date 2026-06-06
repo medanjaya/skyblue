@@ -202,14 +202,14 @@ Future fetchItemList() async {
               'BANNED',
               'UNLIST',
               'REVIEWING',
-              'SELLER_DELETE',
-              'SHOPEE_DELETE',
             ],
           },
         ),
       )
       .then(
         (r) {
+          //FIXME print(r.body);
+          
           final
           result = jsonDecode(r.body)['response']['item'],
           

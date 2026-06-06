@@ -171,7 +171,7 @@ class _ItemState extends State<Item> {
               stream: getItemList(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final items = snapshot.data!;
+                  final List items = snapshot.data!;
 
                   display = List.from(
                     items.where(

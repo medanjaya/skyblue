@@ -79,7 +79,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            final users = snapshot.data!;
+                            final List users = snapshot.data!;
                             
                             if (users.isNotEmpty) {
                               return Expanded(
@@ -204,30 +204,31 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    final stocks = List.from(
-                                      snapshot.data!.where(
-                                        (e) {
-                                          return items[
-                                            items.indexWhere(
-                                              (f) {
-                                                return f['item_id'] == e['id'];
-                                              }
-                                            )
-                                          ]['stock_info_v2']?['summary_info']['total_available_stock'] > e['minimum'];
-                                        },
-                                      ),
+                                    final List stocks = snapshot.data!;
+
+                                    items.retainWhere(
+                                      (e) {
+                                        return (e['stock_info_v2']?['summary_info']['total_available_stock'] ?? 0) < stocks[
+                                          stocks.indexWhere(
+                                            (f) {
+                                              return e['item_id'] == f['id'];
+                                            }
+                                          )
+                                        ]
+                                        ['minimum'];
+                                      },
                                     );
-                        
-                                    if (stocks.isNotEmpty) {
+
+                                    if (items.isNotEmpty) {
                                       return SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           spacing: 8.0,
                                           children: List.generate(
-                                            stocks.length,
+                                            items.length,
                                             (i) {
-                                              final item = stocks[i];
+                                              final item = items[i];
 
                                               return Container(
                                                 padding: const EdgeInsets.all(16.0),
@@ -239,7 +240,7 @@ class _DashboardState extends State<Dashboard> {
                                                   children: [
                                                     Text(item['item_name']),
                                                     Text(
-                                                      '${item['stock_info_v2']?['summary_info']['total_available_stock']} units left',
+                                                      '${item['stock_info_v2']?['summary_info']['total_available_stock']} tersisa',
                                                       style: const TextStyle(
                                                         color: Colors.red,
                                                       ),
@@ -333,7 +334,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('ITEM'),
+                          child: Text('BARANG'),
                         ),
                         Expanded(
                           flex: 1,
@@ -352,7 +353,7 @@ class _DashboardState extends State<Dashboard> {
                   stream: getOrderList(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final orders = snapshot.data!;
+                      final List orders = snapshot.data!;
                       
                       if (orders.isNotEmpty) {
                         return Expanded(
@@ -372,7 +373,9 @@ class _DashboardState extends State<Dashboard> {
                                     flex: 1,
                                     child: Text(
                                       DateFormat('dd/MM/yyyy hh:mm').format(
-                                        DateTime.parse(order['create_time'].toString()),
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          order['create_time'] * Duration.millisecondsPerSecond,
+                                        ),
                                       ),
                                     ),
                                   ),

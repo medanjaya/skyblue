@@ -52,7 +52,7 @@ class _MemberState extends State<Member> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final users = snapshot.data!;
+                  final List users = snapshot.data!;
 
                   display = List.from(
                     users.where(
