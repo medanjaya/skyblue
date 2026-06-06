@@ -62,8 +62,8 @@ class _ItemState extends State<Item> {
                 color: Color(0xFF007BFF),
               ),
             ),
-            TextButton(
-              style: TextButton.styleFrom(
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF007BFF),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
@@ -74,7 +74,8 @@ class _ItemState extends State<Item> {
               onPressed: () {
                 //TODO tambah barang, cek versi sebelumnya
               },
-              child: const Text('Tambah Baru'),
+              icon: const Icon(Icons.add),
+              label: const Text('Tambah Baru'),
             ),
           ],
         ),
@@ -338,8 +339,9 @@ class _ItemState extends State<Item> {
                                               IconButton(
                                                 onPressed: () {}, //TODO edit item
                                                 icon: const Icon(
-                                                  Icons.edit_note,
+                                                  Icons.edit,
                                                   color: Colors.red,
+                                                  size: 18,
                                                 ),
                                               ),
                                               IconButton(
@@ -347,6 +349,7 @@ class _ItemState extends State<Item> {
                                                 icon: const Icon(
                                                   Icons.info_outline,
                                                   color: Colors.blue,
+                                                  size: 18,
                                                 ),
                                               ),
                                             ],
@@ -372,9 +375,41 @@ class _ItemState extends State<Item> {
                                             .toString(),
                                           ),
                                         ),
-                                        Expanded(
+                                        Flexible(
                                           flex: 1,
-                                          child: Text(item['item_status']),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 4.0,
+                                              horizontal: 16.0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: item['item_status'] == 'NORMAL'
+                                              ? const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1)
+                                              : item['item_status'] == 'BANNED'
+                                              ? const Color.fromARGB(120, 255, 0, 0).withOpacity(0.1)
+                                              : item['item_status'] == 'UNLIST'
+                                              ? const Color.fromARGB(120, 255, 165, 0).withOpacity(0.1)
+                                              : item['item_status'] == 'REVIEWING'
+                                              ? const Color.fromARGB(120, 255, 255, 0).withOpacity(0.1)
+                                              : const Color.fromARGB(120, 128, 128, 128).withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(10.0),
+                                            ),
+                                            child: Text(
+                                              item['item_status'],
+                                              style: TextStyle(
+                                                color: item['item_status'] == 'NORMAL'
+                                                ? Colors.green
+                                                : item['item_status'] == 'BANNED'
+                                                ? Colors.red
+                                                : item['item_status'] == 'UNLIST'
+                                                ? Colors.orange
+                                                : item['item_status'] == 'REVIEWING'
+                                                ? Colors.yellow
+                                                : Colors.grey,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     );

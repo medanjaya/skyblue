@@ -28,12 +28,23 @@ class _MemberState extends State<Member> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Data User'),
-            TextButton(
+            const Text('Data User', style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)
+            ),),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF007BFF),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 16.0,
+                ),
+              ),
               onPressed: () {
                 //TODO tambah user, cek versi sebelumnya
               },
-              child: const Text('Tambah Baru'),
+              icon: const Icon(Icons.add),
+              label: const Text('Tambah Baru'),
             ),
           ],
         ),
