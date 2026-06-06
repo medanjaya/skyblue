@@ -187,18 +187,19 @@ class _SyncState extends State<Sync> {
                 const Divider(),
                 StreamBuilder(
                   stream: sb
-                  .from('act')
-                  .select()
-                  .asStream(),
+                  .from('action')
+                  .stream(
+                    primaryKey: ['id'],
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final acts = snapshot.data!;
+                      final List actions = snapshot.data!;
                       
-                      if (acts.isNotEmpty) {
+                      if (actions.isNotEmpty) {
                         return ListView.separated(
                           shrinkWrap: true,
                           itemBuilder: (context, i) {
-                            final act = acts[i];
+                            final action = actions[i];
                         
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -207,13 +208,13 @@ class _SyncState extends State<Sync> {
                                   flex: 1,
                                   child: Text(
                                     DateFormat('dd/MM/yyyy hh:mm:ss').format(
-                                      DateTime.parse(act['created_at']),
+                                      DateTime.parse(action['created_at']),
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   flex: 1,
-                                  child: Text(act['type']),
+                                  child: Text(action['type']),
                                 ),
                                 Expanded(
                                   flex: 1,
@@ -223,13 +224,13 @@ class _SyncState extends State<Sync> {
                                       Icon(
                                         Icons.circle,
                                         color:
-                                        act['status']
+                                        action['status']
                                         ? Colors.green
                                         : Colors.red,
                                         size: 18,
                                       ),
                                       Text(
-                                        act['status']
+                                        action['status']
                                         ? 'Success'
                                         : 'Error',
                                       ),
@@ -238,7 +239,7 @@ class _SyncState extends State<Sync> {
                                 ),
                                 Expanded(
                                   flex: 2,
-                                  child: Text(act['log']),
+                                  child: Text(action['log']),
                                 ),
                               ],
                             );
@@ -246,10 +247,9 @@ class _SyncState extends State<Sync> {
                           separatorBuilder: (context, i) {
                             return const Divider();
                           },
-                          itemCount: acts.length,
+                          itemCount: actions.length,
                         );
                       }
-
                       return const Expanded(
                         child: Center(
                           child: Text(

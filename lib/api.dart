@@ -153,7 +153,18 @@ Future<void> refreshToken() async {
   : authPartner();
 }
 
-Future getItemList() async {
+Stream getItemList() async* {
+  while (true) {
+    yield await fetchItemList();
+    await Future.delayed(
+      const Duration(
+        seconds: 3,
+      ),
+    );
+  }
+}
+
+Future fetchItemList() async {
   final
   prefs = await SharedPreferences.getInstance(),
 
@@ -191,14 +202,14 @@ Future getItemList() async {
               'BANNED',
               'UNLIST',
               'REVIEWING',
-              'SELLER_DELETE',
-              'SHOPEE_DELETE',
             ],
           },
         ),
       )
       .then(
         (r) {
+          //FIXME print(r.body);
+          
           final
           result = jsonDecode(r.body)['response']['item'],
           
@@ -239,7 +250,18 @@ Future getItemList() async {
   );
 }
 
-Future getOrderList() async {
+Stream getOrderList() async* {
+  while (true) {
+    yield await fetchOrderList();
+    await Future.delayed(
+      const Duration(
+        seconds: 3,
+      ),
+    );
+  }
+}
+
+Future fetchOrderList() async {
   final
   prefs = await SharedPreferences.getInstance(),
 

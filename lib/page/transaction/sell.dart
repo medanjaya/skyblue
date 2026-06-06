@@ -42,52 +42,59 @@ class _SellState extends State<Sell> {
                 ),
               ),
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 5,
-                  mainAxisSpacing: 16.0,
-                  crossAxisSpacing: 16.0,
-                  childAspectRatio: 0.625,
-                  children: List.generate(
-                    50,
-                    (i) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: const Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(12.0),
-                                topRight: Radius.circular(12.0),
-                              ),
-                              child: AspectRatio(
-                                aspectRatio: 1.0,
-                                child: ColoredBox(
-                                  color: Colors.grey,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final count = (width / 180.0).floor().clamp(1, 5).toInt();
+
+                    return GridView.count(
+                      crossAxisCount: count,
+                      mainAxisSpacing: 16.0,
+                      crossAxisSpacing: 16.0,
+                      childAspectRatio: 0.625,
+                      children: List.generate(
+                        50,
+                        (i) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: const Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12.0),
+                                    topRight: Radius.circular(12.0),
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio: 1.0,
+                                    child: ColoredBox(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 4.0,
+                                    horizontal: 8.0
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text('Nama Barang'),
+                                      Text('Kode Barang'),
+                                      Text('Harga'),
+                                      Text('Sisa Stok'),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 4.0,
-                                horizontal: 8.0
-                              ),
-                              child: Column(
-                                children: [
-                                  Text('Nama Barang'),
-                                  Text('Kode Barang'),
-                                  Text('Harga'),
-                                  Text('Sisa Stok'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

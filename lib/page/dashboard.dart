@@ -84,11 +84,12 @@ class _DashboardState extends State<Dashboard> {
                       StreamBuilder(
                         stream: sb
                         .from('user')
-                        .select()
-                        .asStream(),
+                        .stream(
+                          primaryKey: ['id'],
+                        ),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            final users = snapshot.data!;
+                            final List users = snapshot.data!;
                             
                             if (users.isNotEmpty) {
                               return Expanded(
@@ -150,7 +151,6 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               );
                             }
-
                             return const Expanded(
                               child: Center(
                                 child: Text(
@@ -201,34 +201,106 @@ class _DashboardState extends State<Dashboard> {
                           ),),
                         ],
                       ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          spacing: 8.0,
-                          children: List.generate( //TODO stok kritis
-                            8,
-                            (i) {
-                              return Container(
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromARGB(40, 135, 206, 235),
-                                  borderRadius: BorderRadius.circular(12.0),
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: getItemList(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final List items = snapshot.data!;
+                        
+                              return StreamBuilder(
+                                stream: sb
+                                .from('stock')
+                                .stream(
+                                  primaryKey: ['id'],
                                 ),
-                                child: const Column(
-                                  children: [
-                                    Text('Sonic Pro Pods'),
-                                    Text(
-                                      '0 units left',
-                                      style: TextStyle(
-                                        color: Colors.red,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    final List stocks = snapshot.data!;
+
+                                    items.retainWhere(
+                                      (e) {
+                                        return (e['stock_info_v2']?['summary_info']['total_available_stock'] ?? 0) < stocks[
+                                          stocks.indexWhere(
+                                            (f) {
+                                              return e['item_id'] == f['id'];
+                                            }
+                                          )
+                                        ]
+                                        ['minimum'];
+                                      },
+                                    );
+
+                                    if (items.isNotEmpty) {
+                                      return SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          spacing: 8.0,
+                                          children: List.generate(
+                                            items.length,
+                                            (i) {
+                                              final item = items[i];
+
+                                              return Container(
+                                                padding: const EdgeInsets.all(16.0),
+                                                decoration: BoxDecoration(
+                                                  color: const Color.fromARGB(40, 135, 206, 235),
+                                                  borderRadius: BorderRadius.circular(12.0),
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    Text(item['item_name']),
+                                                    Text(
+                                                      '${item['stock_info_v2']?['summary_info']['total_available_stock']} tersisa',
+                                                      style: const TextStyle(
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const Center(
+                                      child: Text(
+                                        'Tidak ada barang untuk ditampilkan',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontStyle: FontStyle.italic,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  }
+                                  else {
+                                    return const Center(
+                                      child: Text(
+                                        'Sedang memperbarui pengecekan stok..',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              );
+                            }
+                            else {
+                              return const Center(
+                                child: Text(
+                                  'Sedang memperbarui daftar barang..',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
                                 ),
                               );
-                            },
-                          ),
+                            }
+                          },
                         ),
                       ),
                     ],
@@ -280,9 +352,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('ITEM', style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),),
+                          child: Text('ITEM'),
                         ),
                         Expanded(
                           flex: 1,
@@ -301,11 +371,11 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
                 const Divider(),
-                FutureBuilder(
-                  future: getOrderList(),
+                StreamBuilder(
+                  stream: getOrderList(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final orders = snapshot.data!;
+                      final List orders = snapshot.data!;
                       
                       if (orders.isNotEmpty) {
                         return Expanded(
@@ -325,7 +395,9 @@ class _DashboardState extends State<Dashboard> {
                                     flex: 1,
                                     child: Text(
                                       DateFormat('dd/MM/yyyy hh:mm').format(
-                                        DateTime.parse(order['create_time'].toString()),
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          order['create_time'] * Duration.millisecondsPerSecond,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -414,7 +486,6 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         );
                       }
-
                       return const Expanded(
                         child: Center(
                           child: Text(
