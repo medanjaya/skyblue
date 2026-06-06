@@ -248,7 +248,7 @@ class _MemberState extends State<Member> {
                                             user['is_active']
                                             ? Colors.green
                                             : Colors.red,
-                                            size: 18,
+                                            size: 10,
                                           ),
                                             Text(
                                               user['is_active']
