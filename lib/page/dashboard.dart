@@ -197,7 +197,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Icon(Icons.warning_amber, color: Colors.amber),
                           Text('Stok Hampir Habis', style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF854F0B),
+                            fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black,
                           ),),
                         ],
                       ),
@@ -327,7 +327,7 @@ class _DashboardState extends State<Dashboard> {
                       spacing: 8.0,
                       children: [
                         Icon(Icons.history),
-                        Text('Transaksi Terbaru'),
+                        Text('Transaksi Terbaru', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),),
                       ],
                     ),
                     Row(
@@ -352,7 +352,9 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('ITEM'),
+                          child: Text('ITEM', style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),),
                         ),
                         Expanded(
                           flex: 1,
