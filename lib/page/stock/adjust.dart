@@ -34,7 +34,7 @@ class _AdjustState extends State<Adjust> {
   @override
   Widget build(BuildContext context) {
     final sb = Supabase.instance.client;
-
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
@@ -87,7 +87,7 @@ class _AdjustState extends State<Adjust> {
                           Expanded(
                             child: select.isNotEmpty
                             ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               spacing: 8.0,
                               children: [
                                 const Row(
@@ -107,25 +107,46 @@ class _AdjustState extends State<Adjust> {
                                     ),
                                   ],
                                 ),
-                                Text(
-                                  'ID Produk: ${select['item_id']}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                Text(
-                                  'Nama Produk: ${select['item_name']}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Stok Saat Ini: ${select['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Row(
+                                  spacing: 16.0,
+                                  children: [
+                                    SizedBox(
+                                      width: 128.0,
+                                      height: 128.0,
+                                      child: Image.network(
+                                        select['image']['image_url_list'][0],
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        spacing: 8.0,
+                                        children: [
+                                          Text(
+                                            'ID Produk: ${select['item_id']}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Nama Barang: ${select['item_name']}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Stok Saat Ini: ${select['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             )
@@ -194,6 +215,18 @@ class _AdjustState extends State<Adjust> {
                                           );
                                         },
                                         dense: true,
+                                        leading: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                            minWidth: 48.0,
+                                            minHeight: 48.0,
+                                            maxWidth: 64.0,
+                                            maxHeight: 64.0,
+                                          ),
+                                          child: Image.network(
+                                            item['image']['image_url_list'][0],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                         title: Text(item['item_name']),
                                         subtitle: Text('Stok: ${item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'}'),
                                       );
@@ -463,7 +496,7 @@ class _AdjustState extends State<Adjust> {
                                 },
                               );
                             },
-                            child: const Text('Simpan'), //TODO konfirmasi
+                            child: const Text('Simpan'), //TODO overlay konfirmasi
                           ),
                         ],
                       ),
@@ -643,7 +676,21 @@ class _AdjustState extends State<Adjust> {
                                         ),
                                         Expanded(
                                           flex: 2,
-                                          child: Text(adjust['item'].toString()),
+                                          child: StreamBuilder(
+                                            stream: getItemList(),
+                                            builder: (context, snapshot) {
+                                              final List items = snapshot.data!;
+                                              
+                                              return Text(
+                                                items[
+                                                  items.indexWhere(
+                                                    (e) => e['item_id'] == adjust['item'],
+                                                  )
+                                                ]
+                                                ['item_name'],
+                                              );
+                                            }
+                                          ),
                                         ),
                                         Expanded(
                                           flex: 1,

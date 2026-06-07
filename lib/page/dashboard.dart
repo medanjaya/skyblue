@@ -222,9 +222,7 @@ class _DashboardState extends State<Dashboard> {
                                       (e) {
                                         return (e['stock_info_v2']?['summary_info']['total_available_stock'] ?? 0) < stocks[
                                           stocks.indexWhere(
-                                            (f) {
-                                              return e['item_id'] == f['id'];
-                                            }
+                                            (f) => e['item_id'] == f['id'],
                                           )
                                         ]
                                         ['minimum'];
