@@ -417,7 +417,13 @@ class _AdjustState extends State<Adjust> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          ElevatedButton(
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(
+                                color: Colors.red,
+                              ),
+                            ),
                             onPressed: () {
                               clear();
                             },
