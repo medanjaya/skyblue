@@ -365,14 +365,16 @@ class _ItemState extends State<Item> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Text(item['category_id'].toString()),
+                                          child: Text(item['category_id'].toString()), //TODO switch kategori setelah tarik dari api
                                         ),
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            NumberFormat.decimalPattern('id_ID')
+                                            item['price_info']?[0]['current_price'] != null
+                                            ? NumberFormat.decimalPattern('id_ID')
                                             .format(item['price_info']?[0]['current_price'] ?? 0)
-                                            .toString(),
+                                            .toString()
+                                            : 'Variatif',
                                           ),
                                         ),
                                         Expanded(

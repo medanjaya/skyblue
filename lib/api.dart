@@ -383,6 +383,10 @@ Future<void> updateStock(int id, int value) async {
         'access_token': token,
         'shop_id': shop,
         'sign': sign.toString(),
+      },
+    ),
+    body: jsonEncode(
+      {
         'item_id': id,
         'stock_list': [
           {
@@ -395,6 +399,11 @@ Future<void> updateStock(int id, int value) async {
         ],
       },
     ),
+  )
+  .then(
+    (r) {
+      //FIXME print(r.body);
+    },
   )
   : authPartner();
 }

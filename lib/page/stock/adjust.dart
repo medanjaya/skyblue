@@ -277,7 +277,7 @@ class _AdjustState extends State<Adjust> {
                                         },
                                         controller: type,
                                         decoration: const InputDecoration(
-                                          hintText: 'Tipe Penyesuaian',
+                                          labelText: 'Tipe Penyesuaian',
                                           isDense: true,
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 12.0,
@@ -419,17 +419,45 @@ class _AdjustState extends State<Adjust> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              search.clear();
-                              type.clear();
-                              amount.clear();
-                              note.clear();
+                              clear();
                             },
                             child: const Text('Batal'),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton(
-                            onPressed: () {},
-                            child: const Text('Simpan'),
+                            onPressed: () {
+                              updateStock(
+                                select['item_id'],
+                                predict!,
+                              )
+                              .then(
+                                (r) {
+                                  sb.from('adjust').insert(
+                                    {
+                                      'type': operator,
+                                      'amount': operand,
+                                      'note': note.text,
+                                      'item': select['item_id'],
+                                    },
+                                  )
+                                  .then(
+                                    (r) {
+                                      clear();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Padding(
+                                            padding: EdgeInsets.all(4.0),
+                                            child: Text('Barang berhasil disesuaikan.'),
+                                          ),
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: const Text('Simpan'), //TODO konfirmasi
                           ),
                         ],
                       ),
@@ -720,5 +748,22 @@ class _AdjustState extends State<Adjust> {
       ? value! + operand!
       : value! - operand!
     : null;
+  }
+
+  void clear() {
+    setState(
+      () {
+        search.clear();
+        type.clear();
+        amount.clear();
+        note.clear();
+
+        select = {};
+        value = null;
+        operand = null;
+        operator = null;
+        predict = null;
+      }
+    );
   }
 }
