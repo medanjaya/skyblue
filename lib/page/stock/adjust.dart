@@ -24,7 +24,9 @@ class _AdjustState extends State<Adjust> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
       children: [
-        const Text('Penyesuaian Stok'),
+        const Text('Penyesuaian Stok', style: TextStyle(
+          fontWeight: FontWeight.bold, fontSize: 24, color : Color(0xFF007BFF)
+        )),
         SizedBox(
           height: 288.0,
           child: Row(
@@ -41,7 +43,9 @@ class _AdjustState extends State<Adjust> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     spacing: 8.0,
                     children: [
-                      const Text('Pilih Produk'),
+                      const Text('Pilih Produk', style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
+                      )),
                       TextField(
                         onChanged: (v) {
                           setState(() {});
@@ -85,7 +89,9 @@ class _AdjustState extends State<Adjust> {
                       const Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('Detail Penyesuaian'),
+                          Text('Detail Penyesuaian', style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
+                          )),
                           Text(
                             'Pilih produk untuk penyesuaian stok',
                             style: TextStyle(
@@ -110,7 +116,7 @@ class _AdjustState extends State<Adjust> {
                                       setState(() {});
                                     },
                                     decoration: const InputDecoration(
-                                      hintText: 'Tipe Penyesuaian',
+                                      labelText: 'Tipe Penyesuaian',
                                       isDense: true,
                                       contentPadding: EdgeInsets.symmetric(
                                         vertical: 12.0,
@@ -119,6 +125,7 @@ class _AdjustState extends State<Adjust> {
                                       border: OutlineInputBorder(),
                                     ),
                                   ),
+                                  const SizedBox(height: 8),
                                   const Text('Prediksi Jumlah Stok'),
                                   const Text('-'),
                                 ],
@@ -143,6 +150,7 @@ class _AdjustState extends State<Adjust> {
                                       border: OutlineInputBorder(),
                                     ),
                                   ),
+                                  const SizedBox(height: 8),
                                   const Text('Keterangan'),
                                   TextField(
                                     onChanged: (v) {
@@ -157,6 +165,7 @@ class _AdjustState extends State<Adjust> {
                                       ),
                                       border: OutlineInputBorder(),
                                     ),
+                                    maxLines: 2,
                                   ),
                                 ],
                               ),
