@@ -75,6 +75,9 @@ class _AdjustState extends State<Adjust> {
                           const Text('Pilih Barang', style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
                       )),
+                          const Text('Pilih Barang', style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
+                      )),
                           TextField(
                             onChanged: (v) {
                               setState(() {});
