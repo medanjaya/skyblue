@@ -451,10 +451,10 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: switch (order['order_status'].toString()) {
-                                            'Pending' => Colors.orange.withOpacity(0.1),
-                                            'On progress' => Colors.green.withOpacity(0.1),
-                                            'Cancelled' => Colors.red.withOpacity(0.1),
-                                            String() => Colors.grey.withOpacity(0.1),
+                                            'Pending' => Colors.orange.withValues(alpha: 0.1),
+                                            'On progress' => Colors.green.withValues(alpha: 0.1),
+                                            'Cancelled' => Colors.red.withValues(alpha: 0.1),
+                                            String() => Colors.grey.withValues(alpha: 0.1),
                                           },
                                           borderRadius: BorderRadius.circular(12.0),
                                         ),

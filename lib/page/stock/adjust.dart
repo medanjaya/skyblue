@@ -259,8 +259,12 @@ class _AdjustState extends State<Adjust> {
                                     spacing: 8.0,
                                     children: [
                                       TextField(
+                                        onTap: () {
+                                          setState(() {
+                                            isExpand = !isExpand;   
+                                          });
+                                        },
                                         controller: type,
-                                        focusNode: focus,
                                         decoration: const InputDecoration(
                                           hintText: 'Tipe Penyesuaian',
                                           isDense: true,
@@ -273,11 +277,15 @@ class _AdjustState extends State<Adjust> {
                                         readOnly: true,
                                       ),
                                       const Text('Prediksi Jumlah Stok'),
-                                      const Text('-'),
+                                      Text(
+                                        type.text == 'Penambahan'
+                                        ? 'a'
+                                        : 'b' //FIXME
+                                      ),
                                     ],
                                   ),
                                   if (isExpand) Positioned(
-                                    top: 38.0,
+                                    top: 38.0, //FIXME also magic numbe
                                     child: Container(
                                       padding: const EdgeInsets.all(8.0),
                                       constraints: const BoxConstraints(
@@ -298,18 +306,18 @@ class _AdjustState extends State<Adjust> {
                                       child: ListView.builder(
                                         shrinkWrap: true,
                                         itemBuilder: (context, i) {                                       
-                                          return InkWell(
-                                            onTap: () {
-                                              setState(
-                                                () {
-                                                  type.text = i.isEven
-                                                  ? 'Penambahan'
-                                                  : 'Pengurangan';
-                                                },
-                                              );
-                                              //FIXME
-                                            },
+                                          return Material( //FIXME
                                             child: ListTile(
+                                              onTap: () {
+                                                setState(
+                                                  () {
+                                                    type.clear();
+                                                    type.text = 'fu';
+                                                    print('fu too');
+                                                  }
+                                                );
+                                              },
+                                              dense: true,
                                               title: Text(
                                                 i.isEven
                                                 ? 'Penambahan'
