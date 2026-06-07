@@ -61,7 +61,7 @@ class _SalesState extends State<Sales> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Laporan Penjualan'),
+                              const Text('Laporan Penjualan', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
                               Row(
                                 spacing: 8.0,
                                 children: [
@@ -165,7 +165,7 @@ class _SalesState extends State<Sales> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Kinerja'),
+                                    Text('Kinerja', style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -227,7 +227,7 @@ class _SalesState extends State<Sales> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text('Tren Penjualan'),
+                                        Text('Tren Penjualan', style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
                                         Row(
                                           spacing: 8.0,
                                           children: [
