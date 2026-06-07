@@ -68,7 +68,7 @@ class _MemberState extends State<Member> {
                   display = List.from(
                     users.where(
                       (e) {
-                        return e['name'].toString().toLowerCase().contains(
+                        return e['name'].toLowerCase().contains(
                           name.text.toLowerCase(),
                         );
                       },

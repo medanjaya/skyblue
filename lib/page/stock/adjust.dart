@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
+import 'package:skyblue/api.dart';
+
 class Adjust extends StatefulWidget {
   const Adjust({super.key});
 
@@ -13,8 +15,33 @@ class Adjust extends StatefulWidget {
 }
 
 class _AdjustState extends State<Adjust> {
+  final TextEditingController
+  search = TextEditingController(),
+  type = TextEditingController(),
+  amount = TextEditingController(),
+  note = TextEditingController();
+
+  final FocusNode focus = FocusNode();
+
   List display = [];
   int rows = 10, current = 1;
+
+  Map select = {};
+  bool isExpand = false;
+
+  @override
+  void initState() {
+    super.initState();
+    focus.addListener(
+      () {
+        setState(
+          () {
+            isExpand = focus.hasFocus;
+          }
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,36 +66,167 @@ class _AdjustState extends State<Adjust> {
                     color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: 8.0,
+                  child: Stack(
                     children: [
-                      const Text('Pilih Produk', style: TextStyle(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 8.0,
+                        children: [
+                          const Text('Pilih Barang', style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
                       )),
-                      TextField(
-                        onChanged: (v) {
-                          setState(() {});
-                        },
-                        decoration: const InputDecoration(
-                          hintText: 'Cari berdasarkan nama..',
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 8.0,
-                          ),
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const Expanded(
-                        child: Center(
-                          child: Text(
-                            'Pilih produk untuk melihat informasi',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontStyle: FontStyle.italic,
+                          TextField(
+                            onChanged: (v) {
+                              setState(() {});
+                            },
+                            controller: search,
+                            decoration: const InputDecoration(
+                              hintText: 'Cari berdasarkan nama..',
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 12.0,
+                                horizontal: 8.0,
+                              ),
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder(),
                             ),
+                          ),
+                          Expanded(
+                            child: select.isNotEmpty
+                            ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 8.0,
+                              children: [
+                                const Row(
+                                  spacing: 8.0,
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline_rounded,
+                                      color: Color(0xFF007BFF),
+                                    ),
+                                    Text(
+                                      'Detail Info Produk',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF007BFF),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  'ID Produk: ${select['item_id']}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  'Nama Produk: ${select['item_name']}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Stok Saat Ini: ${select['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            )
+                            : const Center(
+                              child: Text(
+                                'Pilih barang untuk melihat informasi',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (search.text.isNotEmpty) Positioned(
+                        top: 68.0, //FIXME magic numbe
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          constraints: const BoxConstraints(
+                            maxHeight: 192.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(8.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: StreamBuilder(
+                            stream: getItemList(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final items = List.from(
+                                  snapshot.data!.where(
+                                    (e) {
+                                      return e['item_name'].toString().toLowerCase().contains(
+                                        search.text.toLowerCase(),
+                                      );
+                                    },
+                                  ),
+                                );
+
+                                if (items.isNotEmpty) {
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, i) {
+                                      final item = items[i];
+                                      
+                                      return ListTile(
+                                        onTap: () {
+                                          setState(
+                                            () {
+                                              select = item;
+                                              search.clear();
+                                            }
+                                          );
+                                        },
+                                        dense: true,
+                                        title: Text(item['item_name']),
+                                        subtitle: Text('Stok: ${item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'}'),
+                                      );
+                                    },
+                                    itemCount: items.length,
+                                  );
+                                }
+                                return const Center(
+                                  child: Text(
+                                    'Tidak ada barang untuk ditampilkan',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ); 
+                              }
+                              else {
+                                return const Center(
+                                  child: Text(
+                                    'Sedang memperbarui daftar barang..',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -92,54 +250,106 @@ class _AdjustState extends State<Adjust> {
                           Text('Detail Penyesuaian', style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
                           )),
-                          Text(
-                            'Pilih produk untuk penyesuaian stok',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12.0,
-                            ),
-                          ),
                         ],
                       ),
                       Expanded(
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           spacing: 16.0,
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 8.0,
+                              child: Stack(
                                 children: [
-                                  TextField(
-                                    onChanged: (v) {
-                                      setState(() {});
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: 'Tipe Penyesuaian',
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        vertical: 12.0,
-                                        horizontal: 8.0,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    spacing: 8.0,
+                                    children: [
+                                      TextField(
+                                        onTap: () {
+                                          setState(() {
+                                            isExpand = !isExpand;   
+                                          });
+                                        },
+                                        controller: type,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Tipe Penyesuaian',
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 12.0,
+                                            horizontal: 8.0,
+                                          ),
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        readOnly: true,
                                       ),
-                                      border: OutlineInputBorder(),
+                                  const SizedBox(height: 8),
+                                      const Text('Prediksi Jumlah Stok'),
+                                      Text(
+                                        type.text == 'Penambahan'
+                                        ? 'a'
+                                        : 'b' //FIXME
+                                      ),
+                                    ],
+                                  ),
+                                  if (isExpand) Positioned(
+                                    top: 38.0, //FIXME also magic numbe
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 256.0,
+                                        maxHeight: 192.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor,
+                                        borderRadius: BorderRadius.circular(8.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.1),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, i) {                                       
+                                          return Material( //FIXME
+                                            child: ListTile(
+                                              onTap: () {
+                                                setState(
+                                                  () {
+                                                    type.clear();
+                                                    type.text = 'fu';
+                                                    print('fu too');
+                                                  }
+                                                );
+                                              },
+                                              dense: true,
+                                              title: Text(
+                                                i.isEven
+                                                ? 'Penambahan'
+                                                : 'Pengurangan',
+                                              )
+                                            ),
+                                          );
+                                        },
+                                        itemCount: 2,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
-                                  const Text('Prediksi Jumlah Stok'),
-                                  const Text('-'),
                                 ],
                               ),
                             ),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 spacing: 8.0,
                                 children: [
                                   TextField(
                                     onChanged: (v) {
                                       setState(() {});
                                     },
+                                    controller: amount,
                                     decoration: const InputDecoration(
                                       labelText: 'Jumlah',
                                       isDense: true,
@@ -156,6 +366,7 @@ class _AdjustState extends State<Adjust> {
                                     onChanged: (v) {
                                       setState(() {});
                                     },
+                                    controller: note,
                                     decoration: const InputDecoration(
                                       hintText: '(Opsional)',
                                       isDense: true,
@@ -165,7 +376,8 @@ class _AdjustState extends State<Adjust> {
                                       ),
                                       border: OutlineInputBorder(),
                                     ),
-                                    maxLines: 2,
+                                    maxLines: 3,
+                                    minLines: 3,
                                   ),
                                 ],
                               ),

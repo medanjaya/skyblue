@@ -22,7 +22,7 @@ Future<void> main() async {
   
   await Supabase.initialize(
     url: 'https://nodpqwqildvzjpnechui.supabase.co',
-    anonKey: 'sb_publishable_AhZMwxayR5KdKMoAfJvmhQ_m5RWaUZX',
+    publishableKey: 'sb_publishable_AhZMwxayR5KdKMoAfJvmhQ_m5RWaUZX',
     authOptions: const FlutterAuthClientOptions(
       detectSessionInUri: false,
     ),

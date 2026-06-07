@@ -27,11 +27,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final ExpansionTileController
-  master = ExpansionTileController(),
-  stock = ExpansionTileController(),
-  transaction = ExpansionTileController(),
-  report = ExpansionTileController();
+  final ExpansibleController
+  master = ExpansibleController(),
+  stock = ExpansibleController(),
+  transaction = ExpansibleController(),
+  report = ExpansibleController();
 
   bool isExpand = true;
   String current = 'DASHBOARD';
@@ -380,7 +380,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget expansionMenu(String key, IconData icon, String label, List<Widget> children, ExpansionTileController controller) {
+  Widget expansionMenu(String key, IconData icon, String label, List<Widget> children, ExpansibleController controller) {
     final isSelected = current.startsWith(key);
     
     return ExpansionTile(
