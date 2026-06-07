@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -21,27 +22,14 @@ class _AdjustState extends State<Adjust> {
   amount = TextEditingController(),
   note = TextEditingController();
 
-  final FocusNode focus = FocusNode();
-
   List display = [];
   int rows = 10, current = 1;
 
+  int? value, operand, predict;
+  bool? operator;
+  
   Map select = {};
   bool isExpand = false;
-
-  @override
-  void initState() {
-    super.initState();
-    focus.addListener(
-      () {
-        setState(
-          () {
-            isExpand = focus.hasFocus;
-          }
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +60,14 @@ class _AdjustState extends State<Adjust> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         spacing: 8.0,
                         children: [
-                          const Text('Pilih Barang', style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
-                      )),
-                          const Text('Pilih Barang', style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20, color : Color(0xFF007BFF)
-                      )),
+                          const Text(
+                            'Pilih Barang',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color : Color(0xFF007BFF),
+                            ),
+                          ),
                           TextField(
                             onChanged: (v) {
                               setState(() {});
@@ -152,7 +142,7 @@ class _AdjustState extends State<Adjust> {
                         ],
                       ),
                       if (search.text.isNotEmpty) Positioned(
-                        top: 68.0, //FIXME magic numbe
+                        top: 76.0, //FIXME magic numbe
                         left: 0,
                         right: 0,
                         child: Container(
@@ -196,6 +186,9 @@ class _AdjustState extends State<Adjust> {
                                           setState(
                                             () {
                                               select = item;
+                                              value = select['stock_info_v2']?['summary_info']['total_available_stock'];
+                                              operate();
+                                              
                                               search.clear();
                                             }
                                           );
@@ -272,17 +265,19 @@ class _AdjustState extends State<Adjust> {
                                 children: [
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    spacing: 8.0,
+                                    spacing: 16.0,
                                     children: [
                                       TextField(
                                         onTap: () {
-                                          setState(() {
-                                            isExpand = !isExpand;   
-                                          });
+                                          setState(
+                                            () {
+                                              isExpand = true;   
+                                            }
+                                          );
                                         },
                                         controller: type,
                                         decoration: const InputDecoration(
-                                          labelText: 'Tipe Penyesuaian',
+                                          hintText: 'Tipe Penyesuaian',
                                           isDense: true,
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 12.0,
@@ -292,12 +287,17 @@ class _AdjustState extends State<Adjust> {
                                         ),
                                         readOnly: true,
                                       ),
-                                      const SizedBox(height: 8),
-                                  const Text('Prediksi Jumlah Stok'),
-                                      Text(
-                                        type.text == 'Penambahan'
-                                        ? 'a'
-                                        : 'b' //FIXME
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        spacing: 8.0,
+                                        children: [
+                                          const Text('Prediksi Jumlah Stok'),
+                                          Text(
+                                            predict != null
+                                            ? predict.toString()
+                                            : '-',
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -323,19 +323,26 @@ class _AdjustState extends State<Adjust> {
                                       child: ListView.builder(
                                         shrinkWrap: true,
                                         itemBuilder: (context, i) {                                       
+                                          final isEven = i.isEven;
+
                                           return ListTile(
                                             onTap: () {
                                               setState(
                                                 () {
-                                                  type.text = i.isEven
+                                                  type.text = isEven
                                                   ? 'Penambahan'
                                                   : 'Pengurangan';
+                                                  
+                                                  operator = isEven;
+                                                  operate();
+
+                                                  isExpand = false;
                                                 }
                                               );
                                             },
                                             dense: true,
                                             title: Text(
-                                              i.isEven
+                                              isEven
                                               ? 'Penambahan'
                                               : 'Pengurangan',
                                             )
@@ -351,11 +358,16 @@ class _AdjustState extends State<Adjust> {
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                                spacing: 8.0,
+                                spacing: 16.0,
                                 children: [
                                   TextField(
                                     onChanged: (v) {
-                                      setState(() {});
+                                      setState(
+                                        () {
+                                          operand = int.tryParse(v);
+                                          operate();
+                                        },
+                                      );
                                     },
                                     controller: amount,
                                     decoration: const InputDecoration(
@@ -367,25 +379,34 @@ class _AdjustState extends State<Adjust> {
                                       ),
                                       border: OutlineInputBorder(),
                                     ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  const Text('Keterangan'),
-                                  TextField(
-                                    onChanged: (v) {
-                                      setState(() {});
-                                    },
-                                    controller: note,
-                                    decoration: const InputDecoration(
-                                      hintText: '(Opsional)',
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        vertical: 12.0,
-                                        horizontal: 8.0,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    spacing: 8.0,
+                                    children: [
+                                      const Text('Keterangan'),
+                                      TextField(
+                                        onChanged: (v) {
+                                          setState(() {});
+                                        },
+                                        controller: note,
+                                        decoration: const InputDecoration(
+                                          hintText: '(Opsional)',
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 12.0,
+                                            horizontal: 8.0,
+                                          ),
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        maxLines: 3,
+                                        minLines: 3,
                                       ),
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    maxLines: 3,
-                                    minLines: 3,
+                                    ],
                                   ),
                                 ],
                               ),
@@ -397,7 +418,12 @@ class _AdjustState extends State<Adjust> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              search.clear();
+                              type.clear();
+                              amount.clear();
+                              note.clear();
+                            },
                             child: const Text('Batal'),
                           ),
                           const SizedBox(width: 16),
@@ -686,5 +712,13 @@ class _AdjustState extends State<Adjust> {
         ),
       ],
     );
+  }
+
+  void operate() {
+    predict = value != null && operand != null && operator != null
+    ? operator!
+      ? value! + operand!
+      : value! - operand!
+    : null;
   }
 }

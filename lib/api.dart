@@ -353,3 +353,48 @@ Future fetchOrderList() async {
     },
   );
 }
+
+Future<void> updateStock(int id, int value) async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  expiry = prefs.getString('expiry') ?? '',
+  
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/update_stock',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  int.parse(expiry) > int.parse(time)
+  ? http.post(
+    Uri.https(
+      host,
+      path,
+      {
+        'partner_id': partner,
+        'timestamp': time,
+        'access_token': token,
+        'shop_id': shop,
+        'sign': sign.toString(),
+        'item_id': id,
+        'stock_list': [
+          {
+            'seller_stock': [
+              {
+                'stock': value,
+              },
+            ],
+          },
+        ],
+      },
+    ),
+  )
+  : authPartner();
+}

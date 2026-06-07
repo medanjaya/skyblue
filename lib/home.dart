@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyblue/pain.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
@@ -318,6 +319,7 @@ class _HomeState extends State<Home> {
                     : const Color.fromARGB(255, 245, 245, 245),
                     child: switch (current) {
                       //TODO fitur profil ganti password dan lain lain, 'PROFILE' => const Profile(),
+                      'PROFILE' => const Pain(),
                       'DASHBOARD' => const Dashboard(),
                       'MASTER_ITEM' => const Item(),
                       'MASTER_MEMBER' => const Member(),
