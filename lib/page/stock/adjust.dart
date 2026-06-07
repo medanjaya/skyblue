@@ -320,24 +320,22 @@ class _AdjustState extends State<Adjust> {
                                       child: ListView.builder(
                                         shrinkWrap: true,
                                         itemBuilder: (context, i) {                                       
-                                          return Material( //FIXME
-                                            child: ListTile(
-                                              onTap: () {
-                                                setState(
-                                                  () {
-                                                    type.clear();
-                                                    type.text = 'fu';
-                                                    print('fu too');
-                                                  }
-                                                );
-                                              },
-                                              dense: true,
-                                              title: Text(
-                                                i.isEven
-                                                ? 'Penambahan'
-                                                : 'Pengurangan',
-                                              )
-                                            ),
+                                          return ListTile(
+                                            onTap: () {
+                                              setState(
+                                                () {
+                                                  type.text = i.isEven
+                                                  ? 'Penambahan'
+                                                  : 'Pengurangan';
+                                                }
+                                              );
+                                            },
+                                            dense: true,
+                                            title: Text(
+                                              i.isEven
+                                              ? 'Penambahan'
+                                              : 'Pengurangan',
+                                            )
                                           );
                                         },
                                         itemCount: 2,
