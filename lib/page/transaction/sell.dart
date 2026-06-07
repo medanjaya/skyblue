@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Sell extends StatefulWidget {
   const Sell({super.key});
@@ -19,8 +20,14 @@ class _SellState extends State<Sell> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 16.0,
             children: [
-              const Text('Transaksi Penjualan'),
-              const TextField(), //TODO gunakan dropdown ketika input kode/nama barang
+              const Text('Transaksi Penjualan', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'Cari Nama/Kode Barang',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+              ), //TODO gunakan dropdown ketika input kode/nama barang
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -35,7 +42,7 @@ class _SellState extends State<Sell> {
                           color: const Color.fromARGB(40, 135, 206, 235),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        child: const Text('Filter by'),
+                        child: const Text('Filter by'), //TODO ganti dengan ChoiceChip
                       );
                     },
                   ),
@@ -60,9 +67,9 @@ class _SellState extends State<Sell> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12.0),
                             ),
-                            child: const Column(
+                            child: Column(
                               children: [
-                                ClipRRect(
+                                const ClipRRect(
                                   borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(12.0),
                                     topRight: Radius.circular(12.0),
@@ -75,17 +82,31 @@ class _SellState extends State<Sell> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                     vertical: 4.0,
                                     horizontal: 8.0
                                   ),
-                                  child: Column(
-                                    children: [
-                                      Text('Nama Barang'),
-                                      Text('Kode Barang'),
-                                      Text('Harga'),
-                                      Text('Sisa Stok'),
-                                    ],
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Nama Barang', style: TextStyle(fontWeight: FontWeight.bold),),
+                                        const Text('Kode Barang', style: TextStyle(color: Colors.grey),),
+                                        const Text('Harga', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF007BFF), fontSize: 18),),
+                                        const SizedBox(height: 4.0,),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0,
+                                            horizontal: 8.0
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: const Text('Sisa Stok')),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -106,21 +127,21 @@ class _SellState extends State<Sell> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8.0,
             children: [
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     spacing: 8.0,
                     children: [
-                      Icon(Icons.calendar_month_outlined),
-                      Text('13 April 2026'),
+                      const Icon(Icons.calendar_month_outlined),
+                      Text( DateFormat('dd MMM yyyy').format(DateTime.now())),
                     ],
                   ),
                   Row(
                     spacing: 8.0,
                     children: [
-                      Icon(Icons.access_time_outlined),
-                      Text('23:59:59'),
+                      const Icon(Icons.access_time_outlined),
+                      Text( DateFormat('HH:mm:ss').format(DateTime.now())),
                     ],
                   ),
                 ],
@@ -149,6 +170,7 @@ class _SellState extends State<Sell> {
                             children: [
                               Text('Nama Barang'),
                               Text('Harga x Jumlah'),
+                              Text('Subtotal', style: TextStyle(fontWeight: FontWeight.bold),),
                             ],
                           ),
                         ),
@@ -158,12 +180,18 @@ class _SellState extends State<Sell> {
                           },
                           icon: const Icon(Icons.add),
                         ),
-                        const Text('Harga'),
+                        const Text('0'),
                         IconButton(
                           onPressed: () {
                             //TODO
                           },
                           icon: const Icon(Icons.remove),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            //TODO
+                          },
+                          icon: const Icon(Icons.delete_outline, color: Colors.red,),
                         ),
                       ],
                     );
