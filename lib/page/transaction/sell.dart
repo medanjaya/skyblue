@@ -213,7 +213,12 @@ class _SellState extends State<Sell> {
                 },
                 child: const Text('Selesaikan Pesanan'),
               ),
-              ElevatedButton(
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                ),
                 onPressed: () {
                   //TODO
                 },
