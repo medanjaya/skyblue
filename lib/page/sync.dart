@@ -35,7 +35,7 @@ class _SyncState extends State<Sync> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16.0,
       children: [
-        const Text('Sinkronisasi Shopee'),
+        const Text('Sinkronisasi Shopee', style: TextStyle( fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -48,8 +48,8 @@ class _SyncState extends State<Sync> {
               const Row(
                 spacing: 8.0,
                 children: [
-                  Icon(Icons.key),
-                  Text('Kunci API'),
+                  Icon(Icons.key, color: Color(0xFF007BFF),),
+                  Text('Kunci API', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF007BFF)),),
                 ],
               ),
               Column(
@@ -59,7 +59,8 @@ class _SyncState extends State<Sync> {
                   const Text(
                     'Partner ID',
                     style: TextStyle(
-                      fontSize: 10.0,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   TextField(
@@ -97,7 +98,8 @@ class _SyncState extends State<Sync> {
                   const Text(
                     'Secret Key',
                     style: TextStyle(
-                      fontSize: 10.0,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   TextField(
@@ -166,19 +168,19 @@ class _SyncState extends State<Sync> {
                       children: [
                         Expanded(
                           flex: 1,
-                          child: Text('TANGGAL'),
+                          child: Text('TANGGAL', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('TIPE EVENT'),
+                          child: Text('TIPE EVENT', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                         Expanded(
                           flex: 1,
-                          child: Text('STATUS'),
+                          child: Text('STATUS', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('PESAN'),
+                          child: Text('PESAN', style: TextStyle(fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
@@ -207,7 +209,7 @@ class _SyncState extends State<Sync> {
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                    DateFormat('dd MMM yyyy hh:mm:ss').format(
                                       DateTime.parse(action['created_at']),
                                     ),
                                   ),
@@ -217,26 +219,45 @@ class _SyncState extends State<Sync> {
                                   child: Text(action['type']),
                                 ),
                                 Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    spacing: 8.0,
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        color:
-                                        action['status']
-                                        ? Colors.green
-                                        : Colors.red,
-                                        size: 18,
+                                    flex: 1,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 4.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: action['status']
+                                            ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
+                                            : const Color.fromARGB(120, 255, 0, 0).withValues(alpha: 0.1),
+                                          
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 8,
+                                          children: [
+                                            Icon(
+                                              Icons.circle,
+                                               color:
+                                              action['status']
+                                                ? Colors.green
+                                                : Colors.red,
+                                              size: 10,
+                                            ),
+                                            Text(action['status'] ? 'Success' : 'Error', style: TextStyle(
+                                              color:
+                                                action['status']
+                                                ? Colors.green
+                                                : Colors.red,
+                                            )
+                                            ),
+                                          ],
+                                        )
                                       ),
-                                      Text(
-                                        action['status']
-                                        ? 'Success'
-                                        : 'Error',
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
                                 Expanded(
                                   flex: 2,
                                   child: Text(action['log']),
