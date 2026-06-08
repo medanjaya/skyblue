@@ -3,287 +3,249 @@ import 'package:flutter/material.dart';
 class Pain extends StatelessWidget {
   const Pain({super.key});
 
-  static const _pageColor = Color(0xFFEAF8FF);
   static const _accentColor = Color(0xFF1F7CFF);
-  static const _titleColor = Color(0xFF9ED8F5);
   static const _borderColor = Color(0xFFD8D8D8);
   static const _textColor = Color(0xFF3A3A3A);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: _pageColor,
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 18.0,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 18.0,
-                horizontal: 28.0,
-              ),
-              decoration: BoxDecoration(
-                color: _titleColor,
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: const Text(
-                'Tambah Barang',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 16.0,
+      children: [
+        const Text(
+          'Tambah Barang',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF007BFF),
           ),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 36.0,
-              children: [
-                Expanded(
-                  flex: 9,
-                  child: _productInformationCard(),
-                ),
-                Expanded(
-                  flex: 10,
+        ),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 36.0,
+            children: [
+              Expanded(
+                child: _CardShell(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: 22.0,
                     children: [
-                      Expanded(
-                        flex: 7,
-                        child: _descriptionCard(),
+                      const Text(
+                        'Product Information',
+                        style: TextStyle(
+                          color: _textColor,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                      _imageProductCard(),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          width: 148.0,
-                          height: 48.0,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _accentColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
+                      const SizedBox(height: 20.0),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            spacing: 18.0,
+                            children: [
+                              _labeledField(
+                                label: 'Nama Barang',
+                                hint: 'Masukkan Nama Barang',
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w700,
+                              Row(
+                                spacing: 16.0,
+                                children: [
+                                  Expanded(
+                                    child: _labeledField(
+                                      label: 'Ukuran',
+                                      hint: 'Masukkan Ukuran',
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _labeledField(
+                                      label: 'Warna',
+                                      hint: 'Warna',
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            onPressed: () {},
-                            child: const Text('Save Product'),
+                              Row(
+                                spacing: 16.0,
+                                children: [
+                                  Expanded(
+                                    child: _labeledField(
+                                      label: 'Kategori',
+                                      hint: 'pilih category barang',
+                                      suffixIcon: Icons.keyboard_arrow_down_rounded,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _labeledField(
+                                      label: 'Brand',
+                                      hint: 'pilih brand',
+                                      suffixIcon: Icons.keyboard_arrow_down_rounded,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              _labeledField(
+                                label: 'Minimum Stok',
+                                hint: 'Masukkan minimum stok',
+                              ),
+                              _labeledField(
+                                label: 'Harga',
+                                hint: 'Masukkan Harga',
+                              ),
+                              _labeledField(
+                                label: 'Status Product',
+                                hint: 'Select status product',
+                                suffixIcon: Icons.keyboard_arrow_down_rounded,
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _productInformationCard() {
-    return _CardShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Product Information',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 20.0),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: 18.0,
-                children: [
-                  _labeledField(
-                    label: 'Kode Barang',
-                    hint: 'Auto Generate',
-                  ),
-                  _labeledField(
-                    label: 'Nama Barang',
-                    hint: 'Masukkan Nama Barang',
-                  ),
-                  Row(
-                    spacing: 16.0,
-                    children: [
-                      Expanded(
-                        child: _labeledField(
-                          label: 'Ukuran',
-                          hint: 'Masukkan Ukuran',
-                        ),
-                      ),
-                      Expanded(
-                        child: _labeledField(
-                          label: 'Warna',
-                          hint: 'Warna',
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    spacing: 16.0,
-                    children: [
-                      Expanded(
-                        child: _labeledField(
-                          label: 'Kategori',
-                          hint: 'pilih category barang',
-                          suffixIcon: Icons.keyboard_arrow_down_rounded,
-                        ),
-                      ),
-                      Expanded(
-                        child: _labeledField(
-                          label: 'Brand',
-                          hint: 'pilih brand',
-                          suffixIcon: Icons.keyboard_arrow_down_rounded,
-                        ),
-                      ),
-                    ],
-                  ),
-                  _labeledField(
-                    label: 'Minimum Stok',
-                    hint: 'Masukkan minimum stok',
-                  ),
-                  _labeledField(
-                    label: 'Harga',
-                    hint: 'Masukkan Harga',
-                  ),
-                  _labeledField(
-                    label: 'Status Product',
-                    hint: 'Select status product',
-                    suffixIcon: Icons.keyboard_arrow_down_rounded,
-                  ),
-                ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _descriptionCard() {
-    return _CardShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Deskripsi Barang',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12.0),
-          const Text(
-            'Deskripsi Produk',
-            style: TextStyle(
-              color: _accentColor,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 18.0),
-          Expanded(
-            child: TextField(
-              expands: true,
-              maxLines: null,
-              minLines: null,
-              textAlignVertical: TextAlignVertical.top,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.all(14.0),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(
-                    color: Colors.black54,
-                    width: 1.0,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(
-                    color: _accentColor,
-                    width: 1.3,
-                  ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: 22.0,
+                  children: [
+                    Expanded(
+                      child: _CardShell(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'Deskripsi Barang',
+                              style: TextStyle(
+                                color: _textColor,
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 12.0),
+                            const Text(
+                              'Deskripsi Produk',
+                              style: TextStyle(
+                                color: _accentColor,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 18.0),
+                            Expanded(
+                              child: TextField(
+                                expands: true,
+                                maxLines: null,
+                                minLines: null,
+                                textAlignVertical: TextAlignVertical.top,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.all(14.0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors.black54,
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: const BorderSide(
+                                      color: _accentColor,
+                                      width: 1.3,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _CardShell(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Image Product',
+                            style: TextStyle(
+                              color: _textColor,
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          const Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Note : ',
+                                  style: TextStyle(
+                                    color: _accentColor,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Format photos SVG, PNG, or JPG (Max size 4mb)',
+                                  style: TextStyle(
+                                    color: _textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            style: TextStyle(fontSize: 13.0),
+                          ),
+                          const SizedBox(height: 18.0),
+                          Row(
+                            spacing: 16.0,
+                            children: List.generate(
+                              5,
+                              (i) {
+                                return Expanded(
+                                  child: AspectRatio(
+                                    aspectRatio: 1.18,
+                                    child: _PhotoBox(index: i + 1),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: 148.0,
+                        height: 48.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _accentColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: const Text('Save Product'),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _imageProductCard() {
-    return _CardShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Image Product',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          const Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Note : ',
-                  style: TextStyle(
-                    color: _accentColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Format photos SVG, PNG, or JPG (Max size 4mb)',
-                  style: TextStyle(
-                    color: _textColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            style: TextStyle(fontSize: 13.0),
-          ),
-          const SizedBox(height: 18.0),
-          Row(
-            spacing: 16.0,
-            children: List.generate(
-              5,
-              (i) {
-                return Expanded(
-                  child: AspectRatio(
-                    aspectRatio: 1.18,
-                    child: _PhotoBox(index: i + 1),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

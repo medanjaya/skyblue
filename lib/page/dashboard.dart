@@ -197,7 +197,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Icon(Icons.warning_amber, color: Colors.amber),
                           Text('Stok Hampir Habis', style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 16, color: Colors.black,
+                            fontWeight: FontWeight.w600, fontSize: 16,
                           ),),
                         ],
                       ),

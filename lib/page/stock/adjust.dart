@@ -615,7 +615,7 @@ class _AdjustState extends State<Adjust> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 2,
+                                    flex: 3,
                                     child: Text(
                                       'NAMA BARANG',
                                       style: TextStyle(
@@ -642,7 +642,7 @@ class _AdjustState extends State<Adjust> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 3,
+                                    flex: 4,
                                     child: Text(
                                       'KETERANGAN',
                                       style: TextStyle(
@@ -675,7 +675,7 @@ class _AdjustState extends State<Adjust> {
                                           ),
                                         ),
                                         Expanded(
-                                          flex: 2,
+                                          flex: 3,
                                           child: StreamBuilder(
                                             stream: getItemList(),
                                             builder: (context, snapshot) {
@@ -716,7 +716,7 @@ class _AdjustState extends State<Adjust> {
                                           child: Text(adjust['amount'].toString()),
                                         ),
                                         Expanded(
-                                          flex: 3,
+                                          flex: 4,
                                           child: Text(adjust['note']),
                                         ),
                                       ],
