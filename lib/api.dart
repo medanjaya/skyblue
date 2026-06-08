@@ -26,82 +26,81 @@ Future<void> authPartner() async {
   if (!isAuth) {
     isAuth = true;
     
-    try {
-      FlutterWebAuth2.authenticate(
-        url: Uri.https(
-          host,
-          path,
-          {
-            'sign': sign.toString(),
-            'partner_id': partner,
-            'timestamp': time,
-            'redirect': 'https://open.shopee.com',
-          },
-        )
-        .toString(),
-        callbackUrlScheme: 'https',
-        options: const FlutterWebAuth2Options(
-          httpsHost: 'open.shopee.com',
-        ),
-      )
-      .then(
-        (r) {
-          final
-          path = '/api/v2/auth/token/get',
-          sign = hmac.convert(utf8.encode(partner + path + time)),
-          
-          code = Uri.parse(r).queryParameters['code'],
-          shop = Uri.parse(r).queryParameters['shop_id'];
-          
-          prefs.setString('shop', shop!);
-
-          http.post(
-            Uri.https(
-              host,
-              path,
-              {
-                'partner_id': partner,
-                'timestamp': time,
-                'sign': sign.toString(),
-              },
-            ),
-            body: jsonEncode(
-              {
-                'partner_id': partner,
-                'code': code,
-                'shop_id': shop,
-              },
-            ),
-          )
-          .then(
-            (r) {
-              final result = jsonDecode(r.body);
-
-              prefs.setString('token', result['access_token']);
-              prefs.setString('refresh', result['refresh_token']);
-              
-              prefs.setString(
-                'expiry',
-                '${
-                  DateTime.now().add(
-                    const Duration(
-                      hours: 4,
-                    ),
-                  )
-                  .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
-                }'
-              );
-
-              isAuth = false;
-            },
-          );
+    FlutterWebAuth2.authenticate(
+      url: Uri.https(
+        host,
+        path,
+        {
+          'sign': sign.toString(),
+          'partner_id': partner,
+          'timestamp': time,
+          'redirect': 'https://open.shopee.com',
         },
-      );
-    }
-    catch (e) {
-      //FIXME print(e);
-      isAuth = false;
-    }
+      )
+      .toString(),
+      callbackUrlScheme: 'https',
+      options: const FlutterWebAuth2Options(
+        httpsHost: 'open.shopee.com',
+      ),
+    )
+    .then(
+      (r) {
+        final
+        path = '/api/v2/auth/token/get',
+        sign = hmac.convert(utf8.encode(partner + path + time)),
+        
+        code = Uri.parse(r).queryParameters['code'],
+        shop = Uri.parse(r).queryParameters['shop_id'];
+        
+        prefs.setString('shop', shop!);
+
+        http.post(
+          Uri.https(
+            host,
+            path,
+            {
+              'partner_id': partner,
+              'timestamp': time,
+              'sign': sign.toString(),
+            },
+          ),
+          body: jsonEncode(
+            {
+              'partner_id': partner,
+              'code': code,
+              'shop_id': shop,
+            },
+          ),
+        )
+        .then(
+          (r) {
+            final result = jsonDecode(r.body);
+
+            prefs.setString('token', result['access_token']);
+            prefs.setString('refresh', result['refresh_token']);
+            
+            prefs.setString(
+              'expiry',
+              '${
+                DateTime.now().add(
+                  const Duration(
+                    hours: 4,
+                  ),
+                )
+                .millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond
+              }'
+            );
+
+            isAuth = false;
+          },
+        );
+      },
+    )
+    .catchError(
+      (e) {
+        isAuth = false;
+      },
+    );
   }
 }
 
