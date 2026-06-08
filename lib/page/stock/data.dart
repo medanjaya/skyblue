@@ -265,7 +265,7 @@ class _DataState extends State<Data> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Text(
                                       'KATEGORI',
                                       style: TextStyle(
@@ -351,8 +351,33 @@ class _DataState extends State<Data> {
                                           child: Text(item['item_name']),
                                         ),
                                         Expanded(
-                                          flex: 1,
-                                          child: Text(item['category_id'].toString()),
+                                          flex: 2,
+                                          child: FutureBuilder(
+                                            future: fetchCategoryList(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                final List categories = snapshot.data!;
+                                                
+                                                return Text(
+                                                  categories[
+                                                    categories.indexWhere(
+                                                      (e) => e['category_id'] == item['category_id'],
+                                                    )
+                                                  ]
+                                                  ['display_category_name'],
+                                                );
+                                              }
+                                              else {
+                                                return const Text(
+                                                  'Memuat..',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
                                         ),
                                         Expanded(
                                           flex: 1,
@@ -361,9 +386,11 @@ class _DataState extends State<Data> {
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            NumberFormat.decimalPattern('id_ID')
+                                            item['price_info']?[0]['current_price'] != null
+                                            ? NumberFormat.decimalPattern('id_ID')
                                             .format(item['price_info']?[0]['current_price'] ?? 0)
-                                            .toString(),
+                                            .toString()
+                                            : 'Variatif',
                                           ),
                                         ),
                                         Expanded(
@@ -417,7 +444,7 @@ class _DataState extends State<Data> {
                                         ),
                                         Expanded(
                                           flex: 1,
-                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? '?'),
+                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? 'Variatif'),
                                         ),
                                       ],
                                     );

@@ -654,7 +654,7 @@ class _AdjustState extends State<Adjust> {
                               ),
                               const Divider(),
                               Expanded(
-                                child: ListView.separated(
+                                child: ListView.separated( //TODO filter ke barang yang terpilih (select)
                                   shrinkWrap: true,
                                   itemBuilder: (context, i) {
                                     final adjust = pages[i];
@@ -679,17 +679,28 @@ class _AdjustState extends State<Adjust> {
                                           child: StreamBuilder(
                                             stream: getItemList(),
                                             builder: (context, snapshot) {
-                                              final List items = snapshot.data!;
-                                              
-                                              return Text(
-                                                items[
-                                                  items.indexWhere(
-                                                    (e) => e['item_id'] == adjust['item'],
-                                                  )
-                                                ]
-                                                ['item_name'],
-                                              );
-                                            }
+                                              if (snapshot.hasData) {
+                                                final List items = snapshot.data!;
+                                                
+                                                return Text(
+                                                  items[
+                                                    items.indexWhere(
+                                                      (e) => e['item_id'] == adjust['item'],
+                                                    )
+                                                  ]
+                                                  ['item_name'],
+                                                );
+                                              }
+                                              else {
+                                                return const Text(
+                                                  'Memuat..',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                );
+                                              }
+                                            },
                                           ),
                                         ),
                                         Expanded(

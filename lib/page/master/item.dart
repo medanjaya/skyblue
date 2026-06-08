@@ -294,7 +294,7 @@ class _ItemState extends State<Item> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Text(
                                       'KATEGORI',
                                       style: TextStyle(
@@ -364,8 +364,33 @@ class _ItemState extends State<Item> {
                                           child: Text(item['item_name']),
                                         ),
                                         Expanded(
-                                          flex: 1,
-                                          child: Text(item['category_id'].toString()), //TODO switch kategori setelah tarik dari api
+                                          flex: 2,
+                                          child: FutureBuilder(
+                                            future: fetchCategoryList(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                final List categories = snapshot.data!;
+                                                
+                                                return Text(
+                                                  categories[
+                                                    categories.indexWhere(
+                                                      (e) => e['category_id'] == item['category_id'],
+                                                    )
+                                                  ]
+                                                  ['display_category_name'],
+                                                );
+                                              }
+                                              else {
+                                                return const Text(
+                                                  'Memuat..',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
                                         ),
                                         Expanded(
                                           flex: 1,

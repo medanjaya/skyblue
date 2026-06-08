@@ -354,12 +354,53 @@ Future fetchOrderList() async {
   );
 }
 
+Future fetchCategoryList() async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/get_category',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  return refreshToken()
+  .then(
+    (r) {
+      return http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+            'language': 'id',
+          },
+        ),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+          return jsonDecode(r.body)['response']['category_list'];
+        },
+      );
+    },
+  );
+}
+
 Future<void> updateStock(int id, int value) async {
   final
   prefs = await SharedPreferences.getInstance(),
 
-  expiry = prefs.getString('expiry') ?? '',
-  
   partner = prefs.getString('partner') ?? '',
   secret = prefs.getString('secret') ?? '',
 
@@ -372,38 +413,41 @@ Future<void> updateStock(int id, int value) async {
   hmac = Hmac(sha256, base64Decode(secret)),
   sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
 
-  int.parse(expiry) > int.parse(time)
-  ? http.post(
-    Uri.https(
-      host,
-      path,
-      {
-        'partner_id': partner,
-        'timestamp': time,
-        'access_token': token,
-        'shop_id': shop,
-        'sign': sign.toString(),
-      },
-    ),
-    body: jsonEncode(
-      {
-        'item_id': id,
-        'stock_list': [
+  refreshToken()
+  .then(
+    (r) {
+      http.post(
+        Uri.https(
+          host,
+          path,
           {
-            'seller_stock': [
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+          },
+        ),
+        body: jsonEncode(
+          {
+            'item_id': id,
+            'stock_list': [
               {
-                'stock': value,
+                'seller_stock': [
+                  {
+                    'stock': value,
+                  },
+                ],
               },
             ],
           },
-        ],
-      },
-    ),
-  )
-  .then(
-    (r) {
-      //FIXME print(r.body);
+        ),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+        },
+      );
     },
-  )
-  : authPartner();
+  );
 }
