@@ -26,28 +26,13 @@ class _DataState extends State<Data> {
       'controller': TextEditingController(),
     },
     {
-      'key': 'category_id',
+      'key': 'category_id', //FIXME
       'name': 'KATEGORI',
       'controller': TextEditingController(),
     },
     {
       'key': 'BRAND', //FIXME
       'name': 'MEREK',
-      'controller': TextEditingController(),
-    },
-    {
-      'key': 'PRICE', //FIXME
-      'name': 'HARGA',
-      'controller': TextEditingController(),
-    },
-    {
-      'key': 'item_status',
-      'name': 'STATUS',
-      'controller': TextEditingController(),
-    },
-    {
-      'key': 'QUANTITY', //FIXME
-      'name': 'KUANTITAS',
       'controller': TextEditingController(),
     },
   ];
@@ -76,9 +61,7 @@ class _DataState extends State<Data> {
               Row(
                 spacing: 16.0,
                 children: List.generate(
-                  fields.indexWhere(
-                    (e) => e['key'] == 'PRICE',
-                  ),
+                  fields.length,
                   (i) {
                     final field = fields[i];
     
@@ -318,133 +301,202 @@ class _DataState extends State<Data> {
                                   itemBuilder: (context, i) {
                                     final item = pages[i];
                                 
-                                    return Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                    return Column(
                                       children: [
-                                        Expanded(
-                                          flex: 1,
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {}, //TODO edit item
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                              IconButton(
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: IconButton(
                                                 onPressed: () {}, //TODO informasi item
+                                                alignment: Alignment.centerLeft,
                                                 icon: const Icon(
                                                   Icons.info_outline,
                                                   color: Colors.blue,
                                                 ),
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(item['item_id'].toString()),
+                                            ),
+                                            Expanded(
+                                              flex: 2,
+                                              child: Text(item['item_name']),
+                                            ),
+                                            Expanded(
+                                              flex: 2,
+                                              child: FutureBuilder(
+                                                future: fetchCategoryList(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    final List categories = snapshot.data!;
+                                                    
+                                                    return Text(
+                                                      categories[
+                                                        categories.indexWhere(
+                                                          (e) => e['category_id'] == item['category_id'],
+                                                        )
+                                                      ]
+                                                      ['display_category_name'],
+                                                    );
+                                                  }
+                                                  else {
+                                                    return const Text(
+                                                      'Memuat..',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(item['brand']['original_brand_name'].toString()),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(
+                                                item['price_info']?[0]['current_price'] != null
+                                                ? NumberFormat.decimalPattern('id_ID')
+                                                .format(item['price_info']?[0]['current_price'] ?? 0)
+                                                .toString()
+                                                : 'Variatif',
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                    vertical: 4.0,
+                                                    horizontal: 8.0,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: (item['item_status'] == 'NORMAL')
+                                                    ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
+                                                    : (item['item_status'] == 'HABIS')
+                                                    ? const Color.fromARGB(120, 255, 0, 0).withValues(alpha: 0.1)
+                                                    : (item['item_status'] == 'MENIPIS')
+                                                    ? const Color.fromARGB(120, 255, 165, 0).withValues(alpha: 0.1)
+                                                    : const Color.fromARGB(120, 128, 128, 128).withValues(alpha: 0.1),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.circle,
+                                                        color: item['item_status'] == 'NORMAL'
+                                                        ? Colors.green
+                                                        : (item['item_status'] == 'HABIS')
+                                                        ? Colors.red
+                                                        : (item['item_status'] == 'MENIPIS')
+                                                        ? Colors.orange
+                                                        : Colors.grey,
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 4.0,),
+                                                      Text(item['item_status'], style: TextStyle(
+                                                        color: item['item_status'] == 'NORMAL'
+                                                        ? Colors.green
+                                                        : (item['item_status'] == 'HABIS')
+                                                        ? Colors.red
+                                                        : (item['item_status'] == 'MENIPIS')
+                                                        ? Colors.orange
+                                                        : Colors.grey,
+                                                        fontWeight: FontWeight.w600,),  
+                                                      ),
+                                                    ],
+                                                  )
+                                                ) 
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? ''),
+                                            ),
+                                          ],
                                         ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(item['item_id'].toString()),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(item['item_name']),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: FutureBuilder(
-                                            future: fetchCategoryList(),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.hasData) {
-                                                final List categories = snapshot.data!;
-                                                
-                                                return Text(
-                                                  categories[
-                                                    categories.indexWhere(
-                                                      (e) => e['category_id'] == item['category_id'],
-                                                    )
-                                                  ]
-                                                  ['display_category_name'],
-                                                );
-                                              }
-                                              else {
-                                                return const Text(
+                                        if (item['has_model']) StreamBuilder(
+                                          stream: getModelList(item['item_id']),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              final models = snapshot.data!;
+
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                itemBuilder: (context, j) {
+                                                  final model = models[j];
+                                                  
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      vertical: 8.0,
+                                                    ),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        const Expanded(
+                                                          flex: 1,
+                                                          child: SizedBox(),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 1,
+                                                          child: Text(model['model_id'].toString()),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 2,
+                                                          child: Text(model['model_name']),
+                                                        ),
+                                                        const Expanded(
+                                                          flex: 3,
+                                                          child: SizedBox(),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            model['price_info']?[0]['current_price'] != null
+                                                            ? NumberFormat.decimalPattern('id_ID')
+                                                            .format(model['price_info']?[0]['current_price'] ?? 0)
+                                                            .toString()
+                                                            : '',
+                                                          ),
+                                                        ),
+                                                        const Expanded(
+                                                          flex: 1,
+                                                          child: SizedBox(),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 1,
+                                                          child: Text(model['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? ''),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                                itemCount: models.length,
+                                              );
+                                            }
+                                            else {
+                                              return const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 8.0,
+                                                ),
+                                                child: Text(
                                                   'Memuat..',
                                                   style: TextStyle(
                                                     color: Colors.grey,
                                                     fontStyle: FontStyle.italic,
                                                   ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(item['brand']['original_brand_name'].toString()),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(
-                                            item['price_info']?[0]['current_price'] != null
-                                            ? NumberFormat.decimalPattern('id_ID')
-                                            .format(item['price_info']?[0]['current_price'] ?? 0)
-                                            .toString()
-                                            : 'Variatif',
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                vertical: 4.0,
-                                                horizontal: 8.0,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: (item['item_status'] == 'NORMAL')
-                                                ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
-                                                : (item['item_status'] == 'HABIS')
-                                                ? const Color.fromARGB(120, 255, 0, 0).withValues(alpha: 0.1)
-                                                : (item['item_status'] == 'MENIPIS')
-                                                ? const Color.fromARGB(120, 255, 165, 0).withValues(alpha: 0.1)
-                                                : const Color.fromARGB(120, 128, 128, 128).withValues(alpha: 0.1),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    Icons.circle,
-                                                    color: item['item_status'] == 'NORMAL'
-                                                    ? Colors.green
-                                                    : (item['item_status'] == 'HABIS')
-                                                    ? Colors.red
-                                                    : (item['item_status'] == 'MENIPIS')
-                                                    ? Colors.orange
-                                                    : Colors.grey,
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 4.0,),
-                                                  Text(item['item_status'], style: TextStyle(
-                                                    color: item['item_status'] == 'NORMAL'
-                                                    ? Colors.green
-                                                    : (item['item_status'] == 'HABIS')
-                                                    ? Colors.red
-                                                    : (item['item_status'] == 'MENIPIS')
-                                                    ? Colors.orange
-                                                    : Colors.grey,
-                                                    fontWeight: FontWeight.w600,),  
-                                                  ),
-                                                ],
-                                              )
-                                            ) 
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(item['stock_info_v2']?['summary_info']['total_available_stock'].toString() ?? 'Variatif'),
+                                                ),
+                                              );
+                                            }
+                                          },
                                         ),
                                       ],
                                     );

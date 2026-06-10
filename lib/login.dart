@@ -142,7 +142,16 @@ class _LoginState extends State<Login> {
                                       'last_signed_at': time,
                                     },
                                     'WebBrowserInfo' => {
-                                      'device': info.data['browserName'].name, //FIXME cek ini nanti
+                                      'device': switch (info.data['browserName'] as BrowserName) {
+                                        BrowserName.firefox => 'Mozilla Firefox',
+                                        BrowserName.samsungInternet => 'Samsung Internet',
+                                        BrowserName.opera => 'Opera Web',
+                                        BrowserName.msie => 'Internet Explorer',
+                                        BrowserName.edge => 'Microsoft Edge',
+                                        BrowserName.chrome => 'Google Chrome',
+                                        BrowserName.safari => 'Apple Safari',
+                                        BrowserName.unknown => '',
+                                      },
                                       'type': 'web',
                                       'last_signed_at': time,
                                     },
@@ -216,7 +225,7 @@ class _LoginState extends State<Login> {
                           showExceptionSnackBar('Tidak terhubung ke internet saat ini!');
                         }
                         catch (e) {
-                          showExceptionSnackBar('Ada yang salah, mohon hubungi pengembang.');
+                          showExceptionSnackBar('Ada yang salah, mohon hubungi pengembang. $e'); //FIXME hapus setelah selesai
                         }
                       }
                     : null,

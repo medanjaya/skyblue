@@ -294,96 +294,54 @@ class _AdjustState extends State<Adjust> {
                           spacing: 16.0,
                           children: [
                             Expanded(
-                              child: Stack(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 16.0,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    spacing: 16.0,
-                                    children: [
-                                      TextField(
-                                        onTap: () {
-                                          setState(
-                                            () {
-                                              isExpand = true;   
-                                            }
-                                          );
-                                        },
-                                        controller: type,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Tipe Penyesuaian',
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 12.0,
-                                            horizontal: 8.0,
-                                          ),
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        readOnly: true,
+                                  DropdownMenu(
+                                    onSelected: (v) {
+                                      setState(
+                                        () {
+                                          operator = v;
+                                          operate();
+                                        }
+                                      );
+                                    },
+                                    hintText: 'Tipe Penyesuaian',
+                                    inputDecorationTheme: InputDecorationThemeData(
+                                      isDense: true,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 12.0,
+                                        horizontal: 8.0,
                                       ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                                        spacing: 8.0,
-                                        children: [
-                                          const Text('Prediksi Jumlah Stok'),
-                                          Text(
-                                            predict != null
-                                            ? predict.toString()
-                                            : '-',
-                                          ),
-                                        ],
+                                      border: const OutlineInputBorder(),
+                                      constraints: BoxConstraints.tight(
+                                        const Size.fromHeight(37.0), //FIXME magic numbe
+                                      ),
+                                    ),
+                                    expandedInsets: EdgeInsets.zero,
+                                    dropdownMenuEntries: const [
+                                      DropdownMenuEntry(
+                                        value: true,
+                                        label: 'Penambahan',
+                                      ),
+                                      DropdownMenuEntry(
+                                        value: false,
+                                        label: 'Pengurangan',
                                       ),
                                     ],
                                   ),
-                                  if (isExpand) Positioned(
-                                    top: 38.0, //FIXME also magic numbe
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      constraints: const BoxConstraints(
-                                        maxWidth: 256.0,
-                                        maxHeight: 192.0,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    spacing: 8.0,
+                                    children: [
+                                      const Text('Prediksi Jumlah Stok'),
+                                      Text(
+                                        predict != null
+                                        ? predict.toString()
+                                        : '-',
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor,
-                                        borderRadius: BorderRadius.circular(8.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.1),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, i) {                                       
-                                          final isEven = i.isEven;
-
-                                          return ListTile(
-                                            onTap: () {
-                                              setState(
-                                                () {
-                                                  type.text = isEven
-                                                  ? 'Penambahan'
-                                                  : 'Pengurangan';
-                                                  
-                                                  operator = isEven;
-                                                  operate();
-
-                                                  isExpand = false;
-                                                }
-                                              );
-                                            },
-                                            dense: true,
-                                            title: Text(
-                                              isEven
-                                              ? 'Penambahan'
-                                              : 'Pengurangan',
-                                            )
-                                          );
-                                        },
-                                        itemCount: 2,
-                                      ),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -807,7 +765,9 @@ class _AdjustState extends State<Adjust> {
   }
 
   void operate() {
-    predict = value != null && operand != null && operator != null
+    predict = [value, operand, operator].every(
+      (e) => e != null
+    )
     ? operator!
       ? value! + operand!
       : value! - operand!

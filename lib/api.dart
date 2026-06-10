@@ -215,6 +215,8 @@ Future fetchItemList() async {
               'BANNED',
               'UNLIST',
               'REVIEWING',
+              /* 'SELLER_DELETE',
+              'SHOPEE_DELETE', */ //FIXME ini rawan eror sepertinya
             ],
           },
         ),
@@ -257,6 +259,60 @@ Future fetchItemList() async {
               return jsonDecode(r.body)['response']['item_list'];
             }
           );
+        },
+      );
+    },
+  );
+}
+
+Stream getModelList(int id) async* {
+  while (true) {
+    yield await fetchModelList(id);
+    await Future.delayed(
+      const Duration(
+        seconds: 3,
+      ),
+    );
+  }
+}
+
+Future fetchModelList(int id) async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/get_model_list',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  return refreshToken()
+  .then(
+    (r) {
+      return http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+            'item_id': id.toString(),
+          },
+        ),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+          return jsonDecode(r.body)['response']['model'];
         },
       );
     },
@@ -321,6 +377,8 @@ Future fetchOrderList() async {
       )
       .then(
         (r) {
+          //FIXME print(r.body);
+          
           final
           result = jsonDecode(r.body)['response']['order_list'],
           
