@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,34 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:skyblue/api.dart';
+
+// Helper function — taruh di class atau file utils
+Color getOrderStatusColor(String status) {
+  switch (status) {
+    case 'COMPLETED':
+      return const Color(0xFF3B6D11);
+    case 'READY_TO_SHIP':
+      return const Color(0xFF0F6E56);
+    case 'PROCESSED':
+      return const Color(0xFF185FA5);
+    case 'TO_CONFIRM_RECEIVE':
+      return const Color(0xFF185FA5);
+    case 'SHIPPED':
+      return const Color(0xFF534AB7);
+    case 'UNPAID':
+      return const Color(0xFFBA7517);
+    case 'RETRY_SHIP':
+      return const Color(0xFF854F0B);
+    case 'TO_RETURN':
+      return const Color(0xFF993556);
+    case 'IN_CANCEL':
+      return const Color(0xFFA32D2D);
+    case 'CANCELLED':
+      return const Color(0xFFA32D2D);
+    default:
+      return const Color(0xFF888780);
+  }
+}
 
 class Sales extends StatefulWidget {
   const Sales({super.key});
@@ -16,7 +45,7 @@ class Sales extends StatefulWidget {
 
 class _SalesState extends State<Sales> {
   List display = [];
-  int rows = 10, current = 1;
+  int rows = 10, current = 1, selectedPeriod = 7;
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +94,52 @@ class _SalesState extends State<Sales> {
                               Row(
                                 spacing: 8.0,
                                 children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      //TODO
-                                    },
-                                    child: const Text('Last 30 Days'),
+                                  Container(
+                                    height: 28.0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.black54,
+                                      ),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<int>(
+                                        value: selectedPeriod,
+                                        items: const [
+                                          DropdownMenuItem(
+                                            value: 7,
+                                            child: Text('Last 7 Days'),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 30,
+                                            child: Text('Last 1 month'),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 90,
+                                            child: Text('Last 3 months'),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 180,
+                                            child: Text('Last 6 months'),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 365,
+                                            child: Text('Last 1 year'),
+                                          ),
+                                        ],
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() {
+                                              selectedPeriod = value;
+                                              current = 1;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ),
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
@@ -108,46 +178,54 @@ class _SalesState extends State<Sales> {
                           spacing: 16.0,
                           children: [
                             Column(
-                              spacing: 16.0,
+                              spacing: 16,
                               children: [
                                 Expanded(
                                   child: Container(
-                                    padding: const EdgeInsets.all(16.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: const Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text('Total Sales'),
+                                        SizedBox(height: 8.0),
+                                        Text('Rp 12.345.678', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                                        SizedBox(height: 8.0),
                                         Row(
                                           children: [
-                                            Icon(Icons.arrow_upward),
-                                            Text('34%'),
+                                            Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 16),
+                                            SizedBox(width: 4.0),
+                                            Text('34% Dibanding bulan lalu.'),
                                           ],
                                         ),
-                                        Text('Dibanding April 2026.')
                                       ],
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    padding: const EdgeInsets.all(16.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
                                       borderRadius: BorderRadius.circular(12.0),
                                     ),
                                     child: const Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text('Total Order'),
+                                        SizedBox(height: 8),
+                                        Text("15.201", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                                        SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            Icon(Icons.arrow_downward),
-                                            Text('5%'),
+                                            Icon(Icons.arrow_downward, color: Colors.greenAccent, size: 16),
+                                            SizedBox(width: 8),
+                                            Text('5% Dibanding bulan lalu'),
                                           ],
                                         ),
-                                        Text('Dibanding April 2026.')
                                       ],
                                     ),
                                   ),
@@ -442,7 +520,36 @@ class _SalesState extends State<Sales> {
                                               ),
                                               Expanded(
                                                 flex: 1,
-                                                child: Text(order['order_status']),
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 4.0,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: getOrderStatusColor(order['order_status']).withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      spacing: 8,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.circle,
+                                                          size: 10,
+                                                          color: getOrderStatusColor(order['order_status']),
+
+                                                        ),
+                                                        Text(
+                                                          order['order_status'],
+                                                          style: TextStyle(
+                                                            fontWeight: FontWeight.w600,
+                                                            color: getOrderStatusColor(order['order_status'])
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ))),
                                               ),
                                               Expanded(
                                                 flex: 1,
