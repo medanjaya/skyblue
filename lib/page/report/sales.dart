@@ -47,6 +47,54 @@ class _SalesState extends State<Sales> {
   List display = [];
   int rows = 10, current = 1, selectedPeriod = 7;
 
+  int totalPages() {
+    return (display.length / rows).ceil();
+  }
+
+
+  List<int> paginationList() {
+
+    final pages = totalPages();
+
+    if (pages <= 5) {
+      return List.generate(
+        pages,
+        (i) => i + 1,
+      );
+    }
+
+
+    if (current <= 3) {
+      return [
+        1,
+        2,
+        3,
+        -1,
+        pages,
+      ];
+    }
+
+
+    if (current >= pages - 2) {
+      return [
+        1,
+        -1,
+        pages - 2,
+        pages - 1,
+        pages,
+      ];
+    }
+
+
+    return [
+      1,
+      -1,
+      current,
+      -1,
+      pages,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final sb = Supabase.instance.client;
@@ -141,11 +189,12 @@ class _SalesState extends State<Sales> {
                                       ),
                                     ),
                                   ),
-                                  ElevatedButton(
+                                  ElevatedButton.icon(
                                     onPressed: () {
                                       //TODO
                                     },
-                                    child: const Text('Export to CSV'),
+                                    icon: const Icon(Icons.download),
+                                    label: const Text("Export CSV"),
                                   ),
                                 ],
                               ),
@@ -192,14 +241,14 @@ class _SalesState extends State<Sales> {
                                       children: [
                                         Text('Total Sales'),
                                         SizedBox(height: 8.0),
-                                        Text('Rp 12.345.678', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                                        Text('Rp 12.345.678', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                                         SizedBox(height: 8.0),
                                         Row(
                                           children: [
                                             Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 16),
                                             SizedBox(width: 4.0),
-                                            Text('34% Dibanding bulan lalu.'),
-                                          ],
+                                            Text('34% Dibanding bulan lalu'),
+                                          ],//TODO icon dan warna harus bisa berubah dan persenan
                                         ),
                                       ],
                                     ),
@@ -217,14 +266,14 @@ class _SalesState extends State<Sales> {
                                       children: [
                                         Text('Total Order'),
                                         SizedBox(height: 8),
-                                        Text("15.201", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                                        Text("15.201", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                                         SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            Icon(Icons.arrow_downward, color: Colors.greenAccent, size: 16),
+                                            Icon(Icons.arrow_downward, color: Colors.redAccent, size: 16),
                                             SizedBox(width: 8),
                                             Text('5% Dibanding bulan lalu'),
-                                          ],
+                                          ],//TODO icon dan warna harus bisa berubah dan persenan
                                         ),
                                       ],
                                     ),
@@ -366,7 +415,7 @@ class _SalesState extends State<Sales> {
                                       },
                                       value: rows,
                                       underline: const SizedBox(),
-                                      items: [10, 25, 50].map(
+                                      items: [1, 2, 10, 25, 50].map(
                                         (e) {
                                           return DropdownMenuItem(
                                             value: e,
@@ -478,7 +527,7 @@ class _SalesState extends State<Sales> {
                                               Expanded(
                                                 flex: 1,
                                                 child: Text(
-                                                  DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                                  DateFormat('dd MMM yyyy  hh:mm:ss').format(
                                                     DateTime.fromMillisecondsSinceEpoch(
                                                       order['create_time'] * Duration.millisecondsPerSecond,
                                                     ),
@@ -582,35 +631,101 @@ class _SalesState extends State<Sales> {
                                     ),
                                   ),
                                   Row(
-                                    children: List.generate(
-                                      max(1, (total / rows).ceil()),
-                                      (i) {
-                                        final page = i + 1;
-                          
-                                        return InkWell(
-                                          onTap: () {
-                                            setState(
-                                              () {
-                                                current = page;
-                                              }
-                                            );
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8.0),
-                                            margin: const EdgeInsets.only(
-                                              left: 8.0,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: current == page
-                                              ? const Color.fromARGB(120, 135, 206, 235)
-                                              : const Color.fromARGB(40, 135, 206, 235),
-                                              borderRadius: BorderRadius.circular(4.0),
-                                            ),
-                                            child: Text(page.toString()),
+                                    spacing: 4,
+                                    children: [
+                                      // tombol previous
+                                      InkWell(
+                                        onTap: current > 1
+                                        ? () {
+                                          setState(() {
+                                            current = current - 1;
+                                          });
+                                        }
+                                        : null,
+
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: Icon(
+                                            Icons.chevron_left,
+                                            size: 20,
                                           ),
-                                        );
-                                      }
-                                    ),
+                                        ),
+                                      ),
+
+                                      ...paginationList().map(
+                                        (page) {
+
+                                          if(page == -1){
+                                            return const Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: 8),
+                                              child: Text('...'),
+                                            );
+                                          }
+
+                                          return InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                current = page;
+                                              });
+                                            },
+
+                                            child: Container(
+                                              width: 32,
+                                              height: 32,
+
+                                              margin: const EdgeInsets.only(
+                                                left: 4,
+                                              ),
+
+                                              alignment: Alignment.center,
+
+                                              decoration: BoxDecoration(
+                                                color: current == page
+                                                ? const Color(0xFF007BFF)
+                                                : Colors.transparent,
+
+                                                borderRadius:
+                                                  BorderRadius.circular(6),
+                                              ),
+
+                                              child: Text(
+                                                '$page',
+
+                                                style: TextStyle(
+                                                  color: current == page
+                                                  ? Colors.white
+                                                  : Colors.black87,
+
+                                                  fontWeight:
+                                                  current == page
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+
+
+                                      InkWell(
+                                        onTap: current < (total / rows).ceil()
+                                        ? () {
+                                            setState(() {
+                                              current = current + 1;
+                                            });
+                                          }
+                                        : null,
+
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: Icon(
+                                            Icons.chevron_right,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ]
                                   ),
                                 ],
                               ),
