@@ -366,7 +366,7 @@ class _SalesState extends State<Sales> {
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            'NOMINAL',
+                                            'STATUS',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -375,7 +375,7 @@ class _SalesState extends State<Sales> {
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            'STATUS',
+                                            'NOMINAL',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
