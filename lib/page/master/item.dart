@@ -320,7 +320,7 @@ class _ItemState extends State<Item> {
                                       Expanded(
                                         flex: 1,
                                         child: Text(
-                                          'ACTION',
+                                          'AKSI',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                           ),

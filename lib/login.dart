@@ -169,7 +169,7 @@ class _LoginState extends State<Login> {
                                 )
                                 .eq('id', r.user!.id)
                                 .then(
-                                  (v) async {
+                                  (r) async {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Padding(

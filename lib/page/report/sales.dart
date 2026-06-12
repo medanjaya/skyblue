@@ -730,7 +730,7 @@ class _SalesState extends State<Sales> {
                           )
                           : const Center(
                             child: Text(
-                              'Tidak ada penyesuaian untuk ditampilkan',
+                              'Tidak ada riwayat transaksi untuk ditampilkan',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontStyle: FontStyle.italic,
@@ -744,7 +744,7 @@ class _SalesState extends State<Sales> {
                 }
                 return const Center(
                   child: Text(
-                    'Tidak ada riwayat untuk ditampilkan',
+                    'Tidak ada riwayat transaksi untuk ditampilkan',
                     style: TextStyle(
                       color: Colors.grey,
                       fontStyle: FontStyle.italic,

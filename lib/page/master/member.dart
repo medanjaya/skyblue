@@ -54,6 +54,7 @@ class _MemberState extends State<Member> {
         setState(
           () {
             isAdd = n.v;
+            select = null;
           }
         );
         

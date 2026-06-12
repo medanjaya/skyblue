@@ -19,15 +19,18 @@ class Assign extends StatefulWidget {
 class _AssignState extends State<Assign> {
   final TextEditingController
   name = TextEditingController(),
-  email = TextEditingController();
+  email = TextEditingController(),
+  pass = TextEditingController();
 
   final List<String> roles = [
-    'stock',
-    'transaction',
     'admin',
     'master',
+    'stock',
+    'transaction',
     'report',
   ];
+
+  bool isHide = true;
 
   late Set<String> selectedRoles;
   late bool isActive;
@@ -51,6 +54,7 @@ class _AssignState extends State<Assign> {
 
   @override
   Widget build(BuildContext context) {
+    final sb = Supabase.instance.client;
     final isEdit = widget.user != null;
 
     return Column(
@@ -90,6 +94,13 @@ class _AssignState extends State<Assign> {
           ],
         ),
         TextField(
+          onChanged: (v) {
+            email.text = v.isNotEmpty
+            ? '${
+              v.replaceAll(' ', '.').toLowerCase()
+            }@skyblue.co.id'
+            : '';
+          },
           controller: name,
           decoration: const InputDecoration(
             labelText: 'Nama',
@@ -113,6 +124,33 @@ class _AssignState extends State<Assign> {
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.emailAddress,
+        ),
+        TextField(
+          controller: pass,
+          decoration: InputDecoration(
+            labelText: 'Password',
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12.0,
+              horizontal: 8.0,
+            ),
+            suffixIcon: IconButton(
+              onPressed: () {
+                setState(
+                  () {
+                    isHide = !isHide;
+                  },
+                );
+              },
+              icon: Icon(
+                isHide
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+              ),
+            ),
+            border: const OutlineInputBorder(),
+          ),
+          obscureText: isHide,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,7 +184,7 @@ class _AssignState extends State<Assign> {
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('User aktif'),
+          title: const Text('User Aktif'),
           value: isActive,
           onChanged: (v) {
             setState(
@@ -174,16 +212,47 @@ class _AssignState extends State<Assign> {
               child: const Text('Batal'),
             ),
             ElevatedButton(
-              onPressed: () {
-                final user = {
-                  'name': name.text,
-                  'email': email.text,
-                  'role': selectedRoles.toList(),
-                  'is_active': isActive,
-                };
-
-                // TODO: implement create/update user backend with user.
-                debugPrint(user.toString());
+              onPressed: () async {
+                await sb.auth.admin
+                .createUser(
+                  AdminUserAttributes(
+                    email: name.text,
+                    password: pass.text,
+                    emailConfirm: true,
+                  ),
+                )
+                .then(
+                  (r) {
+                    sb.from('user').insert(
+                      {
+                        'name': name.text,
+                        'email': email.text,
+                        'role': selectedRoles.toList(),
+                        'is_active': isActive,
+                      },
+                    )
+                    .select()
+                    .then(
+                      (r) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Text('User dengan nama ${r.first['name']} berhasil ditambahkan.'),
+                            ),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        )
+                        .closed
+                        .then(
+                          (r) {
+                            IsAssign(false).dispatch(context);
+                          },
+                        );
+                      },
+                    );
+                  },
+                );
               },
               child: Text(isEdit ? 'Simpan Perubahan' : 'Simpan'),
             ),
