@@ -7,6 +7,33 @@ import 'package:intl/intl.dart';
 
 import 'package:skyblue/api.dart';
 
+Color getOrderStatusColor(String status) {
+  switch (status) {
+    case 'COMPLETED':
+      return const Color(0xFF3B6D11);
+    case 'READY_TO_SHIP':
+      return const Color(0xFF0F6E56);
+    case 'PROCESSED':
+      return const Color(0xFF185FA5);
+    case 'TO_CONFIRM_RECEIVE':
+      return const Color(0xFF185FA5);
+    case 'SHIPPED':
+      return const Color(0xFF534AB7);
+    case 'UNPAID':
+      return const Color(0xFFBA7517);
+    case 'RETRY_SHIP':
+      return const Color(0xFF854F0B);
+    case 'TO_RETURN':
+      return const Color(0xFF993556);
+    case 'IN_CANCEL':
+      return const Color(0xFFA32D2D);
+    case 'CANCELLED':
+      return const Color(0xFFA32D2D);
+    default:
+      return const Color(0xFF888780);
+  }
+}
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -448,13 +475,7 @@ class _DashboardState extends State<Dashboard> {
                                           vertical: 4.0,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: order['order_status'] == 'Pending'
-                                            ? const Color.fromARGB(120, 255, 165, 0).withValues(alpha: 0.1)
-                                            : order['order_status'] == 'PROCESSED'
-                                            ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
-                                            : order['order_status'] == 'CANCELLED'
-                                            ? const Color.fromARGB(120, 255, 0, 0).withValues(alpha: 0.1)
-                                            : const Color.fromARGB(120, 128, 128, 128).withValues(alpha: 0.1),
+                                          color: getOrderStatusColor(order['order_status']).withOpacity(0.1),
                                           
                                           borderRadius: BorderRadius.circular(12.0),
                                         ),
@@ -464,26 +485,15 @@ class _DashboardState extends State<Dashboard> {
                                           children: [
                                             Icon(
                                               Icons.circle,
-                                               color:
-                                              order['order_status'] == 'Pending'
-                                                ? Colors.orange
-                                                : order['order_status'] == 'PROCESSED'
-                                                ? Colors.green
-                                                : order['order_status'] == 'CANCELLED'
-                                                ? Colors.red
-                                                : Colors.grey,
+                                              color: getOrderStatusColor(order['order_status']),
                                               size: 10,
                                             ),
-                                            Text(order['order_status'], style: TextStyle(
-                                              color:
-                                              order['order_status'] == 'Pending'
-                                                ? Colors.orange
-                                                : order['order_status'] == 'PROCESSED'
-                                                ? Colors.green
-                                                : order['order_status'] == 'CANCELLED'
-                                                ? Colors.red
-                                                : Colors.grey,
-                                            )
+                                            Text(
+                                              order['order_status'],
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: getOrderStatusColor(order['order_status'])
+                                              ),
                                             ),
                                           ],
                                         )

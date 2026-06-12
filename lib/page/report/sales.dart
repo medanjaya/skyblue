@@ -1,6 +1,3 @@
-import 'dart:ffi';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -733,7 +730,7 @@ class _SalesState extends State<Sales> {
                           )
                           : const Center(
                             child: Text(
-                              'Tidak ada penyesuaian untuk ditampilkan',
+                              'Tidak ada riwayat transaksi untuk ditampilkan',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontStyle: FontStyle.italic,
@@ -747,7 +744,7 @@ class _SalesState extends State<Sales> {
                 }
                 return const Center(
                   child: Text(
-                    'Tidak ada riwayat untuk ditampilkan',
+                    'Tidak ada riwayat transaksi untuk ditampilkan',
                     style: TextStyle(
                       color: Colors.grey,
                       fontStyle: FontStyle.italic,

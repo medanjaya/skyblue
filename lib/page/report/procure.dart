@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
 class Procure extends StatefulWidget {
@@ -13,33 +12,8 @@ class Procure extends StatefulWidget {
 }
 
 class _ProcureState extends State<Procure> {
-  final List<Map> debugItems = List.generate(
-    64,
-    (i) {
-      return i.isOdd
-      ? {
-        'ID': 'SKB-001',
-        'TIME': DateTime.now(),
-        'CUSTOMER': 'James Rusli',
-        'SOURCE': 'SHOPEE',
-        'ITEM': ['a', 'b', 'c', 'd'],
-        'PRICE': 1819999,
-        'STATUS': 'Completed',
-      }
-      : {
-        'ID': 'SKB-002',
-        'TIME': DateTime.parse('2012-02-27'),
-        'CUSTOMER': 'Daniel Wiyarta',
-        'SOURCE': 'LOCAL',
-        'ITEM': ['a'],
-        'PRICE': 40000,
-        'STATUS': 'On Progress',
-      };
-    },
-  ); //TODO ganti ke api
-
   List display = [];
-  int rows = 10, current = 1;
+  int rows = 10, current = 1, selectedPeriod = 7;
 
   int totalPages() {
     return (display.length / rows).ceil();
@@ -90,18 +64,8 @@ class _ProcureState extends State<Procure> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    display = List.from(debugItems);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final
-    total = display.length,
-    first = (current - 1) * rows,
-    last = (first + rows > total) ? total : first + rows,
-    pages = display.sublist(first, last);
+    final sb = Supabase.instance.client;
 
     return Column(
       spacing: 16.0,
@@ -112,12 +76,70 @@ class _ProcureState extends State<Procure> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Laporan Pembelian'),
-                ElevatedButton(
-                  onPressed: () {
-                    //TODO
-                  },
-                  child: const Text('Bulan Berjalan'),
+                const Text('Laporan Pembelian', style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF007BFF),
+                  ),
+                ),
+                Row(
+                  spacing: 8.0,
+                  children: [
+                    Container(
+                      height: 28.0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black54,
+                        ),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: selectedPeriod,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 7,
+                              child: Text('Last 7 Days'),
+                            ),
+                            DropdownMenuItem(
+                              value: 30,
+                              child: Text('Last 1 month'),
+                            ),
+                            DropdownMenuItem(
+                              value: 90,
+                              child: Text('Last 3 months'),
+                            ),
+                            DropdownMenuItem(
+                              value: 180,
+                              child: Text('Last 6 months'),
+                            ),
+                            DropdownMenuItem(
+                              value: 365,
+                              child: Text('Last 1 year'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedPeriod = value;
+                                current = 1;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        //TODO
+                      },
+                      icon: const Icon(Icons.download),
+                      label: const Text("Export CSV"),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -131,7 +153,7 @@ class _ProcureState extends State<Procure> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(12.0),
@@ -140,7 +162,9 @@ class _ProcureState extends State<Procure> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Total Pembelian'),
+              SizedBox(height: 8),
               Text('328'),
+              SizedBox(height: 8),
               Text('12 Transaksi dalam Perjalanan'),
             ],
           ),
@@ -152,275 +176,311 @@ class _ProcureState extends State<Procure> {
               color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 8.0,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      spacing: 8.0,
-                      children: [
-                        const Text('Show'),
-                        Container(
-                          height: 32.0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black54,
-                            ),
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: DropdownButton(
-                            onChanged: (v) {
-                              setState(
-                                () {
-                                  rows = v!;
-                                  current = 1;
-                                },
-                              );
-                            },
-                            value: rows,
-                            underline: const SizedBox(),
-                            items: [10, 25, 50].map(
-                              (e) {
-                                return DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e.toString()),
-                                );  
-                              },
-                            )
-                            .toList(),
-                          ),
-                        ),
-                        const Text('entries'),
-                      ],
-                    ),
-                    Row(
-                      spacing: 8.0,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            //TODO
-                          },
-                          icon: const Icon(Icons.filter_list),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            //TODO
-                          },
-                          icon: const Icon(Icons.more_vert),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      const Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Text('NOMOR PO'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('TANGGAL'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('CUSTOMER'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('SUMBER'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('BARANG'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('NOMINAL'),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text('STATUS'),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, i) {
-                            final item = pages[i];
+            child: StreamBuilder(
+              stream: sb
+              .from('procure')
+              .stream(
+                primaryKey: ['id'],
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  display = snapshot.data!;
 
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                  final
+                  total = display.length,
+                  first = (current - 1) * rows,
+                  last = (first + rows > total) ? total : first + rows,
+                  pages = display.sublist(first, last);
+                  
+                  if (display.isNotEmpty) {
+                    return Column(
+                      spacing: 16.0,
+                      children: [
+                        Row(
+                          spacing: 8.0,
+                          children: [
+                            const Text(
+                              'Show',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Container(
+                              height: 32.0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black54,
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: DropdownButton(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      rows = v!;
+                                      current = 1;
+                                    },
+                                  );
+                                },
+                                value: rows,
+                                underline: const SizedBox(),
+                                items: [10, 25, 50].map(
+                                  (e) {
+                                    return DropdownMenuItem(
+                                      value: e,
+                                      child: Text(
+                                        e.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    );  
+                                  },
+                                )
+                                .toList(),
+                              ),
+                            ),
+                            const Text(
+                              'entries',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Row(
                               children: [
                                 Expanded(
                                   flex: 1,
-                                  child: Text(item['ID']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['TIME'].toString()),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['CUSTOMER']),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(item['SOURCE']),
-                                ),
-                                Expanded(
-                                  flex: 1,
                                   child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(item['ITEM'].length)
-                                    .toString(),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    NumberFormat.decimalPattern('id_ID')
-                                    .format(item['PRICE'])
-                                    .toString(),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    item['STATUS'],
+                                    'NO PO',
                                     style: TextStyle(
-                                      color: item['STATUS'].toLowerCase() == 'cancelled'
-                                      ? Colors.red
-                                      : Colors.green,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    'TANGGAL',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'BARANG',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
                               ],
-                            );
-                          },
-                          separatorBuilder: (context, i) {
-                            return const Divider();
-                          },
-                          itemCount: pages.length,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
-                    Row(
-                      spacing: 4,
-                      children: [
-                        // tombol previous
-                        InkWell(
-                          onTap: current > 1
-                          ? () {
-                            setState(() {
-                              current = current - 1;
-                            });
-                          }
-                          : null,
-
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.chevron_left,
-                              size: 20,
                             ),
-                          ),
-                        ),
-
-                        ...paginationList().map(
-                          (page) {
-
-                            if(page == -1){
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text('...'),
-                              );
-                            }
-
-                            return InkWell(
-                              onTap: () {
-                                setState(() {
-                                  current = page;
-                                });
+                            const Divider(),
+                            display.isNotEmpty
+                            ? ListView.separated(
+                              shrinkWrap: true,
+                              itemBuilder: (context, i) {
+                                final procure = pages[i];
+                            
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(procure['id'].toString()),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        DateFormat('dd MMM yyyy hh:mm:ss').format(
+                                          DateTime.parse(procure['created_at']),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: List.generate(
+                                          procure['item_list'].length,
+                                          (i) {
+                                            final item = procure['item_list'][i];
+                            
+                                            return Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Text('x${item['model_quantity_purchased']}'),
+                                                ),
+                                                Expanded(
+                                                  flex: 8,
+                                                  child: Text(item['item_name']),
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
                               },
-
-                              child: Container(
-                                width: 32,
-                                height: 32,
-
-                                margin: const EdgeInsets.only(
-                                  left: 4,
-                                ),
-
-                                alignment: Alignment.center,
-
-                                decoration: BoxDecoration(
-                                  color: current == page
-                                  ? const Color(0xFF007BFF)
-                                  : Colors.transparent,
-
-                                  borderRadius:
-                                    BorderRadius.circular(6),
-                                ),
-
+                              separatorBuilder: (context, i) {
+                                return const Divider();
+                              },
+                              itemCount: pages.length,
+                            )
+                            : const Expanded(
+                              child: Center(
                                 child: Text(
-                                  '$page',
-
+                                  'Tidak ada riwayat pembelian untuk ditampilkan',
                                   style: TextStyle(
-                                    color: current == page
-                                    ? Colors.white
-                                    : Colors.black87,
-
-                                    fontWeight:
-                                    current == page
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-
-
-                        InkWell(
-                          onTap: current < (total / rows).ceil()
-                          ? () {
-                              setState(() {
-                                current = current + 1;
-                              });
-                            }
-                          : null,
-
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.chevron_right,
-                              size: 20,
                             ),
-                          ),
+                          ],
                         ),
-                      ]
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
+                            Row(
+                              spacing: 4,
+                              children: [
+                                // tombol previous
+                                InkWell(
+                                  onTap: current > 1
+                                  ? () {
+                                    setState(() {
+                                      current = current - 1;
+                                    });
+                                  }
+                                  : null,
+
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Icon(
+                                      Icons.chevron_left,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+
+                                ...paginationList().map(
+                                  (page) {
+
+                                    if(page == -1){
+                                      return const Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text('...'),
+                                      );
+                                    }
+
+                                    return InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          current = page;
+                                        });
+                                      },
+
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+
+                                        margin: const EdgeInsets.only(
+                                          left: 4,
+                                        ),
+
+                                        alignment: Alignment.center,
+
+                                        decoration: BoxDecoration(
+                                          color: current == page
+                                          ? const Color(0xFF007BFF)
+                                          : Colors.transparent,
+
+                                          borderRadius:
+                                            BorderRadius.circular(6),
+                                        ),
+
+                                        child: Text(
+                                          '$page',
+
+                                          style: TextStyle(
+                                            color: current == page
+                                            ? Colors.white
+                                            : Colors.black87,
+
+                                            fontWeight:
+                                            current == page
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+
+                                InkWell(
+                                  onTap: current < (total / rows).ceil()
+                                  ? () {
+                                      setState(() {
+                                        current = current + 1;
+                                      });
+                                    }
+                                  : null,
+
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: Icon(
+                                      Icons.chevron_right,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ]
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }
+                  return const Center(
+                    child: Text(
+                      'Tidak ada riwayat pembelian untuk ditampilkan',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                  ],
-                ),
-              ],
+                  );
+                }
+                else {
+                  return const Center(
+                    child: Text(
+                      'Sedang memperbarui riwayat pembelian..',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ),
