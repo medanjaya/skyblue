@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 class Procure extends StatefulWidget {
   const Procure({super.key});
 
+
   @override
   State<Procure> createState() => _ProcureState();
 }
@@ -39,6 +40,54 @@ class _ProcureState extends State<Procure> {
 
   List display = [];
   int rows = 10, current = 1;
+
+  int totalPages() {
+    return (display.length / rows).ceil();
+  }
+
+
+  List<int> paginationList() {
+
+    final pages = totalPages();
+
+    if (pages <= 5) {
+      return List.generate(
+        pages,
+        (i) => i + 1,
+      );
+    }
+
+
+    if (current <= 3) {
+      return [
+        1,
+        2,
+        3,
+        -1,
+        pages,
+      ];
+    }
+
+
+    if (current >= pages - 2) {
+      return [
+        1,
+        -1,
+        pages - 2,
+        pages - 1,
+        pages,
+      ];
+    }
+
+
+    return [
+      1,
+      -1,
+      current,
+      -1,
+      pages,
+    ];
+  }
 
   @override
   void initState() {
@@ -273,35 +322,101 @@ class _ProcureState extends State<Procure> {
                   children: [
                     Text('Showing ${total == 0 ? 0 : first + 1} to $last from $total entries'),
                     Row(
-                      children: List.generate(
-                        max(1, (total / rows).ceil()),
-                        (i) {
-                          final page = i + 1;
-            
-                          return InkWell(
-                            onTap: () {
-                              setState(
-                                () {
-                                  current = page;
-                                }
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              margin: const EdgeInsets.only(
-                                left: 8.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: current == page
-                                ? const Color.fromARGB(120, 135, 206, 235)
-                                : const Color.fromARGB(40, 135, 206, 235),
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              child: Text(page.toString()),
+                      spacing: 4,
+                      children: [
+                        // tombol previous
+                        InkWell(
+                          onTap: current > 1
+                          ? () {
+                            setState(() {
+                              current = current - 1;
+                            });
+                          }
+                          : null,
+
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.chevron_left,
+                              size: 20,
                             ),
-                          );
-                        }
-                      ),
+                          ),
+                        ),
+
+                        ...paginationList().map(
+                          (page) {
+
+                            if(page == -1){
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text('...'),
+                              );
+                            }
+
+                            return InkWell(
+                              onTap: () {
+                                setState(() {
+                                  current = page;
+                                });
+                              },
+
+                              child: Container(
+                                width: 32,
+                                height: 32,
+
+                                margin: const EdgeInsets.only(
+                                  left: 4,
+                                ),
+
+                                alignment: Alignment.center,
+
+                                decoration: BoxDecoration(
+                                  color: current == page
+                                  ? const Color(0xFF007BFF)
+                                  : Colors.transparent,
+
+                                  borderRadius:
+                                    BorderRadius.circular(6),
+                                ),
+
+                                child: Text(
+                                  '$page',
+
+                                  style: TextStyle(
+                                    color: current == page
+                                    ? Colors.white
+                                    : Colors.black87,
+
+                                    fontWeight:
+                                    current == page
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+
+
+                        InkWell(
+                          onTap: current < (total / rows).ceil()
+                          ? () {
+                              setState(() {
+                                current = current + 1;
+                              });
+                            }
+                          : null,
+
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.chevron_right,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ]
                     ),
                   ],
                 ),
