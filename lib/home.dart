@@ -70,158 +70,159 @@ class _HomeState extends State<Home> {
                 },
                 highlightColor: Colors.transparent,
                 splashFactory: NoSplash.splashFactory,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: isExpand ? 256.0 : 58.0,
-                  child: OverflowBox(
-                    alignment: Alignment.topLeft,
-                    maxWidth: 256.0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 12.0,
-                        bottom: 16.0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 12.0,
-                        children: [
-                          ListTile(
-                            leading: InkWell(
-                              onTap: () {
-                                setState(
-                                  () {
-                                    isExpand = !isExpand;
-                                    collapseExpansions();
-                                  },
-                                );
-                              },
-                              child: Icon(
-                                Icons.menu,
-                                color: Theme.of(context).primaryIconTheme.color,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView(
-                              children: [
-                                menuItem(
-                                  'DASHBOARD',
-                                  Icons.home_outlined,
-                                  'DASHBOARD',
-                                ),
-                                if (isOnline && isAdmin || (user?['role'].contains('master') ?? false)) expansionMenu(
-                                  'MASTER',
-                                  Icons.book_outlined,
-                                  'MASTER',
-                                  [
-                                    subMenuItem(
-                                      'MASTER_ITEM',
-                                      'BARANG',
-                                    ),
-                                    if (isAdmin) subMenuItem(
-                                      'MASTER_MEMBER',
-                                      'USER',
-                                    ),
-                                  ],
-                                  master,
-                                ),
-                                if (isOnline && isAdmin || (user?['role'].contains('stock') ?? false)) expansionMenu(
-                                  'STOCK',
-                                  Icons.inventory_outlined,
-                                  'STOK',
-                                  [
-                                    subMenuItem(
-                                      'STOCK_DATA',
-                                      'DATA',
-                                    ),
-                                    subMenuItem(
-                                      'STOCK_ADJUST',
-                                      'PENYESUAIAN',
-                                    ),
-                                  ],
-                                  stock,
-                                ),
-                                if (isOnline && isAdmin || (user?['role'].contains('transaction') ?? false)) expansionMenu(
-                                  'TRANSACTION',
-                                  Icons.shopping_cart_outlined,
-                                  'TRANSAKSI',
-                                  [
-                                    subMenuItem(
-                                      'TRANSACTION_SELL',
-                                      'JUAL',
-                                    ),
-                                    subMenuItem(
-                                      'TRANSACTION_BUY',
-                                      'BELI',
-                                    ),
-                                  ],
-                                  transaction,
-                                ),
-                                if (isOnline && isAdmin || (user?['role'].contains('report') ?? false)) expansionMenu(
-                                  'REPORT',
-                                  Icons.description_outlined,
-                                  'LAPORAN',
-                                  [
-                                    subMenuItem(
-                                      'REPORT_SALES',
-                                      'PENJUALAN',
-                                    ),
-                                    subMenuItem(
-                                      'REPORT_PROCURE',
-                                      'PEMBELIAN',
-                                    ),
-                                  ],
-                                  report,
-                                ),
-                                menuItem(
-                                  'SYNC',
-                                  Icons.sync_alt,
-                                  'SINKRONISASI',
-                                ),
-                              ],
-                            ),
-                          ),
-                          ListTile(
-                            onTap: () async {
-                              await sb.auth.signOut()
-                              .then(
-                                (r) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Padding(
-                                        padding: EdgeInsets.all(4.0),
-                                        child: Text('Telah keluar dari dashboard, sampai jumpa lain waktu.'),
-                                      ),
-                                      duration: Duration(seconds: 3),
-                                    ),
-                                  )
-                                  .closed
-                                  .then(
-                                    (r) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const Login(),
-                                        ),
-                                      );
+                child: ClipRect(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: isExpand ? 256.0 : 58.0,
+                    child: SizedBox(
+                      width: 256.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: 12.0,
+                          bottom: 16.0,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 12.0,
+                          children: [
+                            ListTile(
+                              leading: InkWell(
+                                onTap: () {
+                                  setState(
+                                    () {
+                                      isExpand = !isExpand;
+                                      collapseExpansions();
                                     },
                                   );
                                 },
-                              );
-                            },
-                            leading: Icon(
-                              Icons.logout,
-                              color: Theme.of(context).primaryIconTheme.color,
+                                child: Icon(
+                                  Icons.menu,
+                                  color: Theme.of(context).primaryIconTheme.color,
+                                ),
+                              ),
                             ),
-                            title: Text(
-                              'KELUAR',
-                              style: TextStyle(
+                            Expanded(
+                              child: ListView(
+                                children: [
+                                  menuItem(
+                                    'DASHBOARD',
+                                    Icons.home_outlined,
+                                    'DASHBOARD',
+                                  ),
+                                  if (isOnline && isAdmin || (user?['role'].contains('master') ?? false)) expansionMenu(
+                                    'MASTER',
+                                    Icons.book_outlined,
+                                    'MASTER',
+                                    [
+                                      subMenuItem(
+                                        'MASTER_ITEM',
+                                        'BARANG',
+                                      ),
+                                      if (isAdmin) subMenuItem(
+                                        'MASTER_MEMBER',
+                                        'USER',
+                                      ),
+                                    ],
+                                    master,
+                                  ),
+                                  if (isOnline && isAdmin || (user?['role'].contains('stock') ?? false)) expansionMenu(
+                                    'STOCK',
+                                    Icons.inventory_outlined,
+                                    'STOK',
+                                    [
+                                      subMenuItem(
+                                        'STOCK_DATA',
+                                        'DATA',
+                                      ),
+                                      subMenuItem(
+                                        'STOCK_ADJUST',
+                                        'PENYESUAIAN',
+                                      ),
+                                    ],
+                                    stock,
+                                  ),
+                                  if (isOnline && isAdmin || (user?['role'].contains('transaction') ?? false)) expansionMenu(
+                                    'TRANSACTION',
+                                    Icons.shopping_cart_outlined,
+                                    'TRANSAKSI',
+                                    [
+                                      subMenuItem(
+                                        'TRANSACTION_SELL',
+                                        'JUAL',
+                                      ),
+                                      subMenuItem(
+                                        'TRANSACTION_BUY',
+                                        'BELI',
+                                      ),
+                                    ],
+                                    transaction,
+                                  ),
+                                  if (isOnline && isAdmin || (user?['role'].contains('report') ?? false)) expansionMenu(
+                                    'REPORT',
+                                    Icons.description_outlined,
+                                    'LAPORAN',
+                                    [
+                                      subMenuItem(
+                                        'REPORT_SALES',
+                                        'PENJUALAN',
+                                      ),
+                                      subMenuItem(
+                                        'REPORT_PROCURE',
+                                        'PEMBELIAN',
+                                      ),
+                                    ],
+                                    report,
+                                  ),
+                                  menuItem(
+                                    'SYNC',
+                                    Icons.sync_alt,
+                                    'SINKRONISASI',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () async {
+                                await sb.auth.signOut()
+                                .then(
+                                  (r) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Padding(
+                                          padding: EdgeInsets.all(4.0),
+                                          child: Text('Telah keluar dari dashboard, sampai jumpa lain waktu.'),
+                                        ),
+                                        duration: Duration(seconds: 3),
+                                      ),
+                                    )
+                                    .closed
+                                    .then(
+                                      (r) {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const Login(),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              leading: Icon(
+                                Icons.logout,
                                 color: Theme.of(context).primaryIconTheme.color,
                               ),
-                              softWrap: false,
+                              title: Text(
+                                'KELUAR',
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryIconTheme.color,
+                                ),
+                                softWrap: false,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
