@@ -17,6 +17,17 @@ class _MemberState extends State<Member> {
   List display = [];
   int rows = 5, current = 1;
 
+  Color _roleColor(String role) {
+    switch (role) {
+      case 'admin': return Colors.purple;
+      case 'master': return Colors.orange;
+      case 'transaction': return Colors.teal;
+      case 'stock': return Colors.indigo;
+      case 'report': return Colors.brown;
+      default: return const Color(0xFF007BFF);
+    }
+  }
+
   int totalPages() {
     return (display.length / rows).ceil();
   }
@@ -283,6 +294,12 @@ class _MemberState extends State<Member> {
                                                   },
                                                 );
                                               },
+                                              style: IconButton.styleFrom(
+                                                foregroundColor: Colors.grey,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8)
+                                                ),
+                                              ),
                                               icon: Icon(
                                                 user['is_active']
                                                 ? Icons.person_outline
@@ -302,7 +319,30 @@ class _MemberState extends State<Member> {
                                       ),
                                       Expanded(
                                         flex: 1,
-                                        child: Text(user['role'].join(', ')),
+                                        child: Wrap(
+                                          spacing: 4,
+                                          runSpacing: 4,
+                                          children: (user['role'] as List).map((role) {
+                                            return Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                vertical: 4,
+                                                horizontal: 8,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: _roleColor(role).withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                role, 
+                                                style: TextStyle(
+                                                  color: _roleColor(role),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
                                       Expanded(
                                         flex: 1,
