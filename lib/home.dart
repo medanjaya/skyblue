@@ -213,8 +213,11 @@ class _HomeState extends State<Home> {
                               Icons.logout,
                               color: Theme.of(context).primaryIconTheme.color,
                             ),
-                            title: const Text(
+                            title: Text(
                               'KELUAR',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryIconTheme.color,
+                              ),
                               softWrap: false,
                             ),
                           ),

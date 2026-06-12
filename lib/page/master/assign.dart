@@ -190,7 +190,12 @@ class _AssignState extends State<Assign> {
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('User Aktif'),
+          title: Text(
+            'User Aktif',
+            style: TextStyle(
+              color: Theme.of(context).primaryIconTheme.color,
+            ),
+          ),
           value: isActive,
           onChanged: (v) {
             setState(
@@ -303,7 +308,9 @@ class _AssignState extends State<Assign> {
                       SnackBar(
                         content: Padding(
                           padding: const EdgeInsets.all(4.0),
-                          child: Text('User dengan nama ${r.first['name']} berhasil diperbarui.'),
+                          child: Text(
+                            'User dengan nama ${r.first['name']} berhasil diperbarui.',
+                          ),
                         ),
                         duration: const Duration(seconds: 3),
                       ),
