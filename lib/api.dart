@@ -468,6 +468,48 @@ Future fetchCategoryList() async {
   );
 }
 
+Future fetchChannelList() async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/logistics/get_channel_list',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  return refreshToken()
+  .then(
+    (r) {
+      return http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+          },
+        ),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+          return jsonDecode(r.body)['response']['logistics_channel_list'];
+        },
+      );
+    },
+  );
+}
+
 Future fetchAttributeTree(int id) async {
   final
   prefs = await SharedPreferences.getInstance(),
@@ -562,6 +604,106 @@ Future<void> updateStock(int id, int value) async {
         (r) {
           //FIXME print(r.body);
         },
+      );
+    },
+  );
+}
+
+Future<void> addItem(Map item) async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/add_item',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  refreshToken()
+  .then(
+    (r) {
+      http.post(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+          },
+        ),
+        body: jsonEncode(item),
+      )
+      .then(
+        (r) {
+          print(r.body);
+        },
+      );
+    },
+  );
+}
+
+Future uploadImage(dynamic media) async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/media/upload_image',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time));
+
+  return refreshToken()
+  .then(
+    (r) async {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'sign': sign.toString(),
+          },
+        ),
+      );
+
+      request.fields.addAll(
+        {
+          'business': '2',
+          'scene': '1',
+        }
+      );
+
+      for (final image in media) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'images',
+            image.path,
+          ),
+        );
+      }
+
+      return await http.Response.fromStream(
+        await request.send(),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+          return jsonDecode(r.body)['response']['image_list'];
+        }
       );
     },
   );

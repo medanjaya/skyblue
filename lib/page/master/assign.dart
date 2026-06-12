@@ -171,8 +171,6 @@ class _AssignState extends State<Assign> {
               children: roles.map(
                 (role) {
                   return FilterChip(
-                    label: Text(role),
-                    selected: selectedRoles.contains(role),
                     onSelected: (v) {
                       setState(
                         () {
@@ -184,9 +182,12 @@ class _AssignState extends State<Assign> {
                         },
                       );
                     },
+                    label: Text(role),
+                    selected: selectedRoles.contains(role),
                   );
                 },
-              ).toList(),
+              )
+              .toList(),
             ),
           ],
         ),

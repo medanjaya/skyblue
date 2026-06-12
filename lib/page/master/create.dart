@@ -33,9 +33,13 @@ class _CreateState extends State<Create> {
     'image': {
       'image_id_list': [],
     },
+    'brand': {
+      'brand_id': 0,
+      'original_brand_name': 'NoBrand',
+    },
     'seller_stock': [
       {
-        'stock': null,
+        'stock': 0,
       },
     ],
   },
@@ -43,6 +47,16 @@ class _CreateState extends State<Create> {
   vars = {
     //FIXME
   };
+
+  @override
+  void initState() {
+    super.initState();
+    filter.addListener(
+      () {
+        setState(() {});
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +146,7 @@ class _CreateState extends State<Create> {
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
                                         final hierarchy = Hierarchy(snapshot.data!),
-                                  
+
                                         parents = snapshot.data!
                                         .map(
                                           (e) {
@@ -169,7 +183,7 @@ class _CreateState extends State<Create> {
                                           onSelected: (v) {
                                             setState(
                                               () {
-                                                adds['category'] = v;
+                                                adds['category_id'] = v;
                                               }
                                             );
                                           },
@@ -231,13 +245,13 @@ class _CreateState extends State<Create> {
                                   ),
                                 ],
                               ),
-                              if (adds['category'] != null) Column(
+                              if (adds['category_id'] != null) Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 spacing: 8.0,
                                 children: [
                                   const Text('Atribut'),
                                   FutureBuilder(
-                                    future: fetchAttributeTree(adds['category']),
+                                    future: fetchAttributeTree(adds['category_id']),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
                                         final attributes = snapshot.data!;
@@ -267,7 +281,7 @@ class _CreateState extends State<Create> {
                                                     onSelected: (v) {
                                                       setState(
                                                         () {
-                                                          adds['category_id'] = v;
+                                                          //TODO
                                                         }
                                                       );
                                                     },
@@ -325,7 +339,7 @@ class _CreateState extends State<Create> {
                                 onChanged: (v) {
                                   setState(
                                     () {
-                                      adds['original_price'] = v;
+                                      adds['original_price'] = double.parse(v);
                                     }
                                   );
                                 },
@@ -337,13 +351,85 @@ class _CreateState extends State<Create> {
                                 onChanged: (v) {
                                   setState(
                                     () {
-                                      adds['weight'] = v;
+                                      adds['weight'] = double.parse(v) / 100;
                                     }
                                   );
                                 },
-                                label: 'Berat',
+                                label: 'Berat (gr)',
                                 hint: 'Masukkan Berat Barang',
                                 numeric: true,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 8.0,
+                                children: [
+                                  const Text('Jasa Pengiriman*'),
+                                  FutureBuilder(
+                                    future: fetchChannelList(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final List logistics = snapshot.data!;
+
+                                        logistics.sort(
+                                          (a, b) {
+                                            return a['logistics_channel_name'].toLowerCase().compareTo(
+                                              b['logistics_channel_name'].toLowerCase(),
+                                            );
+                                          },
+                                        );
+
+                                        adds['logistic_info'] = List.generate(
+                                          logistics.length,
+                                          (i) {
+                                            return {
+                                              'logistic_id': logistics[i]['logistics_channel_id'],
+                                              'enabled': adds['logistic_info'].isNotEmpty
+                                              ? adds['logistic_info'][i]['enabled']
+                                              : true,
+                                            };
+                                          },
+                                        );
+
+                                        return Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 8.0,
+                                          children: List.generate(
+                                            logistics.length,
+                                            (i) {
+                                              final
+                                              logistic = logistics[i],
+                                              
+                                              index = adds['logistic_info'].indexWhere(
+                                                (f) => logistic['logistics_channel_id'] == f['logistic_id'],
+                                              );
+                                              
+                                              return FilterChip(
+                                                onSelected: (v) {
+                                                  setState(
+                                                    () {
+                                                      adds['logistic_info'][index]['enabled'] = v;
+                                                    },
+                                                  );
+                                                },
+                                                label: Text(logistic['logistics_channel_name']),
+                                                selected: adds['logistic_info'][index]['enabled'],
+                                              );
+                                            }
+                                          )
+                                        );
+                                      }
+                                      else {
+                                        return const Text(
+                                          'Memuat..',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -449,7 +535,19 @@ class _CreateState extends State<Create> {
                                           setState(
                                             () {
                                               media = files;
-                                            }
+                                              
+                                              uploadImage(media!)
+                                              .then(
+                                                (r) {
+                                                  adds['image']['image_id_list'] = List.generate(
+                                                    r.length,
+                                                    (i) {
+                                                      return r[i]['image_id'];
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
                                           );
                                         }
                                         catch (e) {
@@ -512,26 +610,47 @@ class _CreateState extends State<Create> {
                         ],
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: SizedBox(
-                        width: 148.0,
-                        height: 48.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF007BFF),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
+                    SizedBox(
+                      height: 48.0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: 8.0,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF007BFF),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                            textStyle: const TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            onPressed: () { //TODO
+                              print(adds);
+                            },
+                            child: const Text('Reset'),
                           ),
-                          onPressed: () {},
-                          child: const Text('Simpan Barang'),
-                        ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF007BFF),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            onPressed: () {
+                              addItem(adds);
+                            },
+                            child: const Text('Simpan Barang'),
+                          ),
+                        ],
                       ),
                     ),
                   ],

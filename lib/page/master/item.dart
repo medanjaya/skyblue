@@ -31,8 +31,6 @@ class _ItemState extends State<Item> {
     },
   ];
   
-  final TextEditingController filter = TextEditingController();
-
   List display = [];
   int rows = 10, current = 1;
 
@@ -62,16 +60,6 @@ class _ItemState extends State<Item> {
   }
 
   bool isAdd = false;
-
-  @override
-  void initState() {
-    super.initState();
-    filter.addListener(
-      () {
-        setState(() {});
-      }
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
