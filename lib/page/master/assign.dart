@@ -20,7 +20,8 @@ class _AssignState extends State<Assign> {
   final TextEditingController
   name = TextEditingController(),
   email = TextEditingController(),
-  pass = TextEditingController();
+  pass = TextEditingController(),
+  secret = TextEditingController();
 
   final List<String> roles = [
     'admin',
@@ -41,6 +42,8 @@ class _AssignState extends State<Assign> {
 
     name.text = widget.user?['name'] ?? '';
     email.text = widget.user?['email'] ?? '';
+    pass.text = widget.user != null ? 'kenapa kamu ngintip begitu, siapa yang suruh' : '';
+
     selectedRoles = Set<String>.from(widget.user?['role'] ?? []);
     isActive = widget.user?['is_active'] ?? true;
   }
@@ -54,7 +57,6 @@ class _AssignState extends State<Assign> {
 
   @override
   Widget build(BuildContext context) {
-    final sb = Supabase.instance.client;
     final isEdit = widget.user != null;
 
     return Column(
@@ -65,7 +67,7 @@ class _AssignState extends State<Assign> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              isEdit ? 'Atur User' : 'Tambah User',
+              isEdit ? 'Perbarui User' : 'Tambah User',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -95,7 +97,7 @@ class _AssignState extends State<Assign> {
         ),
         TextField(
           onChanged: (v) {
-            email.text = v.isNotEmpty
+            email.text = !isEdit && v.isNotEmpty
             ? '${
               v.replaceAll(' ', '.').toLowerCase()
             }@skyblue.co.id'
@@ -124,6 +126,7 @@ class _AssignState extends State<Assign> {
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.emailAddress,
+          enabled: !isEdit,
         ),
         TextField(
           controller: pass,
@@ -135,13 +138,15 @@ class _AssignState extends State<Assign> {
               horizontal: 8.0,
             ),
             suffixIcon: IconButton(
-              onPressed: () {
+              onPressed: !isEdit
+              ? () {
                 setState(
                   () {
                     isHide = !isHide;
                   },
                 );
-              },
+              }
+              : null,
               icon: Icon(
                 isHide
                 ? Icons.visibility_outlined
@@ -151,6 +156,7 @@ class _AssignState extends State<Assign> {
             border: const OutlineInputBorder(),
           ),
           obscureText: isHide,
+          enabled: !isEdit,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -195,9 +201,31 @@ class _AssignState extends State<Assign> {
           },
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           spacing: 16.0,
           children: [
+            Expanded(
+              child: TextField(
+                controller: secret,
+                decoration: InputDecoration(
+                  hintText: 'Isi key untuk ${
+                    isEdit
+                    ? 'memperbarui'
+                    : 'menambahkan'
+                  } user',
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 12.0,
+                    horizontal: 8.0,
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.security),
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+            ),
             OutlinedButton(
               onPressed: () {
                 name.clear();
@@ -209,14 +237,20 @@ class _AssignState extends State<Assign> {
                   },
                 );
               },
-              child: const Text('Batal'),
+              child: const Text('Reset'),
             ),
             ElevatedButton(
               onPressed: () async {
-                await sb.auth.admin
+                final sb = SupabaseClient(
+                  'https://nodpqwqildvzjpnechui.supabase.co',
+                  secret.text,
+                );
+                
+                !isEdit
+                ? await sb.auth.admin
                 .createUser(
                   AdminUserAttributes(
-                    email: name.text,
+                    email: email.text,
                     password: pass.text,
                     emailConfirm: true,
                   ),
@@ -225,6 +259,7 @@ class _AssignState extends State<Assign> {
                   (r) {
                     sb.from('user').insert(
                       {
+                        'id': r.user!.id,
                         'name': name.text,
                         'email': email.text,
                         'role': selectedRoles.toList(),
@@ -249,6 +284,34 @@ class _AssignState extends State<Assign> {
                             IsAssign(false).dispatch(context);
                           },
                         );
+                      },
+                    );
+                  },
+                )
+                : await sb.from('user').update(
+                  {
+                    'name': name.text,
+                    'role': selectedRoles.toList(),
+                    'is_active': isActive,
+                  },
+                )
+                .eq('id', widget.user!['id'])
+                .select()
+                .then(
+                  (r) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text('User dengan nama ${r.first['name']} berhasil diperbarui.'),
+                        ),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    )
+                    .closed
+                    .then(
+                      (r) {
+                        IsAssign(false).dispatch(context);
                       },
                     );
                   },
