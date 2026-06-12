@@ -17,7 +17,6 @@ import 'package:skyblue/page/transaction/buy.dart';
 import 'package:skyblue/page/report/sales.dart';
 import 'package:skyblue/page/report/procure.dart';
 import 'package:skyblue/page/sync.dart';
-import 'package:skyblue/page/sandbox.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -164,11 +163,6 @@ class _HomeState extends State<Home> {
                               Icons.sync_alt,
                               'SINKRONISASI',
                             ),
-                            menuItem(
-                              'SANDBOX',
-                              Icons.stop_circle_outlined,
-                              'SANDBOX',
-                            ),
                           ],
                         ),
                       ),
@@ -244,7 +238,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       Row(
-                        spacing: 8.0,
+                        spacing: 16.0,
                         children: [
                           IconButton(
                             onPressed: () {
@@ -257,17 +251,7 @@ class _HomeState extends State<Home> {
                             ),
                             splashRadius: 24.0,
                           ),
-                          IconButton(
-                            onPressed: () {
-                              setState(
-                                () {
-                                  current = 'PROFILE';
-                                }
-                              );
-                            },
-                            icon: const Icon(Icons.person_outline),
-                            splashRadius: 24.0,
-                          ),
+                          const Icon(Icons.person_outline),
                           SizedBox(
                             width: 128.0,
                             child: Padding(
@@ -317,7 +301,6 @@ class _HomeState extends State<Home> {
                     ? const Color.fromARGB(255, 40, 40, 40)
                     : const Color.fromARGB(255, 245, 245, 245),
                     child: switch (current) {
-                      //TODO fitur profil ganti password dan lain lain, 'PROFILE' => const Profile(),
                       'DASHBOARD' => const Dashboard(),
                       'MASTER_ITEM' => const Item(),
                       'MASTER_MEMBER' => const Member(),
@@ -328,7 +311,6 @@ class _HomeState extends State<Home> {
                       'REPORT_SALES' => const Sales(),
                       'REPORT_PROCURE' => const Procure(),
                       'SYNC' => const Sync(),
-                      'SANDBOX' => const Sandbox(),
                       String() => Center(
                         child: Text(
                           'Halaman $current',

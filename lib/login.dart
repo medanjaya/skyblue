@@ -225,7 +225,7 @@ class _LoginState extends State<Login> {
                           showExceptionSnackBar('Tidak terhubung ke internet saat ini!');
                         }
                         catch (e) {
-                          showExceptionSnackBar('Ada yang salah, mohon hubungi pengembang. $e'); //FIXME hapus setelah selesai
+                          showExceptionSnackBar('Ada yang salah, mohon hubungi pengembang.');
                         }
                       }
                     : null,

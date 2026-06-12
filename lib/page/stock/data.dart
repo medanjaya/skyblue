@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
@@ -26,12 +24,12 @@ class _DataState extends State<Data> {
       'controller': TextEditingController(),
     },
     {
-      'key': 'category_id', //FIXME
+      'key': 'display_category_name', //FIXME
       'name': 'KATEGORI',
       'controller': TextEditingController(),
     },
     {
-      'key': 'BRAND', //FIXME
+      'key': 'original_brand_name', //FIXME
       'name': 'MEREK',
       'controller': TextEditingController(),
     },

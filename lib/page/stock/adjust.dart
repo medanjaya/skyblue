@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,18 +23,11 @@ class _AdjustState extends State<Adjust> {
   List display = [];
   int rows = 10, current = 1;
 
-  int? value, operand, predict;
-  bool? operator;
-  
-  Map select = {};
-
   int totalPages() {
     return (display.length / rows).ceil();
   }
 
-
   List<int> paginationList() {
-
     final pages = totalPages();
 
     if (pages <= 5) {
@@ -46,37 +37,21 @@ class _AdjustState extends State<Adjust> {
       );
     }
 
-
     if (current <= 3) {
-      return [
-        1,
-        2,
-        3,
-        -1,
-        pages,
-      ];
+      return [1, 2, 3, -1, pages];
     }
-
 
     if (current >= pages - 2) {
-      return [
-        1,
-        -1,
-        pages - 2,
-        pages - 1,
-        pages,
-      ];
+      return [1, -1, pages - 2, pages - 1, pages];
     }
 
-
-    return [
-      1,
-      -1,
-      current,
-      -1,
-      pages,
-    ];
+    return [1, -1, current, -1, pages];
   }
+
+  int? value, operand, predict;
+  bool? operator;
+  
+  Map select = {};
   
   @override
   Widget build(BuildContext context) {
@@ -210,7 +185,7 @@ class _AdjustState extends State<Adjust> {
                         ],
                       ),
                       if (search.text.isNotEmpty) Positioned(
-                        top: 76.0, //FIXME magic numbe
+                        top: 76.0,
                         left: 0,
                         right: 0,
                         child: Container(
@@ -371,7 +346,7 @@ class _AdjustState extends State<Adjust> {
                                       ),
                                       border: const OutlineInputBorder(),
                                       constraints: BoxConstraints.tight(
-                                        const Size.fromHeight(37.0), //FIXME magic numbe
+                                        const Size.fromHeight(37.0),
                                       ),
                                     ),
                                     expandedInsets: EdgeInsets.zero,
@@ -535,7 +510,15 @@ class _AdjustState extends State<Adjust> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  display = snapshot.data!;
+                  display = select.isNotEmpty
+                  ? List.from(
+                    snapshot.data!.where(
+                      (e) {
+                        return e['item'] == select['item_id'];
+                      },
+                    ),
+                  )
+                  : snapshot.data!;
 
                   final
                   total = display.length,
@@ -667,7 +650,7 @@ class _AdjustState extends State<Adjust> {
                               ),
                               const Divider(),
                               Expanded(
-                                child: ListView.separated( //TODO filter ke barang yang terpilih (select)
+                                child: ListView.separated(
                                   shrinkWrap: true,
                                   itemBuilder: (context, i) {
                                     final adjust = pages[i];
