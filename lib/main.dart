@@ -61,6 +61,7 @@ class MainApp extends StatelessWidget {
           dense: true,
           visualDensity: VisualDensity.standard,
           contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+          tileColor: Colors.transparent,
           titleTextStyle: TextStyle(
             fontSize: 18,
           )
@@ -81,6 +82,7 @@ class MainApp extends StatelessWidget {
           dense: true,
           visualDensity: VisualDensity.standard,
           contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+          tileColor: Colors.transparent,
           titleTextStyle: TextStyle(
             fontSize: 18,
             color: Colors.black,
