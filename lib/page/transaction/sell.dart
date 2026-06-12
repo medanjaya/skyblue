@@ -101,7 +101,7 @@ class _SellState extends State<Sell> {
                                             horizontal: 8.0
                                           ),
                                           decoration: BoxDecoration(
-                                            color: const Color.fromARGB(120, 0, 128, 0).withOpacity(0.1),
+                                            color: const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1),
                                             borderRadius: BorderRadius.circular(8.0),
                                           ),
                                           child: const Text('Sisa Stok')),

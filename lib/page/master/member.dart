@@ -285,7 +285,11 @@ class _MemberState extends State<Member> {
                                                         content: Padding(
                                                           padding: const EdgeInsets.all(4.0),
                                                           child: Text(
-                                                            'Namo BUDDHAYA $r',
+                                                            'User ${
+                                                              r.first['is_active']
+                                                              ? 'diaktifkan'
+                                                              : 'dinonaktifkan'
+                                                            }.',
                                                           ),
                                                         ),
                                                         duration: const Duration(seconds: 3),

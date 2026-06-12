@@ -97,11 +97,13 @@ class _AssignState extends State<Assign> {
         ),
         TextField(
           onChanged: (v) {
-            email.text = !isEdit && v.isNotEmpty
-            ? '${
-              v.replaceAll(' ', '.').toLowerCase()
-            }@skyblue.co.id'
-            : '';
+            !isEdit
+            ? email.text = v.isNotEmpty
+              ? '${
+                v.replaceAll(' ', '.').toLowerCase()
+              }@skyblue.co.id'
+              : ''
+            : null;
           },
           controller: name,
           decoration: const InputDecoration(
