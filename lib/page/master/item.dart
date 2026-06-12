@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:skyblue/api.dart';
@@ -31,11 +34,50 @@ class _ItemState extends State<Item> {
       'controller': TextEditingController(),
     },
   ];
+  
+  final ImagePicker picker = ImagePicker();
+  final TextEditingController filter = TextEditingController();
+
+  List<XFile>? media;
 
   List display = [];
   int rows = 10, current = 1;
 
   bool isAdd = false;
+
+  Map
+  adds = {
+    'original_price': null,
+    'description': null,
+    'weight': null,
+    'item_name': null,
+    'item_status': 'NORMAL',
+    'logistic_info': [],
+    'attribute_list': [],
+    'category_id': null,
+    'image': {
+      'image_id_list': [],
+    },
+    'seller_stock': [
+      {
+        'stock': null,
+      },
+    ],
+  },
+  
+  vars = {
+    //FIXME
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    filter.addListener(
+      () {
+        setState(() {});
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,13 +134,13 @@ class _ItemState extends State<Item> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Text(
-                        'Informasi Produk',
+                        'Informasi Barang',
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 20.0),
+                      const SizedBox(height: 16.0),
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
@@ -106,93 +148,238 @@ class _ItemState extends State<Item> {
                             spacing: 16.0,
                             children: [
                               labeledField(
-                                label: 'Nama Barang',
-                                hint: 'Masukkan Nama Barang',
-                              ),
-                              labeledField(
-                                label: 'Kategori',
-                                hint: 'Masukkan Kategori Barang',
-                              ),
-                              DropdownMenu(
-                                onSelected: (v) {
+                                onChanged: (v) {
                                   setState(
                                     () {
-                                      //TODO
+                                      adds['item_name'] = v;
                                     }
                                   );
                                 },
-                                hintText: 'Tipe Penyesuaian',
-                                inputDecorationTheme: InputDecorationThemeData(
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                    horizontal: 8.0,
-                                  ),
-                                  border: const OutlineInputBorder(),
-                                  constraints: BoxConstraints.tight(
-                                    const Size.fromHeight(37.0), //FIXME magic numbe
-                                  ),
-                                ),
-                                expandedInsets: EdgeInsets.zero,
-                                dropdownMenuEntries: const [
-                                  DropdownMenuEntry(
-                                    value: true,
-                                    label: 'Penambahan',
-                                  ),
-                                  DropdownMenuEntry(
-                                    value: false,
-                                    label: 'Pengurangan',
+                                label: 'Nama Barang',
+                                hint: 'Masukkan Nama Barang',
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 8.0,
+                                children: [
+                                  const Text('Kategori*'),
+                                  FutureBuilder(
+                                    future: fetchCategoryList(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final hierarchy = Hierarchy(snapshot.data!),
+                                  
+                                        parents = snapshot.data!
+                                        .map(
+                                          (e) {
+                                            return e['parent_category_id'];
+                                          }
+                                        )
+                                        .where(
+                                          (e) {
+                                            return e != null && (false || e != 0);
+                                          },
+                                        )
+                                        .toSet(),
+                                  
+                                        categories = List.from(
+                                          snapshot.data!.where(
+                                            (e) {
+                                              return e['display_category_name'].toLowerCase().startsWith(
+                                                filter.text.toLowerCase(),
+                                              )
+                                              as bool;
+                                            },
+                                          ),
+                                        )
+                                        .where(
+                                          (e) {
+                                            return !parents.contains(
+                                              e['category_id'],
+                                            );
+                                          },
+                                        )
+                                        .toList();
+                                        
+                                        return DropdownMenu(
+                                          onSelected: (v) {
+                                            setState(
+                                              () {
+                                                adds['category'] = v;
+                                              }
+                                            );
+                                          },
+                                          controller: filter,
+                                          menuHeight: 256.0,
+                                          hintText: 'Masukkan Kategori Barang',
+                                          textStyle: const TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          inputDecorationTheme: InputDecorationThemeData(
+                                            isDense: true,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              vertical: 12.0,
+                                              horizontal: 8.0,
+                                            ),
+                                            border: const OutlineInputBorder(),
+                                            constraints: BoxConstraints.tight(
+                                              const Size.fromHeight(40.0),
+                                            ),
+                                          ),
+                                          expandedInsets: EdgeInsets.zero,
+                                          dropdownMenuEntries: List.generate(
+                                            categories.length.clamp(0, 8),
+                                            (i) {
+                                              final category = categories[i];
+                                  
+                                              return DropdownMenuEntry(
+                                                value: category['category_id'],
+                                                label: category['display_category_name'],
+                                                labelWidget: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(category['display_category_name']),
+                                                    Text(
+                                                      hierarchy.get(category['category_id']),
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 12.0,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
+                                      else {
+                                        return const Text(
+                                          'Memuat..',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
                               ),
-                              /* Row( //TODO atribut
-                                spacing: 16.0,
+                              if (adds['category'] != null) Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 8.0,
                                 children: [
-                                  Expanded(
-                                    child: labeledField(
-                                      label: 'Berat',
-                                      hint: 'Masukkan Berat',
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: labeledField(
-                                      label: 'Warna',
-                                      hint: 'Warna',
-                                    ),
+                                  const Text('Atribut'),
+                                  FutureBuilder(
+                                    future: fetchAttributeTree(adds['category']),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final attributes = snapshot.data!;
+                                        
+                                        return Wrap(
+                                          spacing: 16.0,
+                                          runSpacing: 16.0,
+                                          children: List.generate(
+                                            attributes.length,
+                                            (i) {
+                                              final
+                                              attribute = attributes[i],
+                                              values = attribute['attribute_value_list'] ?? [];
+
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                spacing: 8.0,
+                                                children: [
+                                                  Text(
+                                                    '${
+                                                      attribute['multi_lang'][0]['value']
+                                                    }${
+                                                      attribute['mandatory'] ? '*' : ''
+                                                    }',
+                                                  ),
+                                                  DropdownMenu(
+                                                    onSelected: (v) {
+                                                      setState(
+                                                        () {
+                                                          adds['category_id'] = v;
+                                                        }
+                                                      );
+                                                    },
+                                                    menuHeight: 256.0,
+                                                    hintText: 'Masukkan ${attribute['multi_lang'][0]['value']}',
+                                                    textStyle: const TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight: FontWeight.normal,
+                                                    ),
+                                                    inputDecorationTheme: InputDecorationThemeData(
+                                                      isDense: true,
+                                                      contentPadding: const EdgeInsets.symmetric(
+                                                        vertical: 12.0,
+                                                        horizontal: 8.0,
+                                                      ),
+                                                      border: const OutlineInputBorder(),
+                                                      constraints: BoxConstraints.tight(
+                                                        const Size.fromHeight(40.0),
+                                                      ),
+                                                    ),
+                                                    expandedInsets: EdgeInsets.zero,
+                                                    dropdownMenuEntries: List.generate(
+                                                      values.length,
+                                                      (j) {
+                                                        final value = values[j];
+                                            
+                                                        return DropdownMenuEntry(
+                                                          value: value['value_id'],
+                                                          label: value['multi_lang'][0]['value'],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
+                                      else {
+                                        return const Text(
+                                          'Memuat..',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
                               ),
-                              Row(
-                                spacing: 16.0,
-                                children: [
-                                  Expanded(
-                                    child: labeledField(
-                                      label: 'Kategori',
-                                      hint: 'pilih category barang',
-                                      suffixIcon: Icons.keyboard_arrow_down_rounded,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: labeledField(
-                                      label: 'Brand',
-                                      hint: 'pilih brand',
-                                      suffixIcon: Icons.keyboard_arrow_down_rounded,
-                                    ),
-                                  ),
-                                ],
-                              ), */
-                              //FIXME variasi
+                              //TODO variasi
                               labeledField(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      adds['original_price'] = v;
+                                    }
+                                  );
+                                },
                                 label: 'Harga',
                                 hint: 'Masukkan Harga',
+                                numeric: true,
                               ),
                               labeledField(
-                                label: 'Minimum Pembelian',
-                                hint: 'Masukkan minimum pembelian',
-                              ),
-                              labeledField(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      adds['weight'] = v;
+                                    }
+                                  );
+                                },
                                 label: 'Berat',
-                                hint: 'Masukkan berat barang',
+                                hint: 'Masukkan Berat Barang',
+                                numeric: true,
                               ),
                             ],
                           ),
@@ -216,46 +403,31 @@ class _ItemState extends State<Item> {
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
+                          spacing: 16.0,
                           children: [
                             const Text(
-                              'Deskripsi Barang',
+                              'Deskripsi*',
                               style: TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 12.0),
-                            const Text(
-                              'Deskripsi Produk',
-                              style: TextStyle(
-                                color: Color(0xFF007BFF),
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 18.0),
                             Expanded(
                               child: TextField(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      adds['description'] = v;
+                                    }
+                                  );
+                                },
                                 expands: true,
                                 maxLines: null,
                                 minLines: null,
                                 textAlignVertical: TextAlignVertical.top,
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.all(14.0),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFD8D8D8),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFF007BFF),
-                                      width: 1.3,
-                                    ),
-                                  ),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.all(16.0),
+                                  border: OutlineInputBorder(),
                                 ),
                               ),
                             ),
@@ -272,36 +444,31 @@ class _ItemState extends State<Item> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisSize: MainAxisSize.min,
+                        spacing: 16.0,
                         children: [
                           const Text(
-                            'Image Product',
+                            'Gambar Barang*',
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8.0),
                           const Text.rich(
                             TextSpan(
                               children: [
                                 TextSpan(
-                                  text: 'Note : ',
+                                  text: 'Catatan : ',
                                   style: TextStyle(
                                     color: Color(0xFF007BFF),
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
                                 TextSpan(
-                                  text: 'Format photos SVG, PNG, or JPG (Max size 4mb)',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  text: 'Format JPG, JPEG, atau PNG (Ukuran maksimal 10MB)',
                                 ),
                               ],
                             ),
-                            style: TextStyle(fontSize: 13.0),
                           ),
-                          const SizedBox(height: 18.0),
                           Row(
                             spacing: 16.0,
                             children: List.generate(
@@ -309,25 +476,69 @@ class _ItemState extends State<Item> {
                               (i) {
                                 return Expanded(
                                   child: AspectRatio(
-                                    aspectRatio: 1.18,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      spacing: 10.0,
-                                      children: [
-                                        const Icon(
-                                          Icons.image_outlined,
-                                          color: Color(0xFF007BFF),
-                                          size: 28.0,
-                                        ),
-                                        Text(
-                                          'Photo ${i + 1}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF6A6A6A),
-                                            fontSize: 13.0,
-                                            fontWeight: FontWeight.w800,
+                                    aspectRatio: 1.0,
+                                    child: InkWell(
+                                      onTap: () async {
+                                        try {
+                                          final files = await picker.pickMultiImage();
+
+                                          setState(
+                                            () {
+                                              media = files;
+                                            }
+                                          );
+                                        }
+                                        catch (e) {
+                                          setState(
+                                            () {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Padding(
+                                                    padding: const EdgeInsets.all(4.0),
+                                                    child: Text('$e'), //FIXME
+                                                  ),
+                                                  duration: const Duration(seconds: 3),
+                                                ),
+                                              );
+                                            }
+                                          );
+                                        }
+                                      },
+                                      child: media?.asMap().containsKey(i) ?? false
+                                      ? Image.file(
+                                        File(media![i].path),
+                                        errorBuilder: (context, e, stackTrace) {
+                                          return const Center(
+                                            child: Icon(Icons.warning_amber),
+                                          );
+                                        },
+                                      )
+                                      : Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0xFF6A6A6A),
                                           ),
+                                          borderRadius: BorderRadius.circular(12.0),
                                         ),
-                                      ],
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          spacing: 8.0,
+                                          children: [
+                                            const Icon(
+                                              Icons.image_outlined,
+                                              color: Color(0xFF007BFF),
+                                              size: 28.0,
+                                            ),
+                                            Text(
+                                              'Gambar ${i + 1}',
+                                              style: const TextStyle(
+                                                color: Color(0xFF6A6A6A),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -355,7 +566,7 @@ class _ItemState extends State<Item> {
                             ),
                           ),
                           onPressed: () {},
-                          child: const Text('Save Product'),
+                          child: const Text('Simpan Barang'),
                         ),
                       ),
                     ),
@@ -495,6 +706,14 @@ class _ItemState extends State<Item> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final List items = snapshot.data!;
+                  
+                  items.sort(
+                    (a, b) {
+                      return a['item_name'].toLowerCase().compareTo(
+                        b['item_name'].toLowerCase(),
+                      );
+                    },
+                  );
 
                   display = List.from(
                     items.where(
@@ -734,9 +953,11 @@ class _ItemState extends State<Item> {
                                               flex: 1,
                                               child: Text(
                                                 item['price_info']?[0]['current_price'] != null
-                                                ? NumberFormat.decimalPattern('id_ID')
-                                                .format(item['price_info']?[0]['current_price'] ?? 0)
-                                                .toString()
+                                                ? 'Rp. ${
+                                                  NumberFormat.decimalPattern('id_ID')
+                                                  .format(item['price_info']?[0]['current_price'] ?? 0)
+                                                  .toString()
+                                                }'
                                                 : '',
                                               ),
                                             ),
@@ -959,56 +1180,62 @@ class _ItemState extends State<Item> {
   }
 }
 
-Widget labeledField({required String label, required String hint, IconData? suffixIcon}) {
+Widget labeledField(
+  {
+    Function(String)? onChanged,
+    required String label,
+    required String hint,
+    bool numeric = false
+  }
+) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     spacing: 8.0,
     children: [
-      Text(
-        label,
-        style: const TextStyle(
-          fontSize: 14.0,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      SizedBox(
-        height: 52.0,
-        child: TextField(
-          readOnly: suffixIcon != null,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(
-              color: Color(0xFF878787),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w400,
-            ),
-            suffixIcon: suffixIcon == null
-            ? null
-            : Icon(
-              suffixIcon,
-              color: const Color(0xFFA7A7A7),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 16.0,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(
-                color: Color(0xFFD8D8D8),
-                width: 1.4,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(
-                color: Color(0xFF007BFF),
-                width: 1.4,
-              ),
-            ),
+      Text('$label*'),
+      TextField(
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          hintText: hint,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12.0,
+            horizontal: 8.0,
           ),
+          border: const OutlineInputBorder(),
         ),
+        keyboardType: numeric
+        ? TextInputType.number
+        : null,
+        inputFormatters: numeric
+        ? [FilteringTextInputFormatter.digitsOnly]
+        : null,
       ),
     ],
   );
+}
+
+class Hierarchy {
+  final Map maps;
+
+  Hierarchy(List categories): maps = {
+    for (final e in categories) e['category_id']: e,
+  };
+
+  String get(int id) {
+    final path = [];
+    int? current = id;
+
+    while (current != null && maps.containsKey(current)) {
+      final category = maps[current]!;
+      path.add(category['display_category_name']);
+
+      final parent = category['parent_category_id'];
+      if (parent == 0) break;
+
+      current = parent;
+    }
+
+    return path.reversed.join(' > ');
+  }
 }

@@ -207,6 +207,14 @@ class _DashboardState extends State<Dashboard> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final List items = snapshot.data!;
+
+                              items.sort(
+                                (a, b) {
+                                  return a['item_name'].toLowerCase().compareTo(
+                                    b['item_name'].toLowerCase(),
+                                  );
+                                },
+                              );
                         
                               return StreamBuilder(
                                 stream: sb
@@ -433,9 +441,13 @@ class _DashboardState extends State<Dashboard> {
                                   Expanded(
                                     flex: 1,
                                     child: Text(
-                                      NumberFormat.decimalPattern('id_ID')
-                                      .format(order['total_amount'])
-                                      .toString(),
+                                      order['total_amount'] != 0
+                                      ? 'Rp. ${
+                                        NumberFormat.decimalPattern('id_ID')
+                                        .format(order['total_amount'])
+                                        .toString()
+                                      }'
+                                      : '-',
                                     ),
                                   ),
                                   Expanded(

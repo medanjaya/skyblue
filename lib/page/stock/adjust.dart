@@ -29,8 +29,7 @@ class _AdjustState extends State<Adjust> {
   bool? operator;
   
   Map select = {};
-  bool isExpand = false;
-
+  
   @override
   Widget build(BuildContext context) {
     final sb = Supabase.instance.client;
@@ -194,6 +193,14 @@ class _AdjustState extends State<Adjust> {
                                       );
                                     },
                                   ),
+                                );
+
+                                items.sort(
+                                  (a, b) {
+                                    return a['item_name'].toLowerCase().compareTo(
+                                      b['item_name'].toLowerCase(),
+                                    );
+                                  },
                                 );
 
                                 if (items.isNotEmpty) {
@@ -639,7 +646,7 @@ class _AdjustState extends State<Adjust> {
                                             builder: (context, snapshot) {
                                               if (snapshot.hasData) {
                                                 final List items = snapshot.data!;
-                                                
+
                                                 return Text(
                                                   items[
                                                     items.indexWhere(

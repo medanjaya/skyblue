@@ -128,6 +128,14 @@ class _DataState extends State<Data> {
                 if (snapshot.hasData) {
                   final List items = snapshot.data!;
 
+                  items.sort(
+                    (a, b) {
+                      return a['item_name'].toLowerCase().compareTo(
+                        b['item_name'].toLowerCase(),
+                      );
+                    },
+                  );
+
                   display = List.from(
                     items.where(
                       (e) {
@@ -362,9 +370,11 @@ class _DataState extends State<Data> {
                                               flex: 1,
                                               child: Text(
                                                 item['price_info']?[0]['current_price'] != null
-                                                ? NumberFormat.decimalPattern('id_ID')
-                                                .format(item['price_info']?[0]['current_price'] ?? 0)
-                                                .toString()
+                                                ? 'Rp. ${
+                                                  NumberFormat.decimalPattern('id_ID')
+                                                  .format(item['price_info']?[0]['current_price'] ?? 0)
+                                                  .toString()
+                                                }'
                                                 : 'Variatif',
                                               ),
                                             ),

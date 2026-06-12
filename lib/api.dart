@@ -468,6 +468,50 @@ Future fetchCategoryList() async {
   );
 }
 
+Future fetchAttributeTree(int id) async {
+  final
+  prefs = await SharedPreferences.getInstance(),
+
+  partner = prefs.getString('partner') ?? '',
+  secret = prefs.getString('secret') ?? '',
+
+  path = '/api/v2/product/get_attribute_tree',
+  time = '${DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond}',
+  
+  token = prefs.getString('token') ?? '',
+  shop = prefs.getString('shop') ?? '',
+
+  hmac = Hmac(sha256, base64Decode(secret)),
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+
+  return refreshToken()
+  .then(
+    (r) {
+      return http.get(
+        Uri.https(
+          host,
+          path,
+          {
+            'partner_id': partner,
+            'timestamp': time,
+            'access_token': token,
+            'shop_id': shop,
+            'sign': sign.toString(),
+            'category_id_list': id.toString(),
+            'language': 'id',
+          },
+        ),
+      )
+      .then(
+        (r) {
+          //FIXME print(r.body);
+          return jsonDecode(r.body)['response']['list'][0]['attribute_tree'];
+        },
+      );
+    },
+  );
+}
+
 Future<void> updateStock(int id, int value) async {
   final
   prefs = await SharedPreferences.getInstance(),
