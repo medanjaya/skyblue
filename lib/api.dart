@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 
 final String host = 'openplatform.sandbox.test-stable.shopee.sg';
+final SupabaseClient sb = Supabase.instance.client;
 
 bool isAuth = false;
 
@@ -623,7 +626,10 @@ Future<void> addItem(Map item) async {
   shop = prefs.getString('shop') ?? '',
 
   hmac = Hmac(sha256, base64Decode(secret)),
-  sign = hmac.convert(utf8.encode(partner + path + time + token + shop));
+  sign = hmac.convert(utf8.encode(partner + path + time + token + shop)),
+  
+  minimum = item['minimum'];
+  item.remove('minimum');
 
   refreshToken()
   .then(
@@ -644,7 +650,13 @@ Future<void> addItem(Map item) async {
       )
       .then(
         (r) {
-          print(r.body);
+          //FIXME print(r.body);
+          sb.from('stock').insert(
+            {
+              'id': jsonDecode(r.body)['response']['item_id'],
+              'minimum': minimum,
+            },
+          );
         },
       );
     },

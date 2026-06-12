@@ -42,6 +42,7 @@ class _CreateState extends State<Create> {
         'stock': 0,
       },
     ],
+    'minimum': null,
   },
   
   vars = {
@@ -249,7 +250,7 @@ class _CreateState extends State<Create> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 spacing: 8.0,
                                 children: [
-                                  const Text('Atribut'),
+                                  const Text('Atribut'), //TODO atribut belum implementasi
                                   FutureBuilder(
                                     future: fetchAttributeTree(adds['category_id']),
                                     builder: (context, snapshot) {
@@ -345,6 +346,18 @@ class _CreateState extends State<Create> {
                                 },
                                 label: 'Harga',
                                 hint: 'Masukkan Harga',
+                                numeric: true,
+                              ),
+                              labeledField(
+                                onChanged: (v) {
+                                  setState(
+                                    () {
+                                      adds['minimum'] = int.parse(v);
+                                    }
+                                  );
+                                },
+                                label: 'Stok Minimum',
+                                hint: 'Masukkan Stok Minimum',
                                 numeric: true,
                               ),
                               labeledField(
@@ -628,8 +641,8 @@ class _CreateState extends State<Create> {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            onPressed: () { //TODO
-                              print(adds);
+                            onPressed: () {
+                              //TODO reset
                             },
                             child: const Text('Reset'),
                           ),
@@ -646,7 +659,26 @@ class _CreateState extends State<Create> {
                               ),
                             ),
                             onPressed: () {
-                              addItem(adds);
+                              addItem(adds)
+                              .then(
+                                (r) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Padding(
+                                        padding: EdgeInsets.all(4.0),
+                                        child: Text('Barang berhasil ditambahkan.'),
+                                      ),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  )
+                                  .closed
+                                  .then(
+                                    (r) {
+                                      IsCreate(false).dispatch(context);
+                                    }
+                                  );
+                                }
+                              );
                             },
                             child: const Text('Simpan Barang'),
                           ),
