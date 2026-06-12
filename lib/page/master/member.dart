@@ -202,23 +202,23 @@ class _MemberState extends State<Member> {
                                 children: [
                                   Expanded(
                                     flex: 1,
-                                    child: Text('AKSI'),
+                                    child: Text('AKSI', style: TextStyle(fontWeight: FontWeight.w600),),
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: Text('NAMA'),
+                                    child: Text('NAMA', style: TextStyle(fontWeight: FontWeight.w600),),
                                   ),
                                   Expanded(
                                     flex: 2,
-                                    child: Text('EMAIL'),
+                                    child: Text('EMAIL', style: TextStyle(fontWeight: FontWeight.w600),),
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: Text('ROLE'),
+                                    child: Text('ROLE', style: TextStyle(fontWeight: FontWeight.w600),),
                                   ),
                                   Expanded(
                                     flex: 1,
-                                    child: Text('STATUS'),
+                                    child: Text('STATUS', style: TextStyle(fontWeight: FontWeight.w600),),
                                   ),
                                 ],
                               ),
@@ -234,19 +234,40 @@ class _MemberState extends State<Member> {
                                     children: [
                                       Expanded(
                                         flex: 1,
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(
-                                              () {
-                                                select = user;
-                                                isAdd = true;
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(
+                                                  () {
+                                                    select = user;
+                                                    isAdd = true;
+                                                  },
+                                                );
                                               },
-                                            );
-                                          },
-                                          icon: const Icon(
-                                            Icons.edit_note,
-                                            color: Colors.red,
-                                          ), 
+                                              style: IconButton.styleFrom(
+                                                foregroundColor: Colors.red,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8)
+                                                ),
+                                              ),
+                                              icon: const Icon(
+                                                Icons.edit_note,
+                                                size: 26,
+                                                color: Colors.red,
+                                              ), 
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+
+                                              },
+                                              icon: Icon(
+                                                user['is_active'] == true ? Icons.person_outline : Icons.person_off_outlined,
+
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       Expanded(
@@ -273,7 +294,7 @@ class _MemberState extends State<Member> {
                                             decoration: BoxDecoration(
                                               color: user['is_active']
                                               ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
-                                              : const Color.fromARGB(120, 255, 0, 0).withValues(alpha: 0.1),
+                                              : Colors.black12.withOpacity(0.1),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                             child: Row(
@@ -284,15 +305,16 @@ class _MemberState extends State<Member> {
                                                   Icons.circle,
                                                   color:
                                                   user['is_active'] == true
-                                                  ? Colors.green
-                                                  : Colors.red,
+                                                  ? Colors.green 
+                                                  : Colors.grey,
                                                   size: 10,
                                                 ),
                                                 Text(user['is_active'] == true ? 'Active' : 'Inactive', style: TextStyle(
                                                   color:
                                                   user['is_active'] == true
                                                   ? Colors.green
-                                                  : Colors.red,
+                                                  : Colors.grey,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                                 ),
                                               ],  

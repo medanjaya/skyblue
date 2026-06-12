@@ -48,17 +48,44 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
-        useMaterial3: false,
+        useMaterial3: true,
         brightness: Brightness.light,
         primaryColor: Colors.white,
         textTheme: Typography.blackCupertino,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF007BFF),
+          brightness: Brightness.light,
+          surface: Colors.white,
+        ),
+        listTileTheme: const ListTileThemeData(
+          dense: true,
+          visualDensity: VisualDensity.standard,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+          )
+        ),
       ),
 
       darkTheme: ThemeData(
-        useMaterial3: false,
+        useMaterial3: true,
         brightness: Brightness.dark,
         primaryColor: Colors.black,
         textTheme: Typography.whiteCupertino,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF007BFF),
+          brightness: Brightness.dark,
+          surface: Colors.black,        // ← warna background sidebar dark mode
+        ),
+        listTileTheme: const ListTileThemeData(
+          dense: true,
+          visualDensity: VisualDensity.standard,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            color: Colors.black,
+          )
+        ),
       ),
 
       themeMode: theme.mode,

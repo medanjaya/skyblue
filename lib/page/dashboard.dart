@@ -163,7 +163,7 @@ class _DashboardState extends State<Dashboard> {
                                         Expanded(
                                           flex: 1,
                                           child: Text(
-                                            DateFormat('dd/MM/yyyy hh:mm:ss').format(
+                                            DateFormat('dd MMM yyyy hh:mm:ss').format(
                                               DateTime.parse(user['last_signed_at']),
                                             ),
                                           ),
@@ -429,7 +429,7 @@ class _DashboardState extends State<Dashboard> {
                                   Expanded(
                                     flex: 1,
                                     child: Text(
-                                      DateFormat('dd/MM/yyyy hh:mm').format(
+                                      DateFormat('dd MMM yyyy hh:mm').format(
                                         DateTime.fromMillisecondsSinceEpoch(
                                           order['create_time'] * Duration.millisecondsPerSecond,
                                         ),
