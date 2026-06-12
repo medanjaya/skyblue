@@ -487,7 +487,7 @@ class _DashboardState extends State<Dashboard> {
                                           vertical: 4.0,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: getOrderStatusColor(order['order_status']).withOpacity(0.1),
+                                          color: getOrderStatusColor(order['order_status']).withValues(alpha: 0.1),
                                           
                                           borderRadius: BorderRadius.circular(12.0),
                                         ),

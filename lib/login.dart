@@ -168,6 +168,7 @@ class _LoginState extends State<Login> {
                                   },
                                 )
                                 .eq('id', r.user!.id)
+                                .select()
                                 .then(
                                   (r) async {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -177,17 +178,7 @@ class _LoginState extends State<Login> {
                                             vertical: 4.0,
                                           ),
                                           child: Text(
-                                            'Selamat datang kembali, ${
-                                              await Supabase.instance.client
-                                              .from('user')
-                                              .select()
-                                              .eq('id', r.user!.id)
-                                              .then(
-                                                (r) {
-                                                  return r.first['name'];
-                                                }
-                                              )
-                                            }.',
+                                            'Selamat datang kembali, ${r.first['name']}.',
                                           ),
                                         ),
                                         duration: const Duration(

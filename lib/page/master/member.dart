@@ -270,8 +270,33 @@ class _MemberState extends State<Member> {
                                               ), 
                                             ),
                                             IconButton(
-                                              onPressed: () {
-
+                                              onPressed: () async {
+                                                await sb.from('user').update(
+                                                  {
+                                                    'is_active': !user['is_active'],
+                                                  },
+                                                )
+                                                .eq('id', user['id'])
+                                                .select()
+                                                .then(
+                                                  (r) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(
+                                                        content: Padding(
+                                                          padding: const EdgeInsets.all(4.0),
+                                                          child: Text(
+                                                            'User ${
+                                                              r.first['is_active']
+                                                              ? 'diaktifkan'
+                                                              : 'dinonaktifkan'
+                                                            }.',
+                                                          ),
+                                                        ),
+                                                        duration: const Duration(seconds: 3),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
                                               },
                                               style: IconButton.styleFrom(
                                                 foregroundColor: Colors.grey,
@@ -280,8 +305,9 @@ class _MemberState extends State<Member> {
                                                 ),
                                               ),
                                               icon: Icon(
-                                                user['is_active'] == true ? Icons.person_outline : Icons.person_off_outlined,
-
+                                                user['is_active']
+                                                ? Icons.person_outline
+                                                : Icons.person_off_outlined,
                                               ),
                                             ),
                                           ],
@@ -334,7 +360,7 @@ class _MemberState extends State<Member> {
                                             decoration: BoxDecoration(
                                               color: user['is_active']
                                               ? const Color.fromARGB(120, 0, 128, 0).withValues(alpha: 0.1)
-                                              : Colors.black12.withOpacity(0.1),
+                                              : Colors.black12.withValues(alpha: 0.1),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                             child: Row(

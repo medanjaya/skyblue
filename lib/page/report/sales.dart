@@ -191,7 +191,7 @@ class _SalesState extends State<Sales> {
                                       //TODO
                                     },
                                     icon: const Icon(Icons.download),
-                                    label: const Text("Export CSV"),
+                                    label: const Text('Export CSV'),
                                   ),
                                 ],
                               ),
@@ -263,7 +263,7 @@ class _SalesState extends State<Sales> {
                                       children: [
                                         Text('Total Order'),
                                         SizedBox(height: 8),
-                                        Text("15.201", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                                        Text('15.201', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                                         SizedBox(height: 8),
                                         Row(
                                           children: [
@@ -574,7 +574,7 @@ class _SalesState extends State<Sales> {
                                                       vertical: 4.0,
                                                     ),
                                                     decoration: BoxDecoration(
-                                                      color: getOrderStatusColor(order['order_status']).withOpacity(0.1),
+                                                      color: getOrderStatusColor(order['order_status']).withValues(alpha: 0.1),
                                                       borderRadius: BorderRadius.circular(10),
                                                     ),
                                                     child: Row(
@@ -585,7 +585,6 @@ class _SalesState extends State<Sales> {
                                                           Icons.circle,
                                                           size: 10,
                                                           color: getOrderStatusColor(order['order_status']),
-
                                                         ),
                                                         Text(
                                                           order['order_status'],
@@ -595,14 +594,20 @@ class _SalesState extends State<Sales> {
                                                           ),
                                                         ),
                                                       ],
-                                                    ))),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                               Expanded(
                                                 flex: 1,
                                                 child: Text(
-                                                  NumberFormat.decimalPattern('id_ID')
-                                                  .format(order['total_amount'])
-                                                  .toString(),
+                                                  order['total_amount'] != 0
+                                                  ? 'Rp. ${
+                                                    NumberFormat.decimalPattern('id_ID')
+                                                    .format(order['total_amount'])
+                                                    .toString()
+                                                  }'
+                                                  : '-',
                                                 ),
                                               ),
                                             ],

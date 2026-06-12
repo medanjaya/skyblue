@@ -424,8 +424,8 @@ class _AdjustState extends State<Adjust> {
                                           ),
                                           border: OutlineInputBorder(),
                                         ),
-                                        maxLines: 3,
-                                        minLines: 3,
+                                        maxLines: 2,
+                                        minLines: 2,
                                       ),
                                     ],
                                   ),
@@ -484,7 +484,7 @@ class _AdjustState extends State<Adjust> {
                                 },
                               );
                             },
-                            child: const Text('Simpan'), //TODO overlay konfirmasi
+                            child: const Text('Simpan'),
                           ),
                         ],
                       ),
