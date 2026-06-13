@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class Sell extends StatefulWidget {
   const Sell({super.key});
@@ -127,25 +126,6 @@ class _SellState extends State<Sell> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8.0,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    spacing: 8.0,
-                    children: [
-                      const Icon(Icons.calendar_month_outlined),
-                      Text( DateFormat('dd MMM yyyy').format(DateTime.now())),
-                    ],
-                  ),
-                  Row(
-                    spacing: 8.0,
-                    children: [
-                      const Icon(Icons.access_time_outlined),
-                      Text( DateFormat('HH:mm:ss').format(DateTime.now())),
-                    ],
-                  ),
-                ],
-              ),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
