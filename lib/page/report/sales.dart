@@ -102,7 +102,7 @@ class _SalesState extends State<Sales> {
         if (snapshot.hasData) {
           final List sellers = snapshot.data!;
           
-          for (final Map e in sellers) {
+          for (final e in sellers) {
             e.addEntries(
               {'source': 'shopee'}.entries
             );
@@ -519,7 +519,7 @@ class _SalesState extends State<Sales> {
                                             children: [
                                               Expanded(
                                                 flex: 1,
-                                                child: Text(order['order_sn']),
+                                                child: Text(order['order_sn'].toString()),
                                               ),
                                               Expanded(
                                                 flex: 1,
